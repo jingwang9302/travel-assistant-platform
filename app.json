@@ -17,13 +17,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier":"com.rnproject.travelAssistantPlatform",
+      "config": {
+        "googleMapsApiKey": "AIzaSyC4pPKjHm_73tLXB5Huj4SdL_4AJsVpueg"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package":"com.rnproject.travelAssistantPlatform",
+      "config":{
+        "googleMaps":{
+          "apiKey":"AIzaSyCOTRWgZ89Ks7PEye6sYexJCKqevRlUtKs"
+          }
+        }
     },
     "web": {
       "favicon": "./assets/favicon.png"
