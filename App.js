@@ -1,16 +1,18 @@
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 
-import MapScreen from "./src/screens/MapScreen";
+import SearchScreen from "./src/screens/SearchScreen";
+import MyMapView from "./src/components/MapView";
 
 const navigator = createStackNavigator(
   {
-    Map: MapScreen,
+    Search: SearchScreen,
+    Map: MyMapView,
   },
   {
-    initialRouteName: "Map",
+    initialRouteName: "Search",
     defaultNavigationOptions: {
-      title: "Map",
+      title: "Search",
     },
   }
 );
