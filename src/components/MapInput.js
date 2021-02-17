@@ -3,6 +3,15 @@ import { StyleSheet } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { config } from "../../config";
 
+const homePlace = {
+  description: "Home",
+  geometry: { location: { lat: 48.8152937, lng: 2.4597668 } },
+};
+const workPlace = {
+  description: "Work",
+  geometry: { location: { lat: 48.8496818, lng: 2.2940881 } },
+};
+
 const MapInput = () => {
   return (
     <GooglePlacesAutocomplete
@@ -19,6 +28,7 @@ const MapInput = () => {
       }}
       nearbyPlacesAPI="GooglePlacesSearch"
       debounce={200}
+      predefinedPlaces={[homePlace, workPlace]}
     />
   );
 };
