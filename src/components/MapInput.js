@@ -29,6 +29,8 @@ const MapInput = () => {
       nearbyPlacesAPI="GooglePlacesSearch"
       debounce={200}
       predefinedPlaces={[homePlace, workPlace]}
+      currentLocation={true}
+      currentLocationLabel="Current location"
     />
   );
 };
