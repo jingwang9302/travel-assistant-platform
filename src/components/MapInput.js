@@ -15,7 +15,8 @@ const workPlace = {
 const MapInput = () => {
   return (
     <GooglePlacesAutocomplete
-      placeholder="Search"
+      placeholder="Enter Location"
+      styles={styles}
       minLength={2}
       autoFocus={true}
       onPress={(data, details = null) => {
