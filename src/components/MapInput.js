@@ -41,8 +41,8 @@ const MapInput = ({ setRegion, setMarker }) => {
           setRegion({
             latitude: location.lat,
             longitude: location.lng,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
           });
           setMarker({
             position: {
@@ -57,8 +57,8 @@ const MapInput = ({ setRegion, setMarker }) => {
           setRegion({
             latitude: details.geometry.location.lat,
             longitude: details.geometry.location.lng,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
           });
           setMarker({
             position: {
