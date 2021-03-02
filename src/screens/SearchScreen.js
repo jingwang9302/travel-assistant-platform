@@ -15,14 +15,19 @@ import {
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import MapInput from "../components/MapInput";
 
+const { height, width } = Dimensions.get("window");
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
+
 const SearchScreen = () => {
   // replace the initial to user's current location
   const initMapState = {
     region: {
       latitude: 37.78825,
       longitude: -122.4324,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
     },
     marker: {
       position: { latitude: 37.78825, longitude: -122.4324 },

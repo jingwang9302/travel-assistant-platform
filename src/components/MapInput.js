@@ -1,8 +1,19 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { config } from "../../config";
 import { Client } from "@googlemaps/google-maps-services-js";
+
+const { height, width } = Dimensions.get("window");
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
 const homePlace = {
   description: "Home",
