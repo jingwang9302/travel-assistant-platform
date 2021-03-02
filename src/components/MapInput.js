@@ -21,43 +21,41 @@ const MapInput = ({ setRegion, setMarker }) => {
       styles={styles}
       minLength={2}
       autoFocus={true}
+      fetchDetails={true}
       onPress={(data, details = null) => {
         // 'details' is provided when fetchDetails = true
 
-        if (data.place_id) {
-          client
-            .placeDetails({
-              params: {
-                place_id: data.place_id,
-                key: config.PLACES_API_KEY,
-                fields: ["geometry"],
-              },
-              timeout: 1000, // milliseconds
-            })
-            .then((r) => {
-              const location = r.data.result.geometry.location;
-              setRegion({
-                latitude: location.lat,
-                longitude: location.lng,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              });
-              setMarker({ latitude: location.lat, longitude: location.lng });
-            })
-            .catch((e) => {
-              console.log(e);
-            });
-        } else {
-          console.log(data);
+        if (details.place_id) {
+          const location = details.geometry.location;
           setRegion({
-            latitude: data.geometry.location.lat,
-            longitude: data.geometry.location.lng,
+            latitude: location.lat,
+            longitude: location.lng,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           });
           setMarker({
-            latitude: data.geometry.location.lat,
-            longitude: data.geometry.location.lng,
+            position: {
+              latitude: details.geometry.location.lat,
+              longitude: details.geometry.location.lng,
+            },
+            title: "new Title",
+            address: "new address",
+          });
+        } else {
+          console.log(details);
+          setRegion({
+            latitude: details.geometry.location.lat,
+            longitude: details.geometry.location.lng,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          });
+          setMarker({
+            position: {
+              latitude: details.geometry.location.lat,
+              longitude: details.geometry.location.lng,
+            },
+            title: "new Title",
+            address: "new address",
           });
         }
       }}
