@@ -38,8 +38,8 @@ const MapInput = ({ setRegion, setMarker }) => {
               latitude: details.geometry.location.lat,
               longitude: details.geometry.location.lng,
             },
-            title: "new Title",
-            address: "new address",
+            title: data.structured_formatting.main_text,
+            address: data.structured_formatting.secondary_text,
           });
         } else {
           console.log(details);
@@ -54,8 +54,8 @@ const MapInput = ({ setRegion, setMarker }) => {
               latitude: details.geometry.location.lat,
               longitude: details.geometry.location.lng,
             },
-            title: "new Title",
-            address: "new address",
+            title: details.description,
+            address: `Address: (${details.geometry.location.lat}, ${details.geometry.location.lng})`,
           });
         }
       }}
