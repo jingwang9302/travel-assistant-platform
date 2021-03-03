@@ -36,7 +36,9 @@ const MapInput = ({ setRegion, setMarker }) => {
 
         if (details.place_id) {
           const location = details.geometry.location;
-          const photoReference = details.photos[0].photo_reference;
+          const photoReference =
+            details.photos && details.photos[0].photo_reference;
+          console.log(details.name);
           setRegion({
             latitude: location.lat,
             longitude: location.lng,
