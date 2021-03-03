@@ -9,11 +9,14 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  TouchableHighlight,
+  Button,
   Platform,
   Alert,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import * as Permissions from "expo-permissions";
+import { withNavigation } from "react-navigation";
 import MapInput from "../components/MapInput";
 
 const { height, width } = Dimensions.get("window");
@@ -21,7 +24,8 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
-const SearchScreen = () => {
+const SearchScreen = ({ navigation }) => {
+  console.log(navigation);
   // replace the initial to user's current location
   const initMapState = {
     region: {
@@ -46,14 +50,7 @@ const SearchScreen = () => {
     console.log("On Region Change");
   };
 
-  const show = () => {
-    marker.showCallout();
-  };
-  const hide = () => {
-    marker.hideCallout();
-  };
-
-  const getLocation = async () => {
+  const getCurrentLocation = async () => {
     const { status } = await Permissions.getAsync(Permissions.LOCATION);
     if (status !== "granted") {
       const response = await Permissions.askAsync(Permissions.LOCATION);
@@ -77,8 +74,12 @@ const SearchScreen = () => {
   };
 
   useEffect(() => {
-    getLocation();
+    getCurrentLocation();
   }, []);
+
+  const handleClick = () => {
+    console.log("Click");
+  };
 
   return (
     <View>
@@ -89,28 +90,21 @@ const SearchScreen = () => {
         initialRegion={region}
         region={region}
         onPress={(e) => {
+          if (e.nativeEvent.action) return;
           setMarker(e.nativeEvent.coordinate);
         }}
+        // BUG: shuttered, onRegionChangeComplete will causing a continues scrolling
         // onRegionChange={onRegionChange}
       >
-        <Marker
-          coordinate={marker}
-          title={marker.title}
-          onPress={(e) => {
-            if (
-              e.nativeEvent.action === "marker-inside-overlay-press" ||
-              e.nativeEvent.action === "callout-inside-press"
-            ) {
-              return;
-            }
-
-            console.log("On Press callout");
-          }}
-        >
-          <Callout tooltip>
+        <MapView.Marker coordinate={marker} title={marker.title}>
+          <MapView.Callout
+            onPress={() => {
+              navigation.navigate("Result");
+            }}
+            tooltip
+          >
             <View style={styles.bubble}>
               <Text>{marker.title}</Text>
-
               {typeof marker.url === "string" && (
                 <Image
                   source={{
@@ -120,9 +114,8 @@ const SearchScreen = () => {
                 />
               )}
             </View>
-          </Callout>
-        </Marker>
-
+          </MapView.Callout>
+        </MapView.Marker>
         <MapInput setRegion={setRegion} setMarker={setMarker} />
       </MapView>
     </View>
