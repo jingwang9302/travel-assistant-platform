@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   TextInput,
@@ -13,6 +13,7 @@ import {
   Alert,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
+import * as Permissions from "expo-permissions";
 import MapInput from "../components/MapInput";
 
 const { height, width } = Dimensions.get("window");
@@ -30,7 +31,8 @@ const SearchScreen = () => {
       longitudeDelta: LONGITUDE_DELTA,
     },
     marker: {
-      position: { latitude: 37.78825, longitude: -122.4324 },
+      latitude: 37.78825,
+      longitude: -122.4324,
       title: "title",
       address: "Address",
       url: null,
@@ -51,6 +53,33 @@ const SearchScreen = () => {
     marker.hideCallout();
   };
 
+  const getLocation = async () => {
+    const { status } = await Permissions.getAsync(Permissions.LOCATION);
+    if (status !== "granted") {
+      const response = await Permissions.askAsync(Permissions.LOCATION);
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude, longitude } }) =>
+        setRegion({
+          latitude,
+          longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        }),
+      (error) => {
+        console.log("Error:", error);
+      }
+    );
+    return () => {
+      console.log("Location granted");
+    };
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
   return (
     <View>
       <MapView
@@ -59,10 +88,25 @@ const SearchScreen = () => {
         showsUserLocation={true}
         initialRegion={region}
         region={region}
-        onPress={(e) => setMarker({ position: e.nativeEvent.coordinate })}
+        onPress={(e) => {
+          setMarker(e.nativeEvent.coordinate);
+        }}
         // onRegionChange={onRegionChange}
       >
-        <Marker coordinate={marker.position} title={marker.title}>
+        <Marker
+          coordinate={marker}
+          title={marker.title}
+          onPress={(e) => {
+            if (
+              e.nativeEvent.action === "marker-inside-overlay-press" ||
+              e.nativeEvent.action === "callout-inside-press"
+            ) {
+              return;
+            }
+
+            console.log("On Press callout");
+          }}
+        >
           <Callout tooltip>
             <View style={styles.bubble}>
               <Text>{marker.title}</Text>

@@ -44,10 +44,8 @@ const MapInput = ({ setRegion, setMarker }) => {
             longitudeDelta: LONGITUDE_DELTA,
           });
           setMarker({
-            position: {
-              latitude: details.geometry.location.lat,
-              longitude: details.geometry.location.lng,
-            },
+            latitude: details.geometry.location.lat,
+            longitude: details.geometry.location.lng,
             title: details.name,
             address: details.formatted_address,
             url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`,
@@ -61,10 +59,8 @@ const MapInput = ({ setRegion, setMarker }) => {
             longitudeDelta: LONGITUDE_DELTA,
           });
           setMarker({
-            position: {
-              latitude: details.geometry.location.lat,
-              longitude: details.geometry.location.lng,
-            },
+            latitude: details.geometry.location.lat,
+            longitude: details.geometry.location.lng,
             title: details.description,
             address: `Address: (${details.geometry.location.lat}, ${details.geometry.location.lng})`,
           });
