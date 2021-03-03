@@ -33,6 +33,7 @@ const SearchScreen = () => {
       position: { latitude: 37.78825, longitude: -122.4324 },
       title: "title",
       address: "Address",
+      url: null,
     },
   };
   const [region, setRegion] = useState(initMapState.region);
@@ -55,41 +56,25 @@ const SearchScreen = () => {
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
-        showUserLocation={true}
+        showsUserLocation={true}
         initialRegion={region}
         region={region}
         onPress={(e) => setMarker({ position: e.nativeEvent.coordinate })}
-        onRegionChange={onRegionChange}
+        // onRegionChange={onRegionChange}
       >
-        <Marker coordinate={marker.position}>
-          <Callout
-            onPress={(e) => {
-              if (
-                e.nativeEvent.action === "marker-inside-overlay-press" ||
-                e.nativeEvent.action === "callout-inside-press"
-              ) {
-                return;
-              }
+        <Marker coordinate={marker.position} title={marker.title}>
+          <Callout tooltip>
+            <View style={styles.bubble}>
+              <Text>{marker.title}</Text>
 
-              console.log("On Press callout");
-            }}
-          >
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log("Show");
-                  marker.showCallout();
-                }}
-                style={[styles.bubble, styles.button]}
-              >
-                <Text>Show</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={{ hide }}
-                style={[styles.bubble, styles.button]}
-              >
-                <Text>Hide</Text>
-              </TouchableOpacity>
+              {typeof marker.url === "string" && (
+                <Image
+                  source={{
+                    uri: marker.url,
+                  }}
+                  style={{ height: 100, width: 200 }}
+                />
+              )}
             </View>
           </Callout>
         </Marker>
@@ -115,7 +100,7 @@ const styles = StyleSheet.create({
   },
   bubble: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.7)",
+    backgroundColor: "rgb(255,255,255)",
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 20,

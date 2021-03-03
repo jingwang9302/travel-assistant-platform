@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { config } from "../../config";
-import { Client } from "@googlemaps/google-maps-services-js";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -25,7 +24,6 @@ const workPlace = {
 };
 
 const MapInput = ({ setRegion, setMarker }) => {
-  const client = new Client({});
   return (
     <GooglePlacesAutocomplete
       placeholder="Enter Location"
@@ -38,6 +36,7 @@ const MapInput = ({ setRegion, setMarker }) => {
 
         if (details.place_id) {
           const location = details.geometry.location;
+          const photoReference = details.photos[0].photo_reference;
           setRegion({
             latitude: location.lat,
             longitude: location.lng,
@@ -49,8 +48,9 @@ const MapInput = ({ setRegion, setMarker }) => {
               latitude: details.geometry.location.lat,
               longitude: details.geometry.location.lng,
             },
-            title: data.structured_formatting.main_text,
-            address: data.structured_formatting.secondary_text,
+            title: details.name,
+            address: details.formatted_address,
+            url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`,
           });
         } else {
           console.log(details);
@@ -78,7 +78,7 @@ const MapInput = ({ setRegion, setMarker }) => {
       debounce={200}
       predefinedPlaces={[homePlace, workPlace]}
       currentLocation={true}
-      currentLocationLabel="Current location"
+      currentLocationLabel="Current Location"
     />
   );
 };
