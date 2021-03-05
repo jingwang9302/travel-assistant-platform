@@ -4,20 +4,13 @@ import {
   TextInput,
   View,
   StyleSheet,
-  ScrollView,
-  Animated,
   Dimensions,
   Image,
-  TouchableOpacity,
-  TouchableHighlight,
-  Button,
-  Platform,
-  Alert,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
-import * as Permissions from "expo-permissions";
 import { withNavigation } from "react-navigation";
 import MapInput from "../components/MapInput";
+import { useCurrentLocation } from "../hooks/useCurrentLocation";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -25,60 +18,28 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
 const SearchScreen = ({ navigation }) => {
-  console.log(navigation);
-  // replace the initial to user's current location
-  const initMapState = {
-    region: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    },
-    marker: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      title: "title",
-      address: "Address",
-      url: null,
-    },
-  };
-  const [region, setRegion] = useState(initMapState.region);
-  const [marker, setMarker] = useState(initMapState.marker);
-
-  const onRegionChange = (reg) => {
-    setRegion(reg);
-    console.log("On Region Change");
-  };
-
-  const getCurrentLocation = async () => {
-    const { status } = await Permissions.getAsync(Permissions.LOCATION);
-    if (status !== "granted") {
-      const response = await Permissions.askAsync(Permissions.LOCATION);
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) =>
-        setRegion({
-          latitude,
-          longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        }),
-      (error) => {
-        console.log("Error:", error);
-      }
+  let [region, setRegion] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const { currentLocation, loading, error } = useCurrentLocation();
+  if (!currentLocation || loading)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
     );
-    return () => {
-      console.log("Location granted");
-    };
-  };
 
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
+  if (error)
+    return (
+      <View>
+        <Text>Error loading data</Text>
+      </View>
+    );
 
-  const handleClick = () => {
-    console.log("Click");
+  const initRegion = {
+    latitude: currentLocation.latitude,
+    longitude: currentLocation.longitude,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
   };
 
   return (
@@ -87,36 +48,41 @@ const SearchScreen = ({ navigation }) => {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         showsUserLocation={true}
-        initialRegion={region}
-        region={region}
+        showsMyLocationButton={true}
+        initialRegion={initRegion}
+        region={region || initRegion}
         onPress={(e) => {
           if (e.nativeEvent.action) return;
           setMarker(e.nativeEvent.coordinate);
         }}
-        // BUG: shuttered, onRegionChangeComplete will causing a continues scrolling
-        // onRegionChange={onRegionChange}
       >
-        <MapView.Marker coordinate={marker} title={marker.title}>
-          <MapView.Callout
-            onPress={() => {
-              navigation.navigate("Result");
-            }}
-            tooltip
-          >
-            <View style={styles.bubble}>
-              <Text>{marker.title}</Text>
-              {typeof marker.url === "string" && (
-                <Image
-                  source={{
-                    uri: marker.url,
-                  }}
-                  style={{ height: 100, width: 200 }}
-                />
-              )}
-            </View>
-          </MapView.Callout>
-        </MapView.Marker>
-        <MapInput setRegion={setRegion} setMarker={setMarker} />
+        {marker && (
+          <Marker coordinate={marker} title={marker.title}>
+            <Callout
+              onPress={() => {
+                navigation.navigate("Result");
+              }}
+              tooltip
+            >
+              <View style={styles.bubble}>
+                <Text>{marker.title}</Text>
+                {typeof marker.url === "string" && (
+                  <Image
+                    source={{
+                      uri: marker.url,
+                    }}
+                    style={{ height: 100, width: 200 }}
+                  />
+                )}
+              </View>
+            </Callout>
+          </Marker>
+        )}
+        <MapInput
+          setRegion={setRegion}
+          setMarker={setMarker}
+          currentLocation={currentLocation}
+        />
       </MapView>
     </View>
   );
