@@ -2,18 +2,22 @@
 What: This is the drawer navigator of the entire application. 
       Every major portion of the application has its own wrapper. 
 */
-import { createDrawerNavigator } from 'react-navigation-drawer';
-import { createAppContainer } from 'react-navigation';
-import MapStack from './mapStack';
+import React from 'react';
+import {createDrawerNavigator} from "@react-navigation/drawer";
+
 import MessageStack from './messageStack';
+import MapStack from "./mapStack";
 
-const RootDrawerNavigator = createDrawerNavigator({
-    Map:{
-        screen:MapStack,
-    },
-    Messages:{
-        screen: MessageStack,
-    }
-});
+const AppDrawer = () => {
+    const Drawer = createDrawerNavigator();
 
-export default createAppContainer(RootDrawerNavigator);
+    return (
+        <Drawer.Navigator initialRouteName="Map">
+            <Drawer.Screen name="Map" component={MapStack} />
+            <Drawer.Screen name="Message" component={MessageStack} />
+        </Drawer.Navigator>
+    );
+
+}
+
+export default AppDrawer;
