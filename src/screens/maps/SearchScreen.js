@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import * as Permissions from "expo-permissions";
-import MapInput from "../components/MapInput";
+import MapInput from "../../components/MapInput";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
