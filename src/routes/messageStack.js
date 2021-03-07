@@ -4,7 +4,7 @@ Why: The whole application uses a drawer navigation. Each major portion of the a
 */
 import React from 'react';
 import {createStackNavigator} from "@react-navigation/stack";
-import MessageHomeScreen from "../src/screens/messages/MessageHomeScreen";
+import MessageHomeScreen from "../screens/messages/MessageHomeScreen";
 
 const MessageStack = () => {
   const Stack = createStackNavigator();

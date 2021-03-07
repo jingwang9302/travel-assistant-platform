@@ -5,7 +5,7 @@ Why: The whole application uses a drawer navigation. Each major portion of the a
 import React from 'react';
 import {createStackNavigator} from "@react-navigation/stack";
 
-import SearchScreen from "../src/screens/maps/SearchScreen";
+import SearchScreen from "../screens/maps/SearchScreen";
 
 const MapStack = () => {
     const Stack = createStackNavigator();
