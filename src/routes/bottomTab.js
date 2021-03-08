@@ -16,16 +16,21 @@ const AppBottomTab = () => {
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName, iconType;
 
-                    if (route.name === 'User') {
-                        iconName = 'user';
-                        iconType = 'antdesign';
-
-                    } else if (route.name === 'Map') {
-                        iconName = 'google-maps';
-                        iconType = 'material-community';
-                    } else if (route.name === 'Message') {
-                        iconName = 'message1';
-                        iconType = 'antdesign';
+                    switch (route.name) {
+                        case 'User':
+                            iconName = 'user';
+                            iconType = 'antdesign';
+                            break;
+                        case 'Map':
+                            iconName = 'google-maps';
+                            iconType = 'material-community';
+                            break;
+                        case 'Message':
+                            iconName = 'message1';
+                            iconType = 'antdesign';
+                            break;
+                        default:
+                            break;
                     }
 
                     return <Icon name={iconName} type={iconType} size={size} color={color} />;
@@ -35,9 +40,9 @@ const AppBottomTab = () => {
                 activeTintColor: 'tomato',
                 inactiveTintColor: 'gray',
             }}>
-            <Tab.Screen name="User" component={UserStack} />
             <Tab.Screen name="Map" component={MapStack} />
             <Tab.Screen name="Message" component={MessageStack} />
+            <Tab.Screen name="User" component={UserStack} />
         </Tab.Navigator>
     );
 
