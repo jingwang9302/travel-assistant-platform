@@ -9,7 +9,8 @@ export default (currentLocation) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const getSearchResult = (searchTerm) => {
-    const { latitude, longitude } = currentLocation;
+    const latitude = currentLocation.latitude;
+    const longitude = currentLocation.longitude;
     const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
     const location = `location=${latitude},${longitude}`;
     const radius = "&radius=2000";

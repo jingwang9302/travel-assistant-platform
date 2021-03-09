@@ -82,6 +82,13 @@ const SearchScreen = ({ navigation }) => {
           setRegion={setRegion}
           setMarker={setMarker}
           currentLocation={currentLocation}
+          //       "accuracy": 10,
+          //       "altitude": 6.025020599365234,
+          //       "altitudeAccuracy": 16,
+          //       "heading": 0,
+          //       "latitude": 37.40235756154861,
+          //       "longitude": -121.93245923157961,
+          //       "speed": 1.149999976158142,
         />
       </MapView>
     </View>

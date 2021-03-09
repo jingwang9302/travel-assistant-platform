@@ -20,10 +20,10 @@ const workPlace = {
 
 const MapInput = ({ setRegion, setMarker, currentLocation }) => {
   const [text, setText] = useState("");
-  const [getSearchResultApi, resultList, errorMessage] = useResults(
+  const [getSearchResultApi, searchResult, errorMessage] = useResults(
     currentLocation
   );
-  const searchResult = resultList.resultList.results;
+  const results = searchResult.resultList.results;
   return (
     <GooglePlacesAutocomplete
       placeholder="Enter Location"

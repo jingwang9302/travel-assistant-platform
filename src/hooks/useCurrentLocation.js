@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as Permissions from "expo-permissions";
+import * as Location from "expo-location";
 
 const useCurrentLocation = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -15,16 +16,10 @@ const useCurrentLocation = () => {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (data) => {
-        setCurrentLocation(data.coords);
-        setLoading(false);
-      },
-      (error) => {
-        setError(error);
-        setLoading(false);
-      }
-    );
+    let location = await Location.getCurrentPositionAsync({});
+    console.log(location);
+    setCurrentLocation(location.coords);
+    setLoading(false);
 
     return () => {
       console.log("Location granted");
