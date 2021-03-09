@@ -1,13 +1,10 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {connect, useDispatch} from "react-redux";
+import {connect} from "react-redux";
 import {Avatar, Card, Icon} from "react-native-elements";
-import {setLogout} from "../../redux/actions/user";
 import LoginAlertScreen from "./LoginAlertScreen";
 
-const ProfileScreen = ({navigation, userProfile}) => {
-
-    const dispatch = useDispatch();
+const ProfileScreen = ({userProfile}) => {
 
     if (!userProfile.isLogin) {
         return (
@@ -47,24 +44,10 @@ const ProfileScreen = ({navigation, userProfile}) => {
             </Card>
 
             <TouchableOpacity
-                style={styles.buttonStyle}
-                activeOpacity={0.5}
-                onPress={() => navigation.navigate('Friend')}
-                >
-                <Text style={styles.buttonTextStyle}>Friends</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.buttonStyle}
-                activeOpacity={0.5}
-                onPress={() => navigation.navigate('FavoritePlace')}
-            >
-                <Text style={styles.buttonTextStyle}>Favorite Places</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
                 style={styles.logoutButtonStyle}
                 activeOpacity={0.5}
-                onPress={()=>{dispatch(setLogout())}}>
-                <Text style={styles.buttonTextStyle}>Logout</Text>
+                onPress={()=>{alert('edit')}}>
+                <Text style={styles.buttonTextStyle}>Edit Profile</Text>
             </TouchableOpacity>
         </View>
 
