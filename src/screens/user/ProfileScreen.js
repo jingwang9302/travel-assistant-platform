@@ -3,6 +3,7 @@ import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect, useDispatch} from "react-redux";
 import {Avatar, Card, Icon} from "react-native-elements";
 import {setLogout} from "../../redux/actions/user";
+import LoginAlertScreen from "./LoginAlertScreen";
 
 const ProfileScreen = ({navigation, userProfile}) => {
 
@@ -10,26 +11,7 @@ const ProfileScreen = ({navigation, userProfile}) => {
 
     if (!userProfile.isLogin) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    backgroundColor: '#307ecc',
-                    justifyContent: 'center',
-                }}>
-                <Icon name={'login'} type={'material-community'} size={200} color={'white'}
-                      style={{
-                          alignSelf: 'center'
-                      }}/>
-                <Text style={styles.loginTextStyle}>
-                    Not Login?
-                </Text>
-                <TouchableOpacity
-                    style={styles.logoutButtonStyle}
-                    activeOpacity={0.5}
-                    onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.buttonTextStyle}>Please Login</Text>
-                </TouchableOpacity>
-            </View>
+            <LoginAlertScreen/>
         );
     }
 
