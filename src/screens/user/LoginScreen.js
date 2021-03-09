@@ -99,6 +99,23 @@ const LoginScreen = ({navigation}) => {
             });
     }
 
+    // Test only!!!!!!!
+    const simulateLogin = () =>{
+        const data = {
+            id:1,
+            email: 'xiaoning.zhao@sjsu.edu',
+            firstName: 'Xiaoning',
+            lastName: 'Zhao',
+            address: '123 Earth Ave, Solar, Universe',
+            phone: '555-555-5555'
+        }
+        dispatch(setLogin(true));
+        dispatch(setToken('fdafsdfafdafasdf'))
+        dispatch(setProfile(data));
+        navigation.goBack();
+    }
+
+
     return(
         <View style={styles.mainBody}>
             <ImageBackground
@@ -166,6 +183,14 @@ const LoginScreen = ({navigation}) => {
                                         {errorMessage}
                                     </Text>
                                 ) : null}
+                            </View>
+                            <View>
+                                <TouchableOpacity
+                                    style={styles.buttonStyle}
+                                    activeOpacity={0.5}
+                                    onPress={simulateLogin}>
+                                    <Text style={styles.buttonTextStyle}>模拟登录！测试用！</Text>
+                                </TouchableOpacity>
                             </View>
                             <View>
                                 <TouchableOpacity
