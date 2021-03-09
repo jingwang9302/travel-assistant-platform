@@ -20,7 +20,7 @@ const Loader = (props) => {
                         size="large"
                         style={styles.activityIndicator}
                     />
-                    <Text style={{ marginLeft: 10,color:"#FFF",marginTop:10 }} >{message}</Text>
+                    <Text style={{color:'black'}} >{message}</Text>
                 </View>
             </View>
         </Modal>

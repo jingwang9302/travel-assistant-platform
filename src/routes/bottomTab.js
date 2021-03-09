@@ -40,9 +40,10 @@ const AppBottomTab = () => {
                 activeTintColor: 'tomato',
                 inactiveTintColor: 'gray',
             }}>
+            <Tab.Screen name="User" component={UserStack} />
             <Tab.Screen name="Map" component={MapStack} />
             <Tab.Screen name="Message" component={MessageStack} />
-            <Tab.Screen name="User" component={UserStack} />
+
         </Tab.Navigator>
     );
 

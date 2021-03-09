@@ -18,7 +18,7 @@ const SplashScreen = ({navigation}) => {
         <View style={styles.container}>
             <ImageBackground
                 source={require('../../../assets/image/about.jpg') }
-                style={{flex: 1, resizeMode: 'cover', justifyContent: "center"}}
+                style={{flex: 1, resizeMode: 'cover', justifyContent: "center", alignItems: 'center',}}
             >
                 <ActivityIndicator
                     animating={animating}
@@ -26,7 +26,8 @@ const SplashScreen = ({navigation}) => {
                     size="large"
                     style={styles.activityIndicator}
                 />
-                <Text>Loading</Text>
+                <Text style={styles.title}>Welcome</Text>
+                <Text style={styles.subtitle}>Let's Travel Together</Text>
             </ImageBackground>
         </View>
     );
@@ -42,5 +43,15 @@ const styles = StyleSheet.create({
     activityIndicator: {
         alignItems: 'center',
         height: 80,
+    },
+    title: {
+        color: '#FFFFFF',
+        paddingVertical: 10,
+        fontSize: 30,
+    },
+    subtitle: {
+        color: '#FFFFFF',
+        paddingVertical: 10,
+        fontSize: 20,
     },
 });

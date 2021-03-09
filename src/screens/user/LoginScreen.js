@@ -11,22 +11,37 @@ import {
     KeyboardAvoidingView, ImageBackground,
 } from 'react-native';
 import axios from "axios";
+import {useDispatch} from "react-redux";
 
 import { LOGIN_URL, USER_SERVICE } from '../../config/urls';
 import Loader from "../../components/Loader";
+import {setLogin, setProfile, setToken} from "../../redux/actions/user";
+import {Icon, Input} from "react-native-elements";
 
 const LoginScreen = ({navigation}) => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const dispatch = useDispatch();
+
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     const passwordInputRef = createRef();
 
     const login = () =>{
+
+        setErrorMessage('');
+        if (!username) {
+            setErrorMessage('Please fill Email');
+            return;
+        }
+        if (!password) {
+            setErrorMessage('Please fill Password');
+            return;
+        }
+
         setLoading(true);
-        console.log('username: '+ username);
-        console.log('password: '+ password);
+
         axios({
             method: 'post',
             url: LOGIN_URL,
@@ -49,26 +64,22 @@ const LoginScreen = ({navigation}) => {
             }
         })
             .then(function (response) {
-                console.log(response);
                 const token = response.data.access_token;
-                console.log('token is: '+token);
-                // store.dispatch(setLogin(true));
-                // store.dispatch(setToken(token));
+                dispatch(setLogin(true));
+                dispatch(setToken(token));
                 fetchUserInfo(token);
-                // history.push('/product');
-                // message.success('Login Successful!');
                 setLoading(false);
+                navigation.goBack();
             })
             .catch(function (error) {
                 setLoading(false);
-
-                setErrorMessage(error.message);
-                console.log(error);
-                // if(error.response.data.message === null){
-                //     setErrorMessage('User does not exist');
-                // }else{
-                //     setErrorMessage(error.response.data.message);
-                // }
+                if(error.response.data.message === null){
+                    setErrorMessage(error.message);
+                }else{
+                    if(error.response.data.status === 401) {
+                        setErrorMessage('Incorrect Email or Password');
+                    }
+                }
             });
     }
 
@@ -81,8 +92,7 @@ const LoginScreen = ({navigation}) => {
             }
         })
             .then(function (response) {
-                console.log(response);
-                // store.dispatch(setProfile(response.data));
+                dispatch(setProfile(response.data));
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -106,21 +116,15 @@ const LoginScreen = ({navigation}) => {
                     <View>
                         <KeyboardAvoidingView enabled>
                             <View style={{alignItems: 'center'}}>
-                                <Image
-                                    source={require('../../../assets/splash.png')}
-                                    style={{
-                                        width: '50%',
-                                        height: 100,
-                                        resizeMode: 'contain',
-                                        margin: 30,
-                                    }}
-                                />
+                                <Text style={styles.title}>Welcome</Text>
                             </View>
                             <View style={styles.SectionStyle}>
-                                <TextInput
+                                <Input
                                     style={styles.inputStyle}
+                                    label={'Email Address'}
+                                    labelStyle={{color: 'white'}}
                                     onChangeText={(text) => setUsername(text)}
-                                    placeholder="Email"
+                                    placeholder="email@address.com"
                                     placeholderTextColor="#8b9cb5"
                                     autoCapitalize="none"
                                     keyboardType="email-address"
@@ -131,11 +135,16 @@ const LoginScreen = ({navigation}) => {
                                     }
                                     underlineColorAndroid="#f000"
                                     blurOnSubmit={false}
+                                    leftIcon={
+                                        <Icon name='email' size={24} type = 'material-community' color='white'/>
+                                    }
                                 />
                             </View>
                             <View style={styles.SectionStyle}>
-                                <TextInput
+                                <Input
                                     style={styles.inputStyle}
+                                    label={'Password'}
+                                    labelStyle={{color: 'white'}}
                                     onChangeText={(text) => setPassword(text)}
                                     placeholder="Password"
                                     placeholderTextColor="#8b9cb5"
@@ -146,19 +155,26 @@ const LoginScreen = ({navigation}) => {
                                     secureTextEntry={true}
                                     underlineColorAndroid="#f000"
                                     returnKeyType="next"
+                                    leftIcon={
+                                        <Icon name='lock' size={24} type = 'material-community' color='white'/>
+                                    }
                                 />
                             </View>
-                            {errorMessage !== '' ? (
-                                <Text style={styles.errorTextStyle}>
-                                    {errorMessage}
-                                </Text>
-                            ) : null}
-                            <TouchableOpacity
-                                style={styles.buttonStyle}
-                                activeOpacity={0.5}
-                                onPress={login}>
-                                <Text style={styles.buttonTextStyle}>LOGIN</Text>
-                            </TouchableOpacity>
+                            <View style={styles.SectionStyle}>
+                                {errorMessage !== '' ? (
+                                    <Text style={styles.errorTextStyle}>
+                                        {errorMessage}
+                                    </Text>
+                                ) : null}
+                            </View>
+                            <View>
+                                <TouchableOpacity
+                                    style={styles.buttonStyle}
+                                    activeOpacity={0.5}
+                                    onPress={login}>
+                                    <Text style={styles.buttonTextStyle}>LOGIN</Text>
+                                </TouchableOpacity>
+                            </View>
                             <Text
                                 style={styles.registerTextStyle}
                                 onPress={() => navigation.navigate('Register')}>
@@ -185,25 +201,31 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
         justifyContent: "center"
     },
+    title: {
+        color: '#FFFFFF',
+        paddingVertical: 10,
+        fontSize: 30,
+        paddingTop: 200,
+    },
     SectionStyle: {
         flexDirection: 'row',
         height: 40,
-        marginTop: 20,
+        marginTop: 30,
         marginLeft: 35,
         marginRight: 35,
         margin: 10,
     },
     buttonStyle: {
-        backgroundColor: '#7de24e',
+        backgroundColor: '#307016',
         borderWidth: 0,
         color: '#FFFFFF',
-        borderColor: '#7DE24E',
+        borderColor: '#307016',
         height: 40,
         alignItems: 'center',
         borderRadius: 10,
         marginLeft: 35,
         marginRight: 35,
-        marginTop: 20,
+        marginTop: 30,
         marginBottom: 25,
     },
     buttonTextStyle: {
@@ -216,15 +238,12 @@ const styles = StyleSheet.create({
         color: 'white',
         paddingLeft: 15,
         paddingRight: 15,
-        borderWidth: 1,
-        borderRadius: 10,
-        borderColor: 'white',
     },
     registerTextStyle: {
         color: '#FFFFFF',
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 15,
         alignSelf: 'center',
         padding: 10,
     },
