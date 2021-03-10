@@ -1,11 +1,9 @@
 import React, {createRef, useState} from 'react';
 import {
     StyleSheet,
-    TextInput,
     View,
     Text,
     ScrollView,
-    Image,
     Keyboard,
     TouchableOpacity,
     KeyboardAvoidingView, ImageBackground,
@@ -13,10 +11,11 @@ import {
 import axios from "axios";
 import {useDispatch} from "react-redux";
 
-import { LOGIN_URL, USER_SERVICE } from '../../config/urls';
+import {LOGIN_URL, NOTIFICATION_SERVICE, USER_SERVICE} from '../../config/urls';
 import Loader from "../../components/Loader";
 import {setLogin, setProfile, setToken} from "../../redux/actions/user";
 import {Icon, Input} from "react-native-elements";
+import {setNotifications} from "../../redux/actions/notification";
 
 const LoginScreen = ({navigation}) => {
     const dispatch = useDispatch();
@@ -78,6 +77,8 @@ const LoginScreen = ({navigation}) => {
                 }else{
                     if(error.response.data.status === 401) {
                         setErrorMessage('Incorrect Email or Password');
+                    }else {
+                        setErrorMessage(error.response.data.message);
                     }
                 }
             });
@@ -93,6 +94,23 @@ const LoginScreen = ({navigation}) => {
         })
             .then(function (response) {
                 dispatch(setProfile(response.data));
+                getNotifications(token, response.data.id);
+            })
+            .catch(function (error) {
+                console.log(error.response);
+            });
+    }
+
+    const getNotifications = (token, userId) =>{
+        axios({
+            method: 'get',
+            url: NOTIFICATION_SERVICE +'/receive/'+ userId,
+            // headers: {
+            //     'Authorization': 'Bearer '+token
+            // }
+        })
+            .then(function (response) {
+                dispatch(setNotifications(response.data));
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -109,9 +127,36 @@ const LoginScreen = ({navigation}) => {
             address: '123 Earth Ave, Solar, Universe',
             phone: '555-555-5555'
         }
+
+        const message = [
+            {
+                id: 1,
+                title: 'Friend added',
+                content: 'People added you as friend.',
+                read: false,
+                timestamp: '2021-02-02',
+            },
+            {
+                id: 2,
+                title: 'People arrived',
+                content: 'People arrived at abc.',
+                read: false,
+                timestamp: '2021-02-01',
+            },
+            {
+                id: 3,
+                title: 'Group confirm',
+                content: 'You joined in abc group.',
+                read: true,
+                timestamp: '2021-01-01',
+            },
+        ]
+
         dispatch(setLogin(true));
         dispatch(setToken('fdafsdfafdafasdf'))
         dispatch(setProfile(data));
+        dispatch(setNotifications(message));
+        // getNotifications('aaa', data.id);
         navigation.goBack();
     }
 

@@ -7,11 +7,14 @@ import {Avatar, Badge, Icon, ListItem} from "react-native-elements";
 import {useDispatch, useSelector} from "react-redux";
 import LoginAlertScreen from "./LoginAlertScreen";
 import {setLogout} from "../../redux/actions/user";
+import {clearNotifications} from "../../redux/actions/notification";
 
 const UserScreen = ({navigation}) => {
 
     const dispatch = useDispatch();
     const userProfile = useSelector(state => state.user);
+    const notifications = useSelector(state => state.notification.notifications);
+    const unreadCount = notifications.filter(item => item.read === false).length;
 
     if (!userProfile.isLogin) {
         return (
@@ -33,6 +36,11 @@ const UserScreen = ({navigation}) => {
             screen: 'FavoritePlace'
         },
     ]
+
+    const logout = () =>{
+        dispatch(clearNotifications());
+        dispatch(setLogout());
+    }
 
     return(
         <View>
@@ -71,15 +79,15 @@ const UserScreen = ({navigation}) => {
                     <ListItem.Content>
                         <ListItem.Title>Notifications</ListItem.Title>
                     </ListItem.Content>
-                    <Badge
-                        value={2}
-                        status="error"
-                    />
+                    {
+                        unreadCount !== 0? (<Badge value={unreadCount} status="error"/>):(<View/>)
+
+                    }
                     <ListItem.Chevron />
                 </ListItem>
             </View>
             <View style={styles.SectionStyle}>
-                <ListItem bottomDivider onPress={()=>{dispatch(setLogout())}}>
+                <ListItem bottomDivider onPress={logout}>
                     <Icon name={'logout'} type={'material-community'}/>
                     <ListItem.Content>
                         <ListItem.Title>Logout</ListItem.Title>
