@@ -64,9 +64,9 @@ const LoginScreen = ({navigation}) => {
         })
             .then(function (response) {
                 const token = response.data.access_token;
-                dispatch(setLogin(true));
                 dispatch(setToken(token));
                 fetchUserInfo(token);
+
                 setLoading(false);
                 navigation.goBack();
             })
@@ -95,6 +95,7 @@ const LoginScreen = ({navigation}) => {
             .then(function (response) {
                 dispatch(setProfile(response.data));
                 getNotifications(token, response.data.id);
+                dispatch(setLogin(true));
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -105,9 +106,9 @@ const LoginScreen = ({navigation}) => {
         axios({
             method: 'get',
             url: NOTIFICATION_SERVICE +'/receive/'+ userId,
-            // headers: {
-            //     'Authorization': 'Bearer '+token
-            // }
+            headers: {
+                'Authorization': 'Bearer '+token
+            }
         })
             .then(function (response) {
                 dispatch(setNotifications(response.data));
@@ -295,8 +296,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginLeft: 35,
         marginRight: 35,
-        marginTop: 30,
-        marginBottom: 25,
+        marginTop: 10,
+        marginBottom: 10,
     },
     buttonTextStyle: {
         color: '#FFFFFF',

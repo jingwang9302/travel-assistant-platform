@@ -1,7 +1,7 @@
 import React from 'react';
 import {ScrollView, Text} from 'react-native';
 import {Icon, ListItem} from "react-native-elements";
-import {connect} from "react-redux";
+import {connect, useSelector} from "react-redux";
 import {setRead} from "../../redux/actions/notification";
 import axios from "axios";
 import {NOTIFICATION_SERVICE} from "../../config/urls";
@@ -28,6 +28,7 @@ const NotificationScreen = ({navigation, notifications, markRead}) => {
     //     },
     // ]
 
+    const userProfile = useSelector(state => state.user);
 
     const showNotification = (item) =>{
         alert(item.content);
@@ -38,9 +39,9 @@ const NotificationScreen = ({navigation, notifications, markRead}) => {
         axios({
             method: 'put',
             url: NOTIFICATION_SERVICE +'/read/'+ id,
-            // headers: {
-            //     'Authorization': 'Bearer '+token
-            // }
+            headers: {
+                'Authorization': 'Bearer '+userProfile.token
+            }
         })
             .then(function (response) {
                 markRead(id);
