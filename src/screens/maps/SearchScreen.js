@@ -8,8 +8,9 @@ import {
   Image,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
-import MapInput from "../components/MapInput";
-import { useCurrentLocation } from "../hooks/useCurrentLocation";
+import MapInput from "../../components/MapInput";
+import ResultList from "./ResultsList";
+import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -86,6 +87,7 @@ const SearchScreen = ({ navigation }) => {
             </Marker>
           ))}
       </MapView>
+      <ResultList />
     </View>
   );
 };

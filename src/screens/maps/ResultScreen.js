@@ -1,5 +1,4 @@
 import React from "react";
-import { withNavigation } from "react-navigation";
 import {
   Text,
   View,
@@ -9,17 +8,14 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { config } from "../../config";
+import { config } from "../../../config";
 
-const getImageByReferenceNum = (ref) => {};
-
-const ResultScreen = ({ navigation }) => {
-  const result = navigation.getParam("result");
+const ResultScreen = ({ route, navigation }) => {
+  const result = route.params;
   console.log(result);
   const photoReference =
     result && result.photos && result.photos[0].photo_reference;
   const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`;
-  console.log(photoUrl);
   return (
     <View>
       <Text>{result.name}</Text>

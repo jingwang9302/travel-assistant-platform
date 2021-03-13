@@ -29,7 +29,6 @@ const useCurrentLocation = () => {
   useEffect(() => {
     getCurrentLocation();
   }, []);
-
   return { currentLocation, loading, error };
 };
 

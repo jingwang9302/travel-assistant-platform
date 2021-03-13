@@ -1,24 +1,34 @@
-import { createAppContainer } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
+import React from "react";
+import AsyncStorage from "@react-native-community/async-storage";
+import { applyMiddleware, compose, createStore } from "redux";
+import { persistStore, persistReducer } from "redux-persist";
+import thunk from "redux-thunk";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-import SearchScreen from "./src/screens/SearchScreen";
-import MyMapView from "./src/components/Map";
-import ResultScreen from "./src/screens/ResultScreen";
-import ResultList from "./src/screens/ResultsList";
+import AppNavigator from "./src/routes/appNavigator";
+import reducer from "./src/redux/reducers/reducer";
 
-const navigator = createStackNavigator(
-  {
-    Search: SearchScreen,
-    Map: MyMapView,
-    Result: ResultScreen,
-    ResultList: ResultList,
-  },
-  {
-    initialRouteName: "Search",
-    defaultNavigationOptions: {
-      title: "Search",
-    },
-  }
-);
+const persistConfig = {
+  key: "root",
+  storage: AsyncStorage,
+};
 
-export default createAppContainer(navigator);
+const persistedReducer = persistReducer(persistConfig, reducer);
+const composeEnhancers =
+  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+    : compose;
+const enhancer = composeEnhancers(applyMiddleware(thunk));
+const store = createStore(persistedReducer, enhancer);
+const persistor = persistStore(store);
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <AppNavigator />
+      </PersistGate>
+    </Provider>
+  );
+}

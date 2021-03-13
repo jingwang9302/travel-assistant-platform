@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, Dimensions } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { config } from "../../config";
 import useResults from "../hooks/useResults";
-import ResultsList from "../screens/ResultsList";
+import ResultsList from "../screens/maps/ResultsList";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
