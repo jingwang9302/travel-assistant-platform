@@ -7,21 +7,29 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { withNavigation } from "react-navigation";
-import useResults from "../hooks/useResults";
+import Result from "./ResultScreen";
 
 const ResultList = ({ results, navigation }) => {
-  const [getSearchResultApi, resultList, errorMessage] = useResults();
-  if (!results.length) {
-    return null;
+  if (!results || !results.length) {
+    return <Text>loading</Text>;
   }
   return (
     <View>
       <FlatList
-        data={resultList}
+        data={results}
         keyExtractor={(item) => item.place_id}
-        renderItem={({ item }) => <Text>{item.name}</Text>}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Result", { result: item });
+            }}
+          >
+            <Text>{item.name}</Text>
+            {/* <Result result={item} /> */}
+          </TouchableOpacity>
+        )}
         style={{
-          backgroundColor: "grey",
+          backgroundColor: "white",
           width: "80%",
           margin: 60,
           padding: 5,

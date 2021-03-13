@@ -8,7 +8,6 @@ import {
   Image,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
-import { withNavigation } from "react-navigation";
 import MapInput from "../components/MapInput";
 import { useCurrentLocation } from "../hooks/useCurrentLocation";
 
@@ -19,19 +18,12 @@ const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
 const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
-  const [marker, setMarker] = useState(null);
+  const [marker, setMarker] = useState([]);
   const { currentLocation, loading, error } = useCurrentLocation();
-  if (!currentLocation || loading)
+  if (!currentLocation)
     return (
       <View>
         <Text>Loading...</Text>
-      </View>
-    );
-
-  if (error)
-    return (
-      <View>
-        <Text>Error loading data</Text>
       </View>
     );
 
@@ -44,40 +36,7 @@ const SearchScreen = ({ navigation }) => {
 
   return (
     <View>
-      <MapView
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-        initialRegion={initRegion}
-        region={region || initRegion}
-        onPress={(e) => {
-          if (e.nativeEvent.action) return;
-          setMarker(e.nativeEvent.coordinate);
-        }}
-      >
-        {marker && (
-          <Marker coordinate={marker} title={marker.title}>
-            <Callout
-              onPress={() => {
-                navigation.navigate("Result");
-              }}
-              tooltip
-            >
-              <View style={styles.bubble}>
-                <Text>{marker.title}</Text>
-                {typeof marker.url === "string" && (
-                  <Image
-                    source={{
-                      uri: marker.url,
-                    }}
-                    style={{ height: 100, width: 200 }}
-                  />
-                )}
-              </View>
-            </Callout>
-          </Marker>
-        )}
+      <View style={styles.mapInput}>
         <MapInput
           setRegion={setRegion}
           setMarker={setMarker}
@@ -90,13 +49,51 @@ const SearchScreen = ({ navigation }) => {
           //       "longitude": -121.93245923157961,
           //       "speed": 1.149999976158142,
         />
+      </View>
+      <MapView
+        style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        showsUserLocation={true}
+        showsMyLocationButton={true}
+        initialRegion={initRegion}
+        region={region || initRegion}
+        onPress={(e) => {
+          if (e.nativeEvent.action) return;
+          setMarker([e.nativeEvent.coordinate]);
+        }}
+      >
+        {marker.length > 0 &&
+          marker.map((item) => (
+            <Marker coordinate={item} title={item.title} key={item.place_id}>
+              <Callout
+                onPress={() => {
+                  navigation.navigate("Result", { result: item });
+                }}
+                tooltip
+              >
+                <View style={styles.bubble}>
+                  <Text>{item.title}</Text>
+                  {typeof item.url === "string" && (
+                    <Image
+                      source={{
+                        uri: item.url,
+                      }}
+                      style={{ height: 100, width: 200 }}
+                    />
+                  )}
+                </View>
+              </Callout>
+            </Marker>
+          ))}
       </MapView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  map: { height: "100%" },
+  mapInput: { height: 43 },
+  map: { height: "94%" },
+
   button: {
     width: 80,
     paddingHorizontal: 12,

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View, Dimensions } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { config } from "../../config";
 import useResults from "../hooks/useResults";
+import ResultsList from "../screens/ResultsList";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -23,7 +24,30 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
   const [getSearchResultApi, searchResult, errorMessage] = useResults(
     currentLocation
   );
-  const results = searchResult.resultList.results;
+
+  const results =
+    searchResult && searchResult.resultList && searchResult.resultList.results;
+
+  useEffect(() => {
+    if (!results) return;
+    setMarker(
+      results.map((item) => {
+        const photoReference = item.photos && item.photos[0].photo_reference;
+
+        return {
+          place_id: item.place_id,
+          url: photoReference
+            ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`
+            : "placeholder",
+          latitude: item.geometry.location.lat,
+          longitude: item.geometry.location.lng,
+          title: item.name,
+          address: item.vicinity,
+        };
+      })
+    );
+  }, [results]);
+
   return (
     <GooglePlacesAutocomplete
       placeholder="Enter Location"
@@ -45,13 +69,16 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           });
-          setMarker({
-            latitude: details.geometry.location.lat,
-            longitude: details.geometry.location.lng,
-            title: details.name,
-            address: details.formatted_address,
-            url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`,
-          });
+          setMarker([
+            {
+              place_id: details.place_id,
+              latitude: details.geometry.location.lat,
+              longitude: details.geometry.location.lng,
+              title: details.name,
+              address: details.formatted_address,
+              url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`,
+            },
+          ]);
         } else {
           // console.log(details);
           setRegion({
@@ -60,12 +87,15 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           });
-          setMarker({
-            latitude: details.geometry.location.lat,
-            longitude: details.geometry.location.lng,
-            title: details.description,
-            address: `Address: (${details.geometry.location.lat}, ${details.geometry.location.lng})`,
-          });
+          setMarker([
+            {
+              place_id: details.place_id,
+              latitude: details.geometry.location.lat,
+              longitude: details.geometry.location.lng,
+              title: details.description,
+              address: `Address: (${details.geometry.location.lat}, ${details.geometry.location.lng})`,
+            },
+          ]);
         }
       }}
       textInputProps={{
@@ -88,8 +118,7 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
       currentLocation={true}
       currentLocationLabel="Current Location"
     >
-      {searchResult.length > 0 &&
-        searchResult.map((res) => <Text>{res.name}</Text>)}
+      <ResultsList results={results} />
     </GooglePlacesAutocomplete>
   );
 };
