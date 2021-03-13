@@ -4,133 +4,98 @@ import {
   TextInput,
   View,
   StyleSheet,
-  ScrollView,
-  Animated,
   Dimensions,
   Image,
-  TouchableOpacity,
-  Platform,
-  Alert,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
-import * as Permissions from "expo-permissions";
 import MapInput from "../../components/MapInput";
+import ResultList from "./ResultsList";
+import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
-const SearchScreen = () => {
-  // replace the initial to user's current location
-  const initMapState = {
-    region: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    },
-    marker: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      title: "title",
-      address: "Address",
-      url: null,
-    },
-  };
-  const [region, setRegion] = useState(initMapState.region);
-  const [marker, setMarker] = useState(initMapState.marker);
-
-  const onRegionChange = (reg) => {
-    setRegion(reg);
-    console.log("On Region Change");
-  };
-
-  const show = () => {
-    marker.showCallout();
-  };
-  const hide = () => {
-    marker.hideCallout();
-  };
-
-  const getLocation = async () => {
-    const { status } = await Permissions.getAsync(Permissions.LOCATION);
-    if (status !== "granted") {
-      const response = await Permissions.askAsync(Permissions.LOCATION);
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) =>
-        setRegion({
-          latitude,
-          longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        }),
-      (error) => {
-        console.log("Error:", error);
-      }
+const SearchScreen = ({ navigation }) => {
+  let [region, setRegion] = useState(null);
+  const [marker, setMarker] = useState([]);
+  const { currentLocation, loading, error } = useCurrentLocation();
+  if (!currentLocation)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
     );
-    return () => {
-      console.log("Location granted");
-    };
-  };
 
-  useEffect(() => {
-    getLocation();
-  }, []);
+  const initRegion = {
+    latitude: currentLocation.latitude,
+    longitude: currentLocation.longitude,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  };
 
   return (
     <View>
+      <View style={styles.mapInput}>
+        <MapInput
+          setRegion={setRegion}
+          setMarker={setMarker}
+          currentLocation={currentLocation}
+          //       "accuracy": 10,
+          //       "altitude": 6.025020599365234,
+          //       "altitudeAccuracy": 16,
+          //       "heading": 0,
+          //       "latitude": 37.40235756154861,
+          //       "longitude": -121.93245923157961,
+          //       "speed": 1.149999976158142,
+        />
+      </View>
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         showsUserLocation={true}
-        initialRegion={region}
-        region={region}
+        showsMyLocationButton={true}
+        initialRegion={initRegion}
+        region={region || initRegion}
         onPress={(e) => {
-          setMarker(e.nativeEvent.coordinate);
+          if (e.nativeEvent.action) return;
+          setMarker([e.nativeEvent.coordinate]);
         }}
-        // onRegionChange={onRegionChange}
       >
-        <Marker
-          coordinate={marker}
-          title={marker.title}
-          onPress={(e) => {
-            if (
-              e.nativeEvent.action === "marker-inside-overlay-press" ||
-              e.nativeEvent.action === "callout-inside-press"
-            ) {
-              return;
-            }
-
-            console.log("On Press callout");
-          }}
-        >
-          <Callout tooltip>
-            <View style={styles.bubble}>
-              <Text>{marker.title}</Text>
-
-              {typeof marker.url === "string" && (
-                <Image
-                  source={{
-                    uri: marker.url,
-                  }}
-                  style={{ height: 100, width: 200 }}
-                />
-              )}
-            </View>
-          </Callout>
-        </Marker>
-
-        <MapInput setRegion={setRegion} setMarker={setMarker} />
+        {marker.length > 0 &&
+          marker.map((item) => (
+            <Marker coordinate={item} title={item.title} key={item.place_id}>
+              <Callout
+                onPress={() => {
+                  navigation.navigate("Result", { result: item });
+                }}
+                tooltip
+              >
+                <View style={styles.bubble}>
+                  <Text>{item.title}</Text>
+                  {typeof item.url === "string" && (
+                    <Image
+                      source={{
+                        uri: item.url,
+                      }}
+                      style={{ height: 100, width: 200 }}
+                    />
+                  )}
+                </View>
+              </Callout>
+            </Marker>
+          ))}
       </MapView>
+      <ResultList />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  map: { height: "100%" },
+  mapInput: { height: 43 },
+  map: { height: "94%" },
+
   button: {
     width: 80,
     paddingHorizontal: 12,
