@@ -35,6 +35,12 @@ const UserScreen = ({navigation}) => {
             iconType: 'material-community',
             screen: 'FavoritePlace'
         },
+        {
+            title: 'Post',
+            icon: 'penguin',
+            iconType: 'material-community',
+            screen: 'Post'
+        },
     ]
 
     const logout = () =>{
