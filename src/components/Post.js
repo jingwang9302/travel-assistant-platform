@@ -4,8 +4,10 @@ import {Avatar, Badge, Card, Icon} from "react-native-elements";
 import axios from "axios";
 import {BLOG_SERVICE, BLOG_SERVICE_POST_IMAGE, USER_SERVICE} from "../config/urls";
 import {useSelector} from "react-redux";
+import { useNavigation } from '@react-navigation/native';
 
 const Post = (props) => {
+    const navigation = useNavigation();
     const {postId, ...attributes} = props;
 
     const userProfile = useSelector(state => state.user);
@@ -19,8 +21,10 @@ const Post = (props) => {
     const [tags, setTags] = useState([{tag:""}]);
 
     useEffect(() => {
-        getPost();
-    },[]);
+        if(postId!==0){
+            getPost();
+        }
+    },[postId]);
 
     const getPost = () =>{
         axios({
@@ -268,7 +272,7 @@ const Post = (props) => {
                 </View>
 
                 <View style={{alignItems: 'center', flexDirection: 'row', justifyContent:'flex-end',marginTop:10}}>
-                    <Icon name={'comment'} type={'material-community'} color={'#5f91c1'}/>
+                    <Icon name={'comment'} type={'material-community'} color={'#5f91c1'} onPress={()=>{navigation.navigate('Comment', {postId: postId})}}/>
                     <Text style={{fontSize: 15, marginRight:10}}>
                         {commentCount}
                     </Text>

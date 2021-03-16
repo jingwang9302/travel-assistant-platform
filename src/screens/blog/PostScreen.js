@@ -18,7 +18,7 @@ const PostScreen = ({navigation}) => {
 
     useEffect(() => {
         getUserPosts();
-    });
+    },[]);
 
 
     const getUserPosts = () => {
