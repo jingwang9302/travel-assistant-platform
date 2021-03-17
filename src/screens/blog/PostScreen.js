@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
-    ScrollView,
-    View,
+    FlatList, RefreshControl, View,
 } from 'react-native';
 import axios from "axios";
 import {BLOG_SERVICE} from "../../config/urls";
@@ -15,6 +14,7 @@ const PostScreen = ({navigation}) => {
     const userProfile = useSelector(state => state.user);
 
     const [posts, setPosts] = useState([]);
+    const [refreshing, setRefreshing] = React.useState(false);
 
     useEffect(() => {
         getUserPosts();
@@ -24,7 +24,7 @@ const PostScreen = ({navigation}) => {
     const getUserPosts = () => {
         axios({
             method: 'get',
-            url: BLOG_SERVICE +'/post/user/'+ userProfile.id,
+            url: BLOG_SERVICE +'/post/all/'+ userProfile.id,
             headers: {
                 'Authorization': 'Bearer '+ userProfile.token
             }
@@ -41,15 +41,38 @@ const PostScreen = ({navigation}) => {
             });
     }
 
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setPosts([{id:0}]);
+        getUserPosts();
+        setRefreshing(false)
+    }, []);
+
+    const renderItem = ({ item }) => (
+        <Post postId={item.id} />
+    );
+
+
     return(
         <View style={{flex: 1}}>
-            <ScrollView>
-                {
-                    posts.map((post, i) => (
-                        <Post key={i} postId={post.id} />
-                    ))
+            <FlatList
+                data={posts}
+                renderItem={renderItem}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
                 }
-            </ScrollView>
+            />
+
+            {/*<ScrollView>*/}
+            {/*    {*/}
+            {/*        posts.map((post, i) => (*/}
+            {/*            <Post key={i} postId={post.id} />*/}
+            {/*        ))*/}
+            {/*    }*/}
+            {/*</ScrollView>*/}
             <View>
                 <Fab
                     direction="up"

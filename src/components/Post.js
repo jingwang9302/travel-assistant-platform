@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, Modal} from 'react-native';
 import {Avatar, Badge, Card, Icon} from "react-native-elements";
 import axios from "axios";
 import {BLOG_SERVICE, UPLOAD_IMAGE_URL, USER_SERVICE} from "../config/urls";
 import {useSelector} from "react-redux";
 import { useNavigation } from '@react-navigation/native';
+import ImageViewer from "react-native-image-zoom-viewer";
 
 const Post = (props) => {
     const navigation = useNavigation();
@@ -20,12 +21,14 @@ const Post = (props) => {
     const [imagesUrl, setImagesUrl] = useState([{imageUrl:""}]);
     const [isLikes, setIsLikes] = useState(false);
     const [tags, setTags] = useState([{tag:""}]);
+    const [imageVisible, setImageVisible] = useState(false);
+    const [imageView, setImageView] = useState([{url:''}]);
 
     useEffect(() => {
         if(postId!==0){
             getPost();
         }
-    },[postId]);
+    },[]);
 
     const getPost = () =>{
         axios({
@@ -246,6 +249,11 @@ const Post = (props) => {
             });
     }
 
+    const viewImage = () =>{
+        setImageView([{url: UPLOAD_IMAGE_URL+imagesUrl[0].imageUrl}]);
+        setImageVisible(true);
+    }
+
     return (
         <View>
             <Card>
@@ -279,7 +287,7 @@ const Post = (props) => {
                         {post.title}
                     </Text>
                 </View>
-                {imagesUrl.length!==0? <Card.Image source={{uri: UPLOAD_IMAGE_URL+imagesUrl[0].imageUrl}}/>: <View/>}
+                {imagesUrl.length!==0? <Card.Image source={{uri: UPLOAD_IMAGE_URL+imagesUrl[0].imageUrl}} onPress={()=>{viewImage()}}/>: <View/>}
                 <View style={{marginTop: 10, alignItems: 'flex-start'}}>
                     <Text style={{fontSize: 15}}>
                         {post.content}
@@ -310,6 +318,9 @@ const Post = (props) => {
                     </Text>
                 </View>
             </Card>
+            <Modal visible={imageVisible} transparent={true}>
+                <ImageViewer imageUrls={imageView} enableSwipeDown={true} onCancel={()=>setImageVisible(false)} onClick={()=>setImageVisible(false)}/>
+            </Modal>
         </View>
     );
 };
