@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, View, Text} from 'react-native';
 import {Avatar, Badge, Card, Icon} from "react-native-elements";
 import axios from "axios";
-import {BLOG_SERVICE, BLOG_SERVICE_POST_IMAGE, USER_SERVICE} from "../config/urls";
+import {BLOG_SERVICE, UPLOAD_IMAGE_URL, USER_SERVICE} from "../config/urls";
 import {useSelector} from "react-redux";
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,6 +14,7 @@ const Post = (props) => {
 
     const [post, setPost] = useState({id:0, title:"", content:"", authorId:0});
     const [author, setAuthor] = useState({id:0, firstName:"", lastName:""});
+    const [authorAvatar, setAuthorAvatar] = useState("");
     const [commentCount, setCommentCount] = useState(0);
     const [likesCount, setLikesCount] = useState(0);
     const [imagesUrl, setImagesUrl] = useState([{imageUrl:""}]);
@@ -37,6 +38,7 @@ const Post = (props) => {
             .then(function (response) {
                 setPost(response.data);
                 getAuthor(response.data.authorId);
+                getAuthorAvatar(response.data.authorId);
                 getCommentCount(response.data.id);
                 getLikesCount(response.data.id);
                 checkLikes(response.data.id);
@@ -64,6 +66,26 @@ const Post = (props) => {
         })
             .then(function (response) {
                 setAuthor(response.data);
+            })
+            .catch(function (error) {
+                if(error.response.data.message === null){
+                    console.log(error.message);
+                }else {
+                    console.log(error.response.data.message);
+                }
+            });
+    }
+
+    const getAuthorAvatar = (authorId) =>{
+        axios({
+            method: 'get',
+            url: USER_SERVICE +'/profile/avatar/'+ authorId,
+            headers: {
+                'Authorization': 'Bearer '+ userProfile.token
+            }
+        })
+            .then(function (response) {
+                setAuthorAvatar(response.data.avatarUrl);
             })
             .catch(function (error) {
                 if(error.response.data.message === null){
@@ -236,6 +258,9 @@ const Post = (props) => {
                                 author.firstName.substr(0,1).toUpperCase()+
                                 author.lastName.substr(0,1).toUpperCase()
                             }
+                            source={{
+                                uri: UPLOAD_IMAGE_URL + authorAvatar,
+                            }}
                             activeOpacity={0.7}
                             overlayContainerStyle={{backgroundColor: 'grey'}}/>
                         <Text style={{fontSize: 15, marginLeft:5}}>{author.firstName+' '+author.lastName}</Text>
@@ -254,7 +279,7 @@ const Post = (props) => {
                         {post.title}
                     </Text>
                 </View>
-                {imagesUrl.length!==0? <Card.Image source={{uri: BLOG_SERVICE_POST_IMAGE+imagesUrl[0].imageUrl}}/>: <View/>}
+                {imagesUrl.length!==0? <Card.Image source={{uri: UPLOAD_IMAGE_URL+imagesUrl[0].imageUrl}}/>: <View/>}
                 <View style={{marginTop: 10, alignItems: 'flex-start'}}>
                     <Text style={{fontSize: 15}}>
                         {post.content}

@@ -5,7 +5,7 @@ import {
 import {Avatar, Icon, Input, ListItem, Overlay} from "react-native-elements";
 import {Fab} from 'native-base'
 import axios from "axios";
-import {USER_SERVICE} from "../../config/urls";
+import {UPLOAD_IMAGE_URL, USER_SERVICE} from "../../config/urls";
 import {useSelector} from "react-redux";
 
 const FriendScreen = ({navigation}) => {
@@ -115,6 +115,9 @@ const FriendScreen = ({navigation}) => {
                                     item.firstName.substr(0,1).toUpperCase()+
                                     item.lastName.substr(0,1).toUpperCase()
                                 }
+                                source={{
+                                    uri: UPLOAD_IMAGE_URL + item.avatarUrl,
+                                }}
                                 activeOpacity={0.7}
                                 overlayContainerStyle={{backgroundColor: 'grey'}}/>
                             <ListItem.Content>
