@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
 import {GiftedChat} from 'react-native-gifted-chat';
-import Backend from '../../backend/messagingBackend';
+// import Backend from '../../backend/messagingBackend';
 
 export default class ChatScreen extends React.Component {
     state = {
