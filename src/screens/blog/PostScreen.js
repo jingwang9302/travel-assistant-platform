@@ -24,7 +24,7 @@ const PostScreen = ({navigation}) => {
     const getUserPosts = () => {
         axios({
             method: 'get',
-            url: BLOG_SERVICE +'/post/user/'+ userProfile.id,
+            url: BLOG_SERVICE +'/post/all/'+ userProfile.id,
             headers: {
                 'Authorization': 'Bearer '+ userProfile.token
             }
