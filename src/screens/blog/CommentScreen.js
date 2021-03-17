@@ -51,6 +51,7 @@ const CommentScreen = ({route, navigation}) => {
         <View style={styles.mainBody}>
             <ScrollView>
                 <Post postId={id} />
+                <View style={{marginRight:15, marginLeft:15, marginTop:10,}}/>
                 <Comment postId={id} />
             </ScrollView>
             <View style={{padding:5, backgroundColor:'#abb1b5', flexDirection:'row', justifyContent:'space-evenly', alignItems:'center'}}>

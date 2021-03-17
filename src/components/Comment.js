@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
-import {Avatar, Card, ListItem} from "react-native-elements";
+import {Avatar, ListItem} from "react-native-elements";
 import axios from "axios";
 import {BLOG_SERVICE, UPLOAD_IMAGE_URL} from "../config/urls";
 import {useSelector} from "react-redux";
@@ -39,8 +39,7 @@ const Comment = (props) => {
     }
 
     return (
-        <View>
-            <Card>
+        <View style={{marginLeft:15, marginRight:15,}}>
                 {
                     comments.map((comment, i) => (
 
@@ -64,7 +63,6 @@ const Comment = (props) => {
                         </ListItem>
                     ))
                 }
-            </Card>
         </View>
     );
 };

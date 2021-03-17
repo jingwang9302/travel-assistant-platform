@@ -28,7 +28,7 @@ const Post = (props) => {
         if(postId!==0){
             getPost();
         }
-    },[postId]);
+    },[]);
 
     const getPost = () =>{
         axios({
