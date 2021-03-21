@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.1.16",
+    "@mapbox/polyline": "^1.1.1",
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.8",

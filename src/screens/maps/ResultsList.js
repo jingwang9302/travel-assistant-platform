@@ -6,14 +6,27 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-// import { withNavigation } from "react-navigation";
+import { useNavigation } from "@react-navigation/native";
+import { ListItem, Icon, Card } from "react-native-elements";
 import Result from "./ResultScreen";
+const ResultList = ({ results }) => {
+  const navigation = useNavigation();
 
-const ResultList = ({ results, navigation }) => {
   if (!results || !results.length) {
     return <Text>loading</Text>;
   }
   return (
+    // <View>
+    //   {list.map((item, i) => (
+    //     <ListItem key={i} bottomDivider>
+    //       <Icon name={item.icon} />
+    //       <ListItem.Content>
+    //         <ListItem.Title>{item.title}</ListItem.Title>
+    //       </ListItem.Content>
+    //       <ListItem.Chevron />
+    //     </ListItem>
+    //   ))}
+    // </View>
     <View style={styles.listContainer}>
       <FlatList
         data={results}
@@ -46,7 +59,8 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   listContainer: {
-    height: 200,
+    height: 300,
+    bottom: 0,
   },
 });
 
