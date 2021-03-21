@@ -8,9 +8,13 @@ import {
   Image,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
+import Polyline from "@mapbox/polyline";
 import MapInput from "../../components/MapInput";
 import ResultList from "./ResultsList";
+
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
+import { Button } from "react-native-elements";
+import { config } from "../../../config";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -20,13 +24,18 @@ const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
   const [marker, setMarker] = useState([]);
+  const [navigationRegion, setNavigationRegion] = useState(null);
+
+  const [coords, setCoords] = useState([]);
+
   const { currentLocation, loading, error } = useCurrentLocation();
-  if (!currentLocation)
+  if (!currentLocation) {
     return (
       <View>
         <Text>Loading...</Text>
       </View>
     );
+  }
 
   const initRegion = {
     latitude: currentLocation.latitude,
@@ -35,22 +44,52 @@ const SearchScreen = ({ navigation }) => {
     longitudeDelta: LONGITUDE_DELTA,
   };
 
+  const navigatedRegion = {
+    latitude: currentLocation.latitude,
+    longitude: currentLocation.longitude,
+    desLatitude: marker.latitude,
+    desLongitude: marker.longitude,
+  };
+
+  const getDirections = async (startLoc, desLoc) => {
+    try {
+      const resp = await fetch(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${config.DIRECTION_API_KEY}`
+      );
+      console.log(resp);
+      const respJson = await resp.json();
+      const response = respJson.routes[0];
+      const distanceTime = response.legs[0];
+      const distance = distanceTime.distance.text;
+      const time = distanceTime.duration.text;
+      const points = Polyline.decode(
+        respJson.routes[0].overview_polyline.points
+      );
+      const coords = points.map((point) => {
+        return {
+          latitude: point[0],
+          longitude: point[1],
+        };
+      });
+      setCoords(coords);
+      // setNavigationRegion({ coords, distance, time });
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
+
+  const mergeCoods = () => {
+    const { latitude, longitude, desLatitude, desLongitude } = navigationRegion;
+    const hasStartAndEnd = latitude !== null && desLatitude !== null;
+    if (hasStartAndEnd) {
+      const concatStart = `${latitude},${longitude}`;
+      const concatEnd = `${desLatitude},${desLongitude}`;
+      getDirections(concatStart, concatEnd);
+    }
+  };
+  console.log(coords);
   return (
     <View>
-      <View style={styles.mapInput}>
-        <MapInput
-          setRegion={setRegion}
-          setMarker={setMarker}
-          currentLocation={currentLocation}
-          //       "accuracy": 10,
-          //       "altitude": 6.025020599365234,
-          //       "altitudeAccuracy": 16,
-          //       "heading": 0,
-          //       "latitude": 37.40235756154861,
-          //       "longitude": -121.93245923157961,
-          //       "speed": 1.149999976158142,
-        />
-      </View>
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
@@ -63,12 +102,22 @@ const SearchScreen = ({ navigation }) => {
           setMarker([e.nativeEvent.coordinate]);
         }}
       >
+        {coords.length > 0 && (
+          <MapView.Polyline
+            strokeWidth={2}
+            strokeColor="red"
+            coordinates={coords}
+          />
+        )}
         {marker.length > 0 &&
           marker.map((item) => (
             <Marker coordinate={item} title={item.title} key={item.place_id}>
               <Callout
                 onPress={() => {
-                  navigation.navigate("Result", { result: item });
+                  // navigation.navigate("Result", { result: item });
+                  const startLoc = `${currentLocation.latitude},${currentLocation.longitude}`;
+                  const desLoc = "37.90233116205613,-121.93255815277293";
+                  getDirections(startLoc, desLoc);
                 }}
                 tooltip
               >
@@ -87,15 +136,23 @@ const SearchScreen = ({ navigation }) => {
             </Marker>
           ))}
       </MapView>
-      <ResultList />
+      <View style={styles.mapInput}>
+        <MapInput
+          setRegion={setRegion}
+          setMarker={setMarker}
+          currentLocation={currentLocation}
+        />
+      </View>
+      {/* <View>
+        <ResultList />
+      </View> */}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  mapInput: { height: 43 },
-  map: { height: "94%" },
-
+  mapInput: { position: "absolute", width: width },
+  map: { height: "100%" },
   button: {
     width: 80,
     paddingHorizontal: 12,
