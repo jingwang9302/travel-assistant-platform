@@ -1,12 +1,15 @@
-// import firebase from 'firebase/app';
+// // @refresh reset
+// import * as firebase from 'firebase';
+// import 'firebase/firestore';
 // import firebaseConfig from '../config/messagingConfig';
 
 // class Backend {
+
 //     uid = '';
 //     messagesRef = null;
 //     // initialize Firebase Backend
 //     constructor() {
-//       if(!firebase.app.length){
+//       if(firebase.app.length === 0){
 //         firebase.initializeApp(firebaseConfig);
 //       }else{
 //         firebase.app();
