@@ -1,7 +1,7 @@
 // Define URLs
 
 // Backend system url
-export const BASE_URL = 'http://192.168.1.21:8080';
+export const BASE_URL = 'http://35.188.32.151:8080';
 
 // Each service entrypoint
 export const USER_SERVICE = BASE_URL + '/user/api/user';
