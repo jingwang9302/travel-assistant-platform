@@ -24,15 +24,12 @@ const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
   const [marker, setMarker] = useState([]);
-  const [navigationRegion, setNavigationRegion] = useState(null);
-
-  const [coords, setCoords] = useState([]);
-
+  const [navigationInfo, setNavigationInfo] = useState(null);
   const { currentLocation, loading, error } = useCurrentLocation();
   if (!currentLocation) {
     return (
       <View>
-        <Text>Loading...</Text>
+        <Text>Loading location...</Text>
       </View>
     );
   }
@@ -44,19 +41,11 @@ const SearchScreen = ({ navigation }) => {
     longitudeDelta: LONGITUDE_DELTA,
   };
 
-  const navigatedRegion = {
-    latitude: currentLocation.latitude,
-    longitude: currentLocation.longitude,
-    desLatitude: marker.latitude,
-    desLongitude: marker.longitude,
-  };
-
   const getDirections = async (startLoc, desLoc) => {
     try {
       const resp = await fetch(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${config.DIRECTION_API_KEY}`
       );
-      console.log(resp);
       const respJson = await resp.json();
       const response = respJson.routes[0];
       const distanceTime = response.legs[0];
@@ -71,23 +60,31 @@ const SearchScreen = ({ navigation }) => {
           longitude: point[1],
         };
       });
-      setCoords(coords);
-      // setNavigationRegion({ coords, distance, time });
+      setNavigationInfo({ coords, distance, time });
+      console.log("================================");
+      console.log(distance);
+      console.log(time);
+      // console.log(response);
     } catch (error) {
       console.log("Error: ", error);
     }
   };
 
   const mergeCoods = () => {
-    const { latitude, longitude, desLatitude, desLongitude } = navigationRegion;
-    const hasStartAndEnd = latitude !== null && desLatitude !== null;
-    if (hasStartAndEnd) {
-      const concatStart = `${latitude},${longitude}`;
-      const concatEnd = `${desLatitude},${desLongitude}`;
-      getDirections(concatStart, concatEnd);
+    console.log("Navigation info");
+    console.log(navigationInfo);
+    if (navigationInfo) {
+      const { desLatitude, desLongitude } = navigationInfo;
+      const hasStartAndEnd =
+        currentLocation.latitude !== null && desLatitude !== null;
+      if (hasStartAndEnd) {
+        const concatStart = `${currentLocation.latitude},${currentLocation.longitude}`;
+        const concatEnd = `${desLatitude},${desLongitude}`;
+        console.log(concatStart);
+        getDirections(concatStart, concatEnd);
+      }
     }
   };
-  console.log(coords);
   return (
     <View>
       <MapView
@@ -102,39 +99,58 @@ const SearchScreen = ({ navigation }) => {
           setMarker([e.nativeEvent.coordinate]);
         }}
       >
-        {coords.length > 0 && (
-          <MapView.Polyline
-            strokeWidth={2}
-            strokeColor="red"
-            coordinates={coords}
-          />
-        )}
+        {navigationInfo &&
+          navigationInfo.coords &&
+          navigationInfo.coords.length > 0 && (
+            <MapView.Polyline
+              strokeWidth={2}
+              strokeColor="red"
+              coordinates={navigationInfo.coords}
+            />
+          )}
         {marker.length > 0 &&
           marker.map((item) => (
-            <Marker coordinate={item} title={item.title} key={item.place_id}>
+            <Marker
+              coordinate={item}
+              title={item.title}
+              key={item.place_id}
+              onPress={() => {
+                setNavigationInfo({
+                  desLatitude: item.latitude,
+                  desLongitude: item.longitude,
+                });
+                console.log("On press");
+                mergeCoods();
+              }}
+            >
               <Callout
                 onPress={() => {
-                  // navigation.navigate("Result", { result: item });
-                  const startLoc = `${currentLocation.latitude},${currentLocation.longitude}`;
-                  const desLoc = "37.90233116205613,-121.93255815277293";
-                  getDirections(startLoc, desLoc);
+                  navigation.navigate("Result", { result: item });
                 }}
                 tooltip
               >
                 <View style={styles.bubble}>
                   <Text>{item.title}</Text>
-                  {typeof item.url === "string" && (
-                    <Image
-                      source={{
-                        uri: item.url,
-                      }}
-                      style={{ height: 100, width: 200 }}
-                    />
-                  )}
+                  <Text>{item.address}</Text>
                 </View>
               </Callout>
             </Marker>
           ))}
+        {/* {typeof item.url === "string" && (
+          <Image
+            source={{
+              uri: item.url,
+            }}
+            style={{
+              flex: 1,
+              width: width * 0.95,
+              alignSelf: "center",
+              height: height * 0.15,
+              position: "absolute",
+              bottom: height * 0.05,
+            }}
+          />
+        )} */}
       </MapView>
       <View style={styles.mapInput}>
         <MapInput
