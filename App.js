@@ -5,7 +5,6 @@ import { persistStore, persistReducer } from "redux-persist";
 import thunk from "redux-thunk";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import * as encoding from 'text-encoding';
 
 
 import AppNavigator from "./src/routes/appNavigator";
