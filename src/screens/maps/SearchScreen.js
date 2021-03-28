@@ -9,21 +9,23 @@ import {
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import Polyline from "@mapbox/polyline";
+import { Card, ListItem, Button, Icon } from "react-native-elements";
 import MapInput from "../../components/MapInput";
 import ResultList from "./ResultsList";
-
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
-import { Button } from "react-native-elements";
 import { config } from "../../../config";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
+const CARD_HEIGHT = 220;
+const CARD_WIDTH = width * 0.8;
 
 const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
   const [marker, setMarker] = useState([]);
+  const [curMarker, setCurMarker] = useState(null);
   const [navigationInfo, setNavigationInfo] = useState(null);
   const { currentLocation, loading, error } = useCurrentLocation();
   if (!currentLocation) {
@@ -61,26 +63,22 @@ const SearchScreen = ({ navigation }) => {
         };
       });
       setNavigationInfo({ coords, distance, time });
-      console.log("================================");
-      console.log(distance);
-      console.log(time);
-      // console.log(response);
+      // console.log(navigationInfo);
+      console.log(coords);
     } catch (error) {
       console.log("Error: ", error);
     }
   };
 
-  const mergeCoods = () => {
-    console.log("Navigation info");
-    console.log(navigationInfo);
-    if (navigationInfo) {
-      const { desLatitude, desLongitude } = navigationInfo;
+  const mergeCoods = (desLocation) => {
+    if (desLocation) {
+      const { desLatitude, desLongitude } = desLocation;
       const hasStartAndEnd =
         currentLocation.latitude !== null && desLatitude !== null;
       if (hasStartAndEnd) {
         const concatStart = `${currentLocation.latitude},${currentLocation.longitude}`;
         const concatEnd = `${desLatitude},${desLongitude}`;
-        console.log(concatStart);
+        console.log("concat location", concatEnd);
         getDirections(concatStart, concatEnd);
       }
     }
@@ -115,12 +113,12 @@ const SearchScreen = ({ navigation }) => {
               title={item.title}
               key={item.place_id}
               onPress={() => {
-                setNavigationInfo({
+                const desLocation = {
                   desLatitude: item.latitude,
                   desLongitude: item.longitude,
-                });
-                console.log("On press");
-                mergeCoods();
+                };
+                mergeCoods(desLocation);
+                setCurMarker(item);
               }}
             >
               <Callout
@@ -136,22 +134,36 @@ const SearchScreen = ({ navigation }) => {
               </Callout>
             </Marker>
           ))}
-        {/* {typeof item.url === "string" && (
+      </MapView>
+      {curMarker && typeof curMarker.url === "string" && (
+        <View
+          style={{
+            backgroundColor: "red",
+            position: "absolute",
+            top: 400,
+            alignSelf: "center",
+          }}
+        >
           <Image
             source={{
-              uri: item.url,
+              uri: curMarker.url,
             }}
             style={{
-              flex: 1,
               width: width * 0.95,
               alignSelf: "center",
               height: height * 0.15,
-              position: "absolute",
-              bottom: height * 0.05,
             }}
           />
-        )} */}
-      </MapView>
+          <View>
+            <Text style={{ backgroundColor: "white", fontSize: 20 }}>
+              {curMarker.title}
+            </Text>
+            <Text style={{ backgroundColor: "white", fontSize: 20 }}>
+              {curMarker.title}
+            </Text>
+          </View>
+        </View>
+      )}
       <View style={styles.mapInput}>
         <MapInput
           setRegion={setRegion}
@@ -186,6 +198,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 20,
+  },
+  scrollView: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 10,
+  },
+
+  textContent: {
+    flex: 2,
+    padding: 10,
+  },
+  cardtitle: {
+    fontSize: 12,
+    // marginTop: 5,
+    fontWeight: "bold",
+  },
+  cardDescription: {
+    fontSize: 12,
+    color: "#444",
+  },
+  card: {
+    // padding: 10,
+    elevation: 2,
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    marginHorizontal: 10,
+    shadowColor: "#000",
+    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowOffset: { x: 2, y: -2 },
+    height: CARD_HEIGHT,
+    width: CARD_WIDTH,
+    overflow: "hidden",
+  },
+  cardImage: {
+    flex: 3,
+    width: "100%",
+    height: "100%",
+    alignSelf: "center",
   },
 });
 
