@@ -2,7 +2,7 @@ import {
     SET_LOGOUT,
     SET_LOGIN,
     SET_PROFILE,
-    SET_TOKEN
+    SET_TOKEN, SET_AVATAR
 } from "../actions/user";
 
 const initialState = {
@@ -12,6 +12,7 @@ const initialState = {
     lastName: '',
     address: '',
     phone: '',
+    avatarUrl: '',
     token: '',
     isLogin: false
 }
@@ -32,6 +33,8 @@ export function user(state=initialState,action) {
                 address: action.payload.address,
                 phone: action.payload.phone
             }
+        case SET_AVATAR:
+            return {...state, avatarUrl: action.payload}
         case SET_LOGOUT:
             return {
                 id:0,
@@ -40,6 +43,7 @@ export function user(state=initialState,action) {
                 lastName: '',
                 address: '',
                 phone: '',
+                avatarUrl: '',
                 token: '',
                 isLogin: false
             }

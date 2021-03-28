@@ -11,6 +11,9 @@ import FriendScreen from "../screens/user/FriendScreen";
 import FavoritePlaceScreen from "../screens/user/FavoritePlaceScreen";
 import UserScreen from "../screens/user/UserScreen";
 import NotificationScreen from "../screens/user/NotificationScreen";
+import PostScreen from "../screens/blog/PostScreen";
+import PostCreationScreen from "../screens/blog/PostCreationScreen";
+import CommentScreen from "../screens/blog/CommentScreen";
 
 const UserStack = () => {
     const Stack = createStackNavigator();
@@ -24,6 +27,9 @@ const UserStack = () => {
             <Stack.Screen name="Friend" component={FriendScreen} />
             <Stack.Screen name="FavoritePlace" component={FavoritePlaceScreen} />
             <Stack.Screen name="Notification" component={NotificationScreen} />
+            <Stack.Screen name="Post" component={PostScreen} />
+            <Stack.Screen name="PostCreation" component={PostCreationScreen} />
+            <Stack.Screen name="Comment" component={CommentScreen} />
         </Stack.Navigator>
     );
 

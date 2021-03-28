@@ -6,6 +6,7 @@ import thunk from "redux-thunk";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
+
 import AppNavigator from "./src/routes/appNavigator";
 import reducer from "./src/redux/reducers/reducer";
 

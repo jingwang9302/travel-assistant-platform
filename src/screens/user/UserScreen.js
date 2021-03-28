@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import LoginAlertScreen from "./LoginAlertScreen";
 import {setLogout} from "../../redux/actions/user";
 import {clearNotifications} from "../../redux/actions/notification";
+import {UPLOAD_IMAGE_URL} from "../../config/urls";
 
 const UserScreen = ({navigation}) => {
 
@@ -35,6 +36,12 @@ const UserScreen = ({navigation}) => {
             iconType: 'material-community',
             screen: 'FavoritePlace'
         },
+        {
+            title: 'Post',
+            icon: 'penguin',
+            iconType: 'material-community',
+            screen: 'Post'
+        },
     ]
 
     const logout = () =>{
@@ -52,6 +59,9 @@ const UserScreen = ({navigation}) => {
                             userProfile.firstName.substr(0,1).toUpperCase()+
                             userProfile.lastName.substr(0,1).toUpperCase()
                         }
+                        source={{
+                            uri: UPLOAD_IMAGE_URL + userProfile.avatarUrl,
+                        }}
                         activeOpacity={0.7}
                         overlayContainerStyle={{backgroundColor: 'grey'}}/>
                     <ListItem.Content>

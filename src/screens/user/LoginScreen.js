@@ -13,7 +13,7 @@ import {useDispatch} from "react-redux";
 
 import {LOGIN_URL, NOTIFICATION_SERVICE, USER_SERVICE} from '../../config/urls';
 import Loader from "../../components/Loader";
-import {setLogin, setProfile, setToken} from "../../redux/actions/user";
+import {setAvatar, setLogin, setProfile, setToken} from "../../redux/actions/user";
 import {Icon, Input} from "react-native-elements";
 import {setNotifications} from "../../redux/actions/notification";
 
@@ -95,7 +95,24 @@ const LoginScreen = ({navigation}) => {
             .then(function (response) {
                 dispatch(setProfile(response.data));
                 getNotifications(token, response.data.id);
+                getUserAvatar(token, response.data.id);
                 dispatch(setLogin(true));
+            })
+            .catch(function (error) {
+                console.log(error.response);
+            });
+    }
+
+    const getUserAvatar = (token, userId) =>{
+        axios({
+            method: 'get',
+            url: USER_SERVICE +'/profile/avatar/'+ userId,
+            headers: {
+                'Authorization': 'Bearer '+token
+            }
+        })
+            .then(function (response) {
+                dispatch(setAvatar(response.data.avatarUrl));
             })
             .catch(function (error) {
                 console.log(error.response);
