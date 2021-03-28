@@ -117,9 +117,7 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
       predefinedPlaces={[homePlace, workPlace]}
       currentLocation={true}
       currentLocationLabel="Current Location"
-    >
-      <ResultsList results={results} />
-    </GooglePlacesAutocomplete>
+    ></GooglePlacesAutocomplete>
   );
 };
 
