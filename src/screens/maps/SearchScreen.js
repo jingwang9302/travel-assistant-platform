@@ -14,6 +14,7 @@ import { Card, ListItem, Button, Icon } from "react-native-elements";
 import MapInput from "../../components/MapInput";
 import ResultList from "./ResultsList";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
+import useDirection from "../../hooks/useDirection";
 import { config } from "../../../config";
 
 const { height, width } = Dimensions.get("window");
@@ -27,7 +28,7 @@ const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
   const [marker, setMarker] = useState([]);
   const [curMarker, setCurMarker] = useState(null);
-  const [navigationInfo, setNavigationInfo] = useState(null);
+  const { navigationInfo, getDirections } = useDirection();
   const { currentLocation, loading, error } = useCurrentLocation();
   if (!currentLocation) {
     return (
@@ -44,34 +45,8 @@ const SearchScreen = ({ navigation }) => {
     longitudeDelta: LONGITUDE_DELTA,
   };
 
-  const getDirections = async (startLoc, desLoc) => {
-    try {
-      const resp = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${config.DIRECTION_API_KEY}`
-      );
-      const respJson = await resp.json();
-      const response = respJson.routes[0];
-      const distanceTime = response.legs[0];
-      const distance = distanceTime.distance.text;
-      const time = distanceTime.duration.text;
-      const points = Polyline.decode(
-        respJson.routes[0].overview_polyline.points
-      );
-      const coords = points.map((point) => {
-        return {
-          latitude: point[0],
-          longitude: point[1],
-        };
-      });
-      setNavigationInfo({ coords, distance, time });
-      // console.log(navigationInfo);
-      console.log(coords);
-    } catch (error) {
-      console.log("Error: ", error);
-    }
-  };
-
   const mergeCoods = (desLocation) => {
+    console.log("merge coords");
     if (desLocation) {
       const { desLatitude, desLongitude } = desLocation;
       const hasStartAndEnd =
@@ -79,11 +54,11 @@ const SearchScreen = ({ navigation }) => {
       if (hasStartAndEnd) {
         const concatStart = `${currentLocation.latitude},${currentLocation.longitude}`;
         const concatEnd = `${desLatitude},${desLongitude}`;
-        console.log("concat location", concatEnd);
         getDirections(concatStart, concatEnd);
       }
     }
   };
+  console.log(navigationInfo);
   return (
     <View>
       <MapView
@@ -169,9 +144,11 @@ const SearchScreen = ({ navigation }) => {
             <Text style={{ backgroundColor: "white", fontSize: 15 }}>
               {curMarker.address}
             </Text>
-            <Text style={{ fontSize: 15 }}>
-              {`Estimate time: ${navigationInfo.time}        Distance: ${navigationInfo.distance}`}
-            </Text>
+            {navigationInfo && (
+              <Text style={{ fontSize: 15 }}>
+                {`Estimate time: ${navigationInfo.time}        Distance: ${navigationInfo.distance}`}
+              </Text>
+            )}
             <Button
               // style={styles.button}
               onPress={() => {
