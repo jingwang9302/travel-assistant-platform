@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import Polyline from "@mapbox/polyline";
@@ -122,9 +123,9 @@ const SearchScreen = ({ navigation }) => {
               }}
             >
               <Callout
-                onPress={() => {
-                  navigation.navigate("Result", { result: item });
-                }}
+                // onPress={() => {
+                //   navigation.navigate("Result", { result: item });
+                // }}
                 tooltip
               >
                 <View style={styles.bubble}>
@@ -138,29 +139,48 @@ const SearchScreen = ({ navigation }) => {
       {curMarker && typeof curMarker.url === "string" && (
         <View
           style={{
-            backgroundColor: "red",
+            backgroundColor: "white",
             position: "absolute",
-            top: 400,
+            top: height - 392,
             alignSelf: "center",
           }}
         >
-          <Image
-            source={{
-              uri: curMarker.url,
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Result", { result: curMarker });
             }}
-            style={{
-              width: width * 0.95,
-              alignSelf: "center",
-              height: height * 0.15,
-            }}
-          />
+          >
+            <Image
+              source={{
+                uri: curMarker.url,
+              }}
+              style={{
+                width: width,
+                alignSelf: "center",
+                height: height * 0.15,
+              }}
+            />
+          </TouchableOpacity>
+
           <View>
-            <Text style={{ backgroundColor: "white", fontSize: 20 }}>
-              {curMarker.title}
+            <Text style={{ backgroundColor: "white", fontSize: 18 }}>
+              {`${curMarker.title}`}
             </Text>
-            <Text style={{ backgroundColor: "white", fontSize: 20 }}>
-              {curMarker.title}
+            <Text style={{ backgroundColor: "white", fontSize: 15 }}>
+              {curMarker.address}
             </Text>
+            <Text style={{ fontSize: 15 }}>
+              {`Estimate time: ${navigationInfo.time}        Distance: ${navigationInfo.distance}`}
+            </Text>
+            <Button
+              // style={styles.button}
+              onPress={() => {
+                console.log("button pressed for nothing");
+              }}
+              icon={<Icon name="arrow-right" size={20} color="white" />}
+              iconRight
+              title="Go Here"
+            />
           </View>
         </View>
       )}
@@ -182,10 +202,8 @@ const styles = StyleSheet.create({
   mapInput: { position: "absolute", width: width },
   map: { height: "100%" },
   button: {
-    width: 80,
-    paddingHorizontal: 12,
-    alignItems: "center",
-    marginHorizontal: 10,
+    width: width,
+    height: 60,
   },
   buttonContainer: {
     flexDirection: "row",
