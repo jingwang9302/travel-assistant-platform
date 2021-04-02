@@ -21,7 +21,7 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
-const SearchScreen = () => {
+const SearchScreen = ({ navigation }) => {
   // replace the initial to user's current location
   const initMapState = {
     region: {

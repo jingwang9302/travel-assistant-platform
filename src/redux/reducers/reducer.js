@@ -1,4 +1,12 @@
-import {combineReducers} from 'redux'
-import {user} from './user'
+import { combineReducers } from "redux";
+import { user } from "./user";
 
-export default combineReducers({user})
+import { travelgroupReducer } from "./travelgroupReducer";
+import { travelplanReducer } from "./travelPlanReducer";
+import { errorReducer } from "./errorReducer";
+
+export default combineReducers({
+  user,
+  groups: travelgroupReducer,
+  plans: travelplanReducer,
+});

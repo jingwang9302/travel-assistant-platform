@@ -7,7 +7,8 @@ import {
   Dimensions,
 } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { config } from "../../config";
+import config from "../config/config";
+import screen from "../screens/travelgroup/GroupListScreen";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
