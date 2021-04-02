@@ -68,10 +68,10 @@ const SearchScreen = ({ navigation }) => {
         showsMyLocationButton={true}
         initialRegion={initRegion}
         region={region || initRegion}
-        onPress={(e) => {
-          if (e.nativeEvent.action) return;
-          setMarker([e.nativeEvent.coordinate]);
-        }}
+        // onPress={(e) => {
+        //   if (e.nativeEvent.action) return;
+        //   setMarker([e.nativeEvent.coordinate]);
+        // }}
       >
         {navigationInfo &&
           navigationInfo.coords &&
@@ -98,14 +98,14 @@ const SearchScreen = ({ navigation }) => {
               }}
             >
               <Callout
-                // onPress={() => {
-                //   navigation.navigate("Result", { result: item });
-                // }}
+                onPress={() => {
+                  navigation.navigate("Result", { result: item });
+                }}
                 tooltip
               >
                 <View style={styles.bubble}>
-                  <Text>{item.title}</Text>
-                  <Text>{item.address}</Text>
+                  <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
+                  <Text style={{ fontSize: 12 }}>{item.address}</Text>
                 </View>
               </Callout>
             </Marker>
@@ -138,7 +138,13 @@ const SearchScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <View>
-            <Text style={{ backgroundColor: "white", fontSize: 18 }}>
+            <Text
+              style={{
+                backgroundColor: "white",
+                fontSize: 18,
+                fontWeight: "bold",
+              }}
+            >
               {`${curMarker.title}`}
             </Text>
             <Text style={{ backgroundColor: "white", fontSize: 15 }}>
@@ -150,13 +156,12 @@ const SearchScreen = ({ navigation }) => {
               </Text>
             )}
             <Button
-              // style={styles.button}
               onPress={() => {
-                console.log("button pressed for nothing");
+                navigation.navigate("Navigation");
               }}
               icon={<Icon name="arrow-right" size={20} color="white" />}
               iconRight
-              title="Go Here"
+              title="Start Navigation"
             />
           </View>
         </View>
@@ -178,21 +183,15 @@ const SearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   mapInput: { position: "absolute", width: width },
   map: { height: "100%" },
-  button: {
-    width: width,
-    height: 60,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginVertical: 20,
-    backgroundColor: "transparent",
-  },
   bubble: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: "rgb(255,255,255)",
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 20,
+    width: 160,
+    height: 80,
+    opacity: 0.8,
   },
   scrollView: {
     position: "absolute",

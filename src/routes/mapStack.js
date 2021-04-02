@@ -8,6 +8,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import SearchScreen from "../screens/maps/SearchScreen";
 import ResultScreen from "../screens/maps/ResultScreen";
 import ResultList from "../screens/maps/ResultsList";
+import NavigationScreen from "../screens/maps/NavigationScreen";
 
 const MapStack = () => {
   const Stack = createStackNavigator();
@@ -17,6 +18,7 @@ const MapStack = () => {
       <Stack.Screen name="Search" component={SearchScreen} />
       <Stack.Screen name="Result" component={ResultScreen} />
       <Stack.Screen name="ResultList" component={ResultList} />
+      <Stack.Screen name="Navigation" component={NavigationScreen} />
     </Stack.Navigator>
   );
 };
