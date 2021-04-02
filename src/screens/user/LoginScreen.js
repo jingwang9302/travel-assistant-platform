@@ -1,5 +1,6 @@
 import React, { createRef, useState } from "react";
 import {
+<<<<<<< HEAD
   StyleSheet,
   TextInput,
   View,
@@ -11,13 +12,31 @@ import {
   KeyboardAvoidingView,
   ImageBackground,
 } from "react-native";
+=======
+    StyleSheet,
+    View,
+    Text,
+    ScrollView,
+    Keyboard,
+    TouchableOpacity,
+    KeyboardAvoidingView, ImageBackground,
+} from 'react-native';
+>>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd
 import axios from "axios";
 import { useDispatch } from "react-redux";
 
+<<<<<<< HEAD
 import { LOGIN_URL, USER_SERVICE } from "../../config/urls";
 import Loader from "../../components/Loader";
 import { setLogin, setProfile, setToken } from "../../redux/actions/user";
 import { Icon, Input } from "react-native-elements";
+=======
+import {LOGIN_URL, NOTIFICATION_SERVICE, USER_SERVICE} from '../../config/urls';
+import Loader from "../../components/Loader";
+import {setAvatar, setLogin, setProfile, setToken} from "../../redux/actions/user";
+import {Icon, Input} from "react-native-elements";
+import {setNotifications} from "../../redux/actions/notification";
+>>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd
 
 const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -29,6 +48,7 @@ const LoginScreen = ({ navigation }) => {
 
   const passwordInputRef = createRef();
 
+<<<<<<< HEAD
   const login = () => {
     setErrorMessage("");
     if (!username) {
@@ -72,6 +92,156 @@ const LoginScreen = ({ navigation }) => {
         dispatch(setToken(token));
         fetchUserInfo(token);
         setLoading(false);
+=======
+    const login = () =>{
+
+        setErrorMessage('');
+        if (!username) {
+            setErrorMessage('Please fill Email');
+            return;
+        }
+        if (!password) {
+            setErrorMessage('Please fill Password');
+            return;
+        }
+
+        setLoading(true);
+
+        axios({
+            method: 'post',
+            url: LOGIN_URL,
+            data: {
+                grant_type: 'password',
+                client_id: 'tap',
+                client_secret: '123456',
+                username: username,
+                password: password
+            },
+            transformRequest: [function (data) {
+                let ret = ''
+                for (let it in data) {
+                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                }
+                return ret
+            }],
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+            .then(function (response) {
+                const token = response.data.access_token;
+                dispatch(setToken(token));
+                fetchUserInfo(token);
+
+                setLoading(false);
+                navigation.goBack();
+            })
+            .catch(function (error) {
+                setLoading(false);
+                if(error.response.data.message === null){
+                    setErrorMessage(error.message);
+                }else{
+                    if(error.response.data.status === 401) {
+                        setErrorMessage('Incorrect Email or Password');
+                    }else {
+                        setErrorMessage(error.response.data.message);
+                    }
+                }
+            });
+    }
+
+    const fetchUserInfo = (token) =>{
+        axios({
+            method: 'get',
+            url: USER_SERVICE +'/profile/'+ username,
+            headers: {
+                'Authorization': 'Bearer '+token
+            }
+        })
+            .then(function (response) {
+                dispatch(setProfile(response.data));
+                getNotifications(token, response.data.id);
+                getUserAvatar(token, response.data.id);
+                dispatch(setLogin(true));
+            })
+            .catch(function (error) {
+                console.log(error.response);
+            });
+    }
+
+    const getUserAvatar = (token, userId) =>{
+        axios({
+            method: 'get',
+            url: USER_SERVICE +'/profile/avatar/'+ userId,
+            headers: {
+                'Authorization': 'Bearer '+token
+            }
+        })
+            .then(function (response) {
+                dispatch(setAvatar(response.data.avatarUrl));
+            })
+            .catch(function (error) {
+                console.log(error.response);
+            });
+    }
+
+    const getNotifications = (token, userId) =>{
+        axios({
+            method: 'get',
+            url: NOTIFICATION_SERVICE +'/receive/'+ userId,
+            headers: {
+                'Authorization': 'Bearer '+token
+            }
+        })
+            .then(function (response) {
+                dispatch(setNotifications(response.data));
+            })
+            .catch(function (error) {
+                console.log(error.response);
+            });
+    }
+
+    // Test only!!!!!!!
+    const simulateLogin = () =>{
+        const data = {
+            id:1,
+            email: 'xiaoning.zhao@sjsu.edu',
+            firstName: 'Xiaoning',
+            lastName: 'Zhao',
+            address: '123 Earth Ave, Solar, Universe',
+            phone: '555-555-5555'
+        }
+
+        const message = [
+            {
+                id: 1,
+                title: 'Friend added',
+                content: 'People added you as friend.',
+                read: false,
+                timestamp: '2021-02-02',
+            },
+            {
+                id: 2,
+                title: 'People arrived',
+                content: 'People arrived at abc.',
+                read: false,
+                timestamp: '2021-02-01',
+            },
+            {
+                id: 3,
+                title: 'Group confirm',
+                content: 'You joined in abc group.',
+                read: true,
+                timestamp: '2021-01-01',
+            },
+        ]
+
+        dispatch(setLogin(true));
+        dispatch(setToken('fdafsdfafdafasdf'))
+        dispatch(setProfile(data));
+        dispatch(setNotifications(message));
+        // getNotifications('aaa', data.id);
+>>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd
         navigation.goBack();
       })
       .catch(function (error) {
@@ -227,6 +397,7 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   mainBody: {
     flex: 1,
     justifyContent: "center",
@@ -289,6 +460,70 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 14,
   },
+=======
+    mainBody: {
+        flex: 1,
+        justifyContent: 'center',
+        backgroundColor: '#307ecc',
+        alignContent: 'center',
+    },
+    image: {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: "center"
+    },
+    title: {
+        color: '#FFFFFF',
+        paddingVertical: 10,
+        fontSize: 30,
+        paddingTop: 200,
+    },
+    SectionStyle: {
+        flexDirection: 'row',
+        height: 40,
+        marginTop: 30,
+        marginLeft: 35,
+        marginRight: 35,
+        margin: 10,
+    },
+    buttonStyle: {
+        backgroundColor: '#307016',
+        borderWidth: 0,
+        color: '#FFFFFF',
+        borderColor: '#307016',
+        height: 40,
+        alignItems: 'center',
+        borderRadius: 10,
+        marginLeft: 35,
+        marginRight: 35,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    buttonTextStyle: {
+        color: '#FFFFFF',
+        paddingVertical: 10,
+        fontSize: 16,
+    },
+    inputStyle: {
+        flex: 1,
+        color: 'white',
+        paddingLeft: 15,
+        paddingRight: 15,
+    },
+    registerTextStyle: {
+        color: '#FFFFFF',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 15,
+        alignSelf: 'center',
+        padding: 10,
+    },
+    errorTextStyle: {
+        color: 'red',
+        textAlign: 'center',
+        fontSize: 14,
+    },
+>>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd
 });
 
 export default LoginScreen;
