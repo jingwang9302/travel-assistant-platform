@@ -18,14 +18,16 @@ const messagesRef = db.collection('messages');
 
 const ChatScreen = (props) => {
     const [user, setUser] = useState(null);
-    // const [name, setName] = useState('');
     const [messages, setMessages] = useState([]);
     const currentUserProfile = useSelector(state => state.user);
     const navigation = useNavigation();
 
     useEffect(()=>{
+        console.log(JSON.stringify(props.route.params.chatId));
         readUser();
-        const unsubscribe = messagesRef.onSnapshot((querySnapshot) => {
+        const unsubscribe = messagesRef
+            .where('chatGroup', '==', props.route.params.chatGroup)
+            .onSnapshot((querySnapshot) => {
             const messagesFirestore = querySnapshot
                 .docChanges()
                 .filter(({ type }) => type === 'added')
@@ -40,24 +42,17 @@ const ChatScreen = (props) => {
                 .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             appendMessages(messagesFirestore)
         });
-        console.log("Chat screen rendered.");
+        console.log("[ChatScreen::useEffect]Chat screen rendered.");
         return () => unsubscribe();
     }, []);
 
     useFocusEffect(
         React.useCallback(() => {
-            console.log("Chat focused");
-            async function checkUserStatus(){
-                console.log("Checking user status...");
-                const user = await AsyncStorage.getItem('user');
-                console.log("user in storage: " + JSON.stringify(user));
-                console.log("userProfile" + JSON.stringify(currentUserProfile));
-                if (user._id.normalize() !== currentUserProfile.id.normalize()) {
-                    console.log("user changed. Go to Message Home Screen...");
-                    navigation.navigate("Message");
-                }
+            console.log("[ChatScreen::useFocusEffect] Chat focused");
+            console.log(JSON.stringify(currentUserProfile));
+            if (!currentUserProfile.isLogin) {
+                navigation.navigate("Message");
             }
-            checkUserStatus();
         }, [])
       );
 
@@ -87,12 +82,15 @@ const ChatScreen = (props) => {
      * @param {*} messages 
      */
     async function handleSend(messages) {
-        const writes = messages.map((m) => messagesRef.add(m))
+        const writes = messages.map((m) => {
+            m = {...m, chatGroup:props.route.params.chatGroup}
+            messagesRef.add(m)
+        })
         await Promise.all(writes)
     }
 
     return (
-        <GiftedChat messages={messages} user={user} onSend={handleSend} />
+        <GiftedChat messages={messages} user={user} onSend={handleSend} renderUsernameOnMessage={true}/>
     );
 }
 

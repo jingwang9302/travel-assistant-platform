@@ -13,7 +13,7 @@ const MessageStack = () => {
   return (
       <Stack.Navigator initialRouteName="Message">
         <Stack.Screen name="Message" component={MessageHomeScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} options={({ route }) => ({ title: route.params.members })}/>
       </Stack.Navigator>
   );
 
