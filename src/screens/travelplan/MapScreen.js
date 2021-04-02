@@ -16,7 +16,7 @@ import {
   OverflowMenu,
 } from "react-navigation-header-buttons";
 import axios from "axios";
-import config from "../../config/config";
+import { PLACES_API_KEY } from "../../config/config";
 
 //import Colors from "../constants/Colors";
 import Loader from "../../components/Loader";
@@ -58,7 +58,7 @@ const MapScreen = ({ navigation, route }) => {
     setLoading(true);
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${PLACES_API_KEY}`
       )
       .then((res) => {
         const result = res.data.results[0];

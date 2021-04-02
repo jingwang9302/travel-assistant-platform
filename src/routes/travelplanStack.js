@@ -12,7 +12,7 @@ import GroupListForPlanPublishScreen from "../screens/travelgroup/GroupListForPl
 import TestScreen from "../screens/travelplan/test";
 import TravelPlanListTabScreen from "../screens/travelplan/PlanListTabScreen";
 
-const TravelPlanStack = () => {
+const TravelplanStack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator initialRouteName="PlanListTab">
@@ -53,4 +53,4 @@ const TravelPlanStack = () => {
   );
 };
 
-export default TravelPlanStack;
+export default TravelplanStack;

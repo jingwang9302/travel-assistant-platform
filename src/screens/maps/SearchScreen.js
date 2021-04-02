@@ -25,31 +25,6 @@ const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 
 const SearchScreen = ({ navigation }) => {
-<<<<<<< HEAD
-  // replace the initial to user's current location
-  const initMapState = {
-    region: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    },
-    marker: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      title: "title",
-      address: "Address",
-      url: null,
-    },
-  };
-  const [region, setRegion] = useState(initMapState.region);
-  const [marker, setMarker] = useState(initMapState.marker);
-
-  const onRegionChange = (reg) => {
-    setRegion(reg);
-    console.log("On Region Change");
-  };
-=======
   let [region, setRegion] = useState(null);
   const [marker, setMarker] = useState([]);
   const [curMarker, setCurMarker] = useState(null);
@@ -62,7 +37,6 @@ const SearchScreen = ({ navigation }) => {
       </View>
     );
   }
->>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd
 
   const initRegion = {
     latitude: currentLocation.latitude,

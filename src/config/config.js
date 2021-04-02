@@ -1,13 +1,23 @@
-const config = {
-  IOS_API_KEY: "REPLACE_WITH_YOU_API_KEY",
-  ANDROID_API_KEY: "REPLACE_WITH_YOU_API_KEY",
-<<<<<<< HEAD:src/config/config.js
-  PLACES_API_KEY: "AIzaSyDhARuvPnY3-bCJvu7FavCdichpag3-LDY",
-=======
-  PLACES_API_KEY: "REPLACE_WITH_YOU_API_KEY",
-  DIRECTION_API_KEY: "REPLACE_WITH_YOU_API_KEY",
->>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd:config.js
-};
+/** Define URLs */
+
+/** Backend system url */
+export const BASE_URL = 'http://35.188.32.151:8080';
+
+/** Entry point */
+
+/** User-related service */
+export const USER_SERVICE = BASE_URL + '/user/api/user';
+export const LOGIN_URL = BASE_URL + '/login';
+export const NOTIFICATION_SERVICE = BASE_URL + '/notification/api/notification';
+export const NOTIFICATION_WEBSOCKET_SERVICE = BASE_URL + '/notification-ws/notification';
+export const BLOG_SERVICE = BASE_URL + '/user/api/blog';
+export const UPLOAD_IMAGE_URL = BASE_URL + '/user';
+
+/** Group related service */
+export const GROUP_SERVICE = 'http://localhost:5000/travelgroup/'; 
 
 
-export default config;
+/** Travel related service */
+export const PLAN_SERVICE = 'http://localhost:5001/travelplan/'
+
+export const PLACES_API_KEY = 'AIzaSyDhARuvPnY3-bCJvu7FavCdichpag3-LDY'

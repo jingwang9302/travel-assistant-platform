@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import axios from "axios";
-import config from "../../config/config";
+
 import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -183,7 +183,7 @@ const PlacePickScreen = ({ navigation, route }) => {
   const fetchLoaction = () => {
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=48.8152937,2.4597668&key=${config.PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=48.8152937,2.4597668&key=${PLACES_API_KEY}`
       )
       .then((res) => {
         console.log(res.data);
