@@ -71,7 +71,7 @@ const NavigationScreen = ({ route, navigation }) => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            height: height * 0.6,
+            height: height * 0.05,
             width: width * 0.95,
             paddingHorizontal: 2,
             paddingVertical: 1,
