@@ -34,7 +34,7 @@ const NavigationScreen = ({ route, navigation }) => {
   const info = route.params;
   const { address, latitude, longitude, place_id, title, url } = info.info;
 
-  const { currentLocation, loading, error } = useCurrentLocation();
+  const { currentLocation, loading, error } = useCurrentLocation(true);
   if (!currentLocation) {
     return (
       <View>
@@ -83,7 +83,6 @@ const NavigationScreen = ({ route, navigation }) => {
           <View style={{ flex: 1 }}>
             <Text>{address}</Text>
           </View>
-
           <Text>{Math.ceil(duration)} mins </Text>
         </View>
       </View>
@@ -102,7 +101,7 @@ const NavigationScreen = ({ route, navigation }) => {
         followsUserLocation={true}
         minZoomLevel={15}
         // camera={initRegion}
-        // region={region || initRegion}
+        region={initRegion}
       >
         <Marker coordinate={info.info} anchor={{ x: 0.5, y: 0.5 }} />
         <MapViewDirections
@@ -139,7 +138,13 @@ const NavigationScreen = ({ route, navigation }) => {
         }}
       >
         <View style={styles.buttonContainer}>
-          <Button type="solid" title="End Navigation" />
+          <Button
+            type="solid"
+            title="End Navigation"
+            onPress={() => {
+              navigation.navigate("Search");
+            }}
+          />
         </View>
         <View style={styles.buttonContainer}>
           <Button type="solid" title="Modify Plan" />
