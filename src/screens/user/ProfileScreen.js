@@ -112,16 +112,16 @@ const ProfileScreen = ({userProfile}) => {
                 return response.json();
             })
             .then((data)=>{
-                dispatch(setAvatar(data.avatarUrl));
-                setAvatarVisible(false);
+                if(data.status === 200){
+                    dispatch(setAvatar(data.avatarUrl));
+                    setAvatarVisible(false);
+                }else{
+                    alert(data.message);
+                }
             })
             .catch((error)=> {
                 console.log('err: ' + error);
             });
-
-
-
-
     }
 
     const pickImage = async () => {
