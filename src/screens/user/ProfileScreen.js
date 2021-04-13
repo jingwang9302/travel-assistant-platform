@@ -112,11 +112,11 @@ const ProfileScreen = ({userProfile}) => {
                 return response.json();
             })
             .then((data)=>{
-                if(data.status === 200){
+                if(data.status === 500){
+                    alert(data.message);
+                }else{
                     dispatch(setAvatar(data.avatarUrl));
                     setAvatarVisible(false);
-                }else{
-                    alert(data.message);
                 }
             })
             .catch((error)=> {
