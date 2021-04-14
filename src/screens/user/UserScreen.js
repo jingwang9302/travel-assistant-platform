@@ -42,6 +42,12 @@ const UserScreen = ({navigation}) => {
             iconType: 'material-community',
             screen: 'Post'
         },
+        {
+            title: 'Travel Reviews',
+            icon: 'calendar',
+            iconType: 'material-community',
+            screen: 'TravelReviewHome'
+        }
     ]
 
     const logout = () =>{
