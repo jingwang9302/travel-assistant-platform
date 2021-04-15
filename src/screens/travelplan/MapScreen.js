@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,9 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+
+import { Button } from "react-native-elements";
+import MapView, { Marker, Callout } from "react-native-maps";
 import {
   HeaderButtons,
   HeaderButton,
@@ -16,22 +18,22 @@ import {
   OverflowMenu,
 } from "react-navigation-header-buttons";
 import axios from "axios";
-import { PLACES_API_KEY } from "../../config/config";
-
-//import Colors from "../constants/Colors";
-import Loader from "../../components/Loader";
+import { config } from "../../../config";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import * as Location from "expo-location";
 
 const MapScreen = ({ navigation, route }) => {
   const { initialLocation, readOnly } = route.params;
   const [selectedLocation, setSelectedLocation] = useState(initialLocation);
-  const [loading, setLoading] = useState(false);
-  console.log("initial locaiton");
-  console.log(
-    `initial lat: ${initialLocation.lat}; lng: ${initialLocation.lng}`
-  );
+  //const [place, setPlace] = useState(null);
+  const [placeDetail, setPlaceDetail] = useState(null);
+
+  const mapRef = useRef(null);
+  const mapDetailRef = useRef(null);
+
   const mapRegion = {
-    latitude: initialLocation ? initialLocation.lat : 37.78,
-    longitude: initialLocation ? initialLocation.lng : -122.43,
+    latitude: initialLocation ? initialLocation.lat : 37.2329,
+    longitude: initialLocation ? initialLocation.lng : -122.406417,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
@@ -55,10 +57,9 @@ const MapScreen = ({ navigation, route }) => {
   }, [selectedLocation]);
 
   const fetchLocationInfo = () => {
-    setLoading(true);
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.PLACES_API_KEY}`
       )
       .then((res) => {
         const result = res.data.results[0];
@@ -71,7 +72,6 @@ const MapScreen = ({ navigation, route }) => {
         const place = { placeId, address, lat, lng };
         console.log("place is: ");
         console.log(`${place.address}`);
-        setLoading(false);
 
         navigation.navigate("PlacePick", {
           placeInfo: place,
@@ -80,39 +80,73 @@ const MapScreen = ({ navigation, route }) => {
       })
       .catch((error) => {
         console.log(error.response.data.error.errors);
-        setLoading(false);
+
         Alert.alert("Failed!", "feching google place has problem");
       });
+  };
+
+  const onAutoCompleteHandler = (place_detail) => {
+    setSelectedLocation({
+      lat: place_detail.geometry.location.lat,
+      lng: place_detail.geometry.location.lng,
+    });
+  };
+  const showMyLocation = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
+      return;
+    }
+
+    let myLocation = await Location.getCurrentPositionAsync({ accuracy: 6 });
+    // console.log(myLocation);
+
+    if (myLocation !== null) {
+      mapRef.current.animateCamera({
+        center: {
+          latitude: myLocation.coords.latitude,
+          longitude: myLocation.coords.longitude,
+        },
+      });
+      setSelectedLocation({
+        lat: myLocation.coords.latitude,
+        lng: myLocation.coords.longitude,
+      });
+    }
   };
 
   const selectLocationHandler = (event) => {
     if (readOnly) {
       return;
     }
-    console.log("new picked location ");
-    console.log(
-      event.nativeEvent.coordinate.latitude,
-      event.nativeEvent.coordinate.longitude
-    );
+
+    console.log("picked location");
+    console.log(event.nativeEvent.coordinate.latitude);
+    console.log(event.nativeEvent.coordinate.longitude);
+
+    if (placeDetail) {
+      console.log("atuo location");
+      console.log(placeDetail.geometry.location.lat);
+      console.log(placeDetail.geometry.location.lng);
+
+      if (
+        event.nativeEvent.coordinate.latitude ===
+          placeDetail.geometry.location.lat &&
+        event.nativeEvent.coordinate.longitude ===
+          placeDetail.geometry.location.lng
+      ) {
+        return;
+      }
+    }
+    setPlaceDetail(null);
+    console.log("setplace detail is clicked");
+    console.log(placeDetail);
+
     setSelectedLocation({
       lat: event.nativeEvent.coordinate.latitude,
       lng: event.nativeEvent.coordinate.longitude,
     });
   };
-
-  //   const savePickedLocationHandler = () => {
-  //     if (!selectedLocation) {
-  //       Alert.alert("Warning", "You have to pick a place on the map");
-  //       return;
-  //     }
-  //     navigation.navigate("PlacePick", {
-  //       pickedLocationFromMap: selectedLocation,
-  //     });
-  //   };
-
-  // useEffect(() => {
-  //   props.navigation.setParams({ saveLocation: savePickedLocationHandler });
-  // }, [savePickedLocationHandler]);
 
   let markerCoordinates;
 
@@ -124,33 +158,110 @@ const MapScreen = ({ navigation, route }) => {
   }
 
   return (
-    <MapView
-      style={styles.map}
-      region={mapRegion}
-      onPress={selectLocationHandler}
-    >
-      <Loader loading={loading} />
-      {markerCoordinates && (
-        <Marker title="Picked Location" coordinate={markerCoordinates} />
-      )}
-    </MapView>
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 0.1 }}>
+        <GooglePlacesAutocomplete
+          placeholder="Search"
+          fetchDetails={true}
+          onPress={(data, details) => {
+            setPlaceDetail(details);
+            onAutoCompleteHandler(details);
+
+            mapRef.current.animateCamera({
+              center: {
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+              },
+            });
+          }}
+          query={{
+            key: config.PLACES_API_KEY,
+            language: "en",
+          }}
+          styles={{
+            container: {
+              flex: 1,
+            },
+            textInputContainer: {
+              flexDirection: "row",
+            },
+            textInput: {
+              backgroundColor: "#FFFFFF",
+              height: 40,
+              borderRadius: 5,
+              paddingVertical: 0,
+              paddingHorizontal: 5,
+              fontSize: 15,
+              flex: 1,
+            },
+            listView: {
+              zIndex: 10,
+              width: "100%",
+              height: 200,
+              backgroundColor: "transparent",
+              position: "absolute",
+              top: 40,
+            },
+          }}
+        />
+      </View>
+      <View style={{ flex: 1 }}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={mapRegion}
+          zoomEnabled={true}
+          onMapReady={() => {
+            showMyLocation();
+          }}
+          onPress={selectLocationHandler}
+        >
+          {markerCoordinates && (
+            <Marker coordinate={markerCoordinates}>
+              <Callout>
+                {placeDetail ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      length: 80,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: 5,
+                    }}
+                  >
+                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                      {placeDetail.name}
+                    </Text>
+                    <Text style={{ fontSize: 13 }}>
+                      {placeDetail.formatted_address}
+                    </Text>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flex: 1,
+                      length: 80,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: 5,
+                    }}
+                  >
+                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                      Picked Location
+                    </Text>
+                  </View>
+                )}
+              </Callout>
+            </Marker>
+          )}
+        </MapView>
+      </View>
+      <View style={styles.FloatingButton}>
+        <Button title="My Location" onPress={showMyLocation} />
+      </View>
+    </View>
   );
 };
-
-// MapScreen.navigationOptions = (navData) => {
-//   const saveFn = navData.navigation.getParam("saveLocation");
-//   const readonly = navData.navigation.getParam("readonly");
-//   if (readonly) {
-//     return {};
-//   }
-//   return {
-//     headerRight: (
-//       <TouchableOpacity style={styles.headerButton} onPress={saveFn}>
-//         <Text style={styles.headerButtonText}>Save</Text>
-//       </TouchableOpacity>
-//     ),
-//   };
-// };
 
 const styles = StyleSheet.create({
   map: {
@@ -158,6 +269,15 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     marginHorizontal: 20,
+  },
+  FloatingButton: {
+    position: "absolute",
+
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 150,
+    bottom: 2,
   },
   //   headerButtonText: {
   //     fontSize: 16,

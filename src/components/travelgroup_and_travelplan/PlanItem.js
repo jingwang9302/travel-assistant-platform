@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Icon, Badge } from "react-native-elements";
+import { PLAN_BASE_URL, GCS_URL } from "../../config/urls";
 
 const PlanItem = (props) => {
   // pass travelplan object as parameter
@@ -30,14 +31,23 @@ const PlanItem = (props) => {
                 <Image
                   style={styles.image}
                   source={{
-                    uri: "http://localhost:5001/uploads/" + props.imageUrl,
+                    uri: GCS_URL + props.imageUrl,
                   }}
                   //source={require("../../screens/travelplan/images/planimage.jpeg")}
                 />
               </View>
-              <View style={{ alignItems: "center", height: "30%" }}>
+              <View
+                style={{
+                  alignItems: "center",
+                  height: "30%",
+                  justifyContent: "center",
+                }}
+              >
                 <Text style={styles.title}>{props.name}</Text>
-                <Text style={styles.title}>{props.description}</Text>
+                <Text style={{ fontSize: 17 }}>{props.description}</Text>
+                <Text style={{ fontSize: 15, marginTop: 3 }}>
+                  Start Time: {props.estimatedStartDate}{" "}
+                </Text>
               </View>
               <View
                 style={{
@@ -48,13 +58,7 @@ const PlanItem = (props) => {
                 }}
               >
                 <View>
-                  <Icon
-                    name="thumbs-up-outline"
-                    type="ionicon"
-                    onPress={() => {
-                      console.log("like is pressed");
-                    }}
-                  />
+                  <Icon name="thumbs-up-outline" type="ionicon" />
                   {props.likes === 0 ? null : (
                     <Badge
                       value={props.likes}
@@ -68,15 +72,11 @@ const PlanItem = (props) => {
                   )}
                 </View>
 
-                <Text>{props.status}</Text>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  {props.status}
+                </Text>
                 <View>
-                  <Icon
-                    name="thumbs-down-outline"
-                    type="ionicon"
-                    onPress={() => {
-                      console.log("dislike is pressed");
-                    }}
-                  />
+                  <Icon name="thumbs-down-outline" type="ionicon" />
                   {props.dislikes === 0 ? null : (
                     <Badge
                       value={props.dislikes}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     marginVertical: 2,
   },
   price: {

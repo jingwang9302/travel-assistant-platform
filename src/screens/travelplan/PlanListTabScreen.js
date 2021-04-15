@@ -1,7 +1,7 @@
 import React, { createRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
-import { UPDATE_ERRORS, CLEAR_ERRORS } from "../../redux/actions/errorAction";
+
 import axios from "axios";
 import {
   getGroupsUserIn,
@@ -67,10 +67,13 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
   const { ongoingPlan } = useSelector((state) => state.plans);
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
+  const isFocused = navigation.isFocused();
 
   useEffect(() => {
-    fechTravelPlanOfInitiator();
-  }, []);
+    if (userProfile.isLogin) {
+      fechTravelPlanOfInitiator();
+    }
+  }, [userProfile, isFocused]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -96,7 +99,6 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
 
           {ongoingPlan ? (
             <Item
-              title="Ongoing"
               iconName="airplane-outline"
               onPress={() => {
                 navigation.navigate("PlanDetail", { planId: ongoingPlan });
@@ -117,6 +119,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
   );
 
   const fechTravelPlanOfInitiator = () => {
+    setPlans([]);
     setLoading(true);
     setIsRefreshing(true);
     axios
@@ -134,7 +137,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
         console.log(error.response.data.error);
         setIsRefreshing(false);
         setLoading(false);
-        Alert.alert("Failed!", `${error.response.data.error}`);
+        //Alert.alert("Alert", `${error.response.data.error}`);
       });
   };
 
@@ -151,6 +154,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
         status={planStatus[item.status]}
         likes={item.likes.length}
         dislikes={item.dislikes.length}
+        estimatedStartDate={item.startDate}
         onSelect={() => {
           navigation.navigate("PlanDetail", {
             planId: item._id,

@@ -8,12 +8,9 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-screens/user/*
-screens/maps/*
-redux/reducers/errorReducer.js
-redux/actions/errorAction.js
-screens/travelplan/images
-config/config.js
+screens/user/
+screens/maps/
+config.js
 
 # macOS
 .DS_Store

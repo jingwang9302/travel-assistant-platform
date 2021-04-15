@@ -56,7 +56,7 @@ const LocationPicker = (props) => {
       Alert.alert(
         "Could not fetch location!",
         "Please try again later or pick a location on the map.",
-        [{ text: "Okay" }]
+        [{ text: "Ok" }]
       );
     }
     setIsFetching(false);
@@ -83,14 +83,9 @@ const LocationPicker = (props) => {
       </MapPreview>
       <View style={styles.actions}>
         <Button
-          title="Get Current Location"
-          onPress={getLocationHandler}
-          buttonStyle={{ width: 190 }}
-        />
-        <Button
           title="Pick on Map"
           onPress={pickOnMapHandler}
-          buttonStyle={{ width: 180 }}
+          buttonStyle={{ width: 400 }}
         />
       </View>
     </View>
@@ -109,8 +104,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   actions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    justifyContent: "center",
     width: "100%",
   },
 });

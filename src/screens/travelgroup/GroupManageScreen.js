@@ -12,7 +12,11 @@ import {
   Alert,
 } from "react-native";
 
-import { USER_SERVICE, GROUP_SERVICE } from "../../config/urls";
+import {
+  USER_SERVICE,
+  GROUP_SERVICE,
+  UPLOAD_IMAGE_URL,
+} from "../../config/urls";
 import {
   Icon,
   Input,
@@ -38,10 +42,7 @@ const GroupManageScreen = ({ navigation, route }) => {
   const [test2, setTest2] = useState([]);
 
   const { currUserRole, groupId, selectedUserDetail, readOnly } = route.params;
-  console.log("button display");
-  console.log(test2);
-  //console.log(buttonDisplay);
-  //console.log(buttonDisplay.length);
+
   useEffect(() => {
     loadManageScreen();
   }, []);
@@ -181,8 +182,7 @@ const GroupManageScreen = ({ navigation, route }) => {
           <Avatar
             rounded
             source={{
-              uri:
-                "https://avatars0.githubusercontent.com/u/32242596?s=460&u=1ea285743fc4b083f95d6ee0be2e7bb8dcfc676e&v=4",
+              uri: UPLOAD_IMAGE_URL + selectedUserDetail.avatarUrl,
             }}
             size="xlarge"
           />

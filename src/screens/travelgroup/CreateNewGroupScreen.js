@@ -14,7 +14,7 @@ import {
   Alert,
 } from "react-native";
 
-import { USER_SERVICE, GROUP_SERVICE } from "../../config/urls";
+import { USER_SERVICE, GROUP_SERVICE, GROUP_BASE_URL } from "../../config/urls";
 import Loader from "../../components/Loader";
 import { Icon, Input, Image, Button } from "react-native-elements";
 import { set } from "react-native-reanimated";
@@ -37,12 +37,6 @@ const CreateNewGroupScreen = ({ navigation }) => {
   }
 
   const createNewGroup = () => {
-    //for test
-    // navigation.navigate("GroupDetail", {
-    //   groupId: 10,
-    //   //groupName: ,
-    // });
-
     setGroupNameInputError("");
     setErrorMessage("");
 
@@ -115,9 +109,6 @@ const CreateNewGroupScreen = ({ navigation }) => {
       .then((res) => {
         const { data } = res.data;
         console.log(`image name is ${data}`);
-        // setSelectedImage({
-        //   localUri: `http://localhost:5001/uploads/${data}`,
-        // });
       })
       .catch((error) => {
         setErrorMessage(error.response.data.error);
@@ -184,25 +175,35 @@ const CreateNewGroupScreen = ({ navigation }) => {
             />
           </View>
 
-          {/* <View style={styles.SectionStyle}>
-            {errorMessage !== "" ? (
-              <Text style={styles.errorTextStyle}>{errorMessage}</Text>
-            ) : null}
-          </View> */}
           <View style={{ alignItems: "center", marginTop: 30 }}>
-            <Image
-              source={{ uri: selectedImage.localUri }}
-              style={{ width: 400, height: 200 }}
-              PlaceholderContent={
-                <Icon
-                  name="add-circle-outline"
-                  type="ionicon"
-                  size={100}
-                  color="grey"
-                />
-              }
-              onPress={openImagePickerAsync}
-            />
+            {selectedImage.localUri ? (
+              <Image
+                source={{ uri: selectedImage.localUri }}
+                style={{ width: 400, height: 200 }}
+                PlaceholderContent={
+                  <Icon
+                    name="add-circle-outline"
+                    type="ionicon"
+                    size={100}
+                    color="grey"
+                  />
+                }
+                onPress={openImagePickerAsync}
+              />
+            ) : (
+              <Image
+                style={{ width: 400, height: 200 }}
+                PlaceholderContent={
+                  <Icon
+                    name="add-circle-outline"
+                    type="ionicon"
+                    size={100}
+                    color="grey"
+                  />
+                }
+                onPress={openImagePickerAsync}
+              />
+            )}
           </View>
           <Button
             buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
@@ -210,19 +211,6 @@ const CreateNewGroupScreen = ({ navigation }) => {
             style={{ marginVertical: 20 }}
             onPress={createNewGroup}
           />
-          {/* <TouchableOpacity
-            style={styles.buttonStyle}
-            activeOpacity={0.5}
-            onPress={createNewGroup}
-          >
-            <Text style={styles.buttonTextStyle}>Submit</Text>
-          </TouchableOpacity> */}
-          {/* <Button
-            title="upload image"
-            onPress={() => {
-              upLoadImage(selectedImage.localUri, "605d7a773e135e36c6b10a58");
-            }}
-          /> */}
         </KeyboardAvoidingView>
       </ScrollView>
     </View>

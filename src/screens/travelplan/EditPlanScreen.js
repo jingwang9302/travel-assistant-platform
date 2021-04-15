@@ -15,7 +15,12 @@ import {
   Alert,
 } from "react-native";
 
-import { USER_SERVICE, GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
+import {
+  USER_SERVICE,
+  GROUP_SERVICE,
+  PLAN_SERVICE,
+  PLAN_BASE_URL,
+} from "../../config/urls";
 
 import Loader from "../../components/Loader";
 import {
@@ -42,17 +47,19 @@ import {
   removeDeparturPlace,
   clearDepartureAndDestinationAddress,
 } from "../../redux/actions/travelPlanAction";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const EditPlanScreen = ({ navigation, route }) => {
   const { plan } = route.params;
   const [errorMessage, setErrorMessage] = useState("");
   const [planName, setPlanName] = useState("");
   const [planDescription, setPlanDescription] = useState("");
+  const [estimatedStartTime, setEstimatedStartTime] = useState("");
 
   // const [destinationAddress, setDestinationAddress] = useState([]);
   //const [departureAddress, setDepartureAddress] = useState("");
   const [selectedImage, setSelectedImage] = useState({
-    localUri: `http://localhost:5001/uploads/${plan.image}`,
+    localUri: `${PLAN_BASE_URL}/uploads/${plan.image}`,
   });
   const [planUpdated, setPlanUpdated] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -62,20 +69,46 @@ const EditPlanScreen = ({ navigation, route }) => {
   ] = useState("");
 
   const [planNameInputErrorMessage, setPlanNameInputError] = useState("");
+  const [startTimeInputErrorMessage, setStartTimeInputError] = useState("");
   const { departureAddress, destinationAddress } = useSelector(
     (state) => state.plans
   );
 
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState("date");
+  const [show, setShow] = useState(false);
+
   const userProfile = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-  const oldUrl = `http://localhost:5001/uploads/${plan.image}`;
+  const oldUrl = `${PLAN_BASE_URL}/${plan.image}`;
 
   useEffect(() => {
     setPlanName(plan.planName);
-    console.log(`planName is: ${planName}`);
+    //console.log(`planName is: ${planName}`);
     setPlanDescription(plan.planDescription);
+    setEstimatedStartTime(plan.startDate);
   }, []);
+
+  const onChange = (event, selectedDate) => {
+    //const date = new Date();
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+    setEstimatedStartTime(currentDate.toLocaleString());
+  };
+
+  const showMode = (currentMode) => {
+    setShow(!show);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode("date");
+  };
+
+  const showTimepicker = () => {
+    showMode("time");
+  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -99,7 +132,14 @@ const EditPlanScreen = ({ navigation, route }) => {
         </HeaderButtons>
       ),
     });
-  }, [planName, planDescription, destinationAddress, departureAddress]);
+  }, [
+    planName,
+    planDescription,
+    destinationAddress,
+    departureAddress,
+    estimatedStartTime,
+    selectedImage,
+  ]);
 
   const openImagePickerAsync = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -150,6 +190,7 @@ const EditPlanScreen = ({ navigation, route }) => {
         planDescription,
         departureAddress,
         destinationAddress,
+        startDate: estimatedStartTime,
       },
     })
       .then((res) => {
@@ -157,10 +198,11 @@ const EditPlanScreen = ({ navigation, route }) => {
         setPlanUpdated(data);
         console.log("Updated plan:");
         console.log(data);
+        console.log(selectedImage.localUri);
         if (
           selectedImage.localUri &&
           selectedImage.localUri !== oldUrl &&
-          selectedImage.localUri !== " "
+          selectedImage.localUri !== ""
         ) {
           console.log("selelected image url:");
           console.log(selectedImage.localUri);
@@ -294,6 +336,64 @@ const EditPlanScreen = ({ navigation, route }) => {
                 />
               }
             />
+            <Input
+              style={styles.inputStyle}
+              onChangeText={(input) => {
+                setEstimatedStartTime(input);
+              }}
+              underlineColorAndroid="#f000"
+              placeholder="Input Travelplan StartDate and Time"
+              placeholderTextColor="#8b9cb5"
+              autoCapitalize="sentences"
+              errorMessage={startTimeInputErrorMessage}
+              blurOnSubmit={false}
+              value={estimatedStartTime}
+              leftIcon={
+                <Icon
+                  name="account"
+                  size={24}
+                  type="material-community"
+                  color="black"
+                />
+              }
+              rightIcon={
+                <Icon
+                  color="black"
+                  name="close"
+                  size={20}
+                  onPress={() => {
+                    //planDescriptionRef.current.clear();
+                    setStartTimeInputError("");
+                    setEstimatedStartTime("");
+                    setErrorMessage("");
+                  }}
+                />
+              }
+            />
+          </View>
+          <View>
+            <View
+              style={{
+                marginHorizontal: 40,
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button title="Pick Date" onPress={showDatepicker} />
+              <Button title="Pick Time" onPress={showTimepicker} />
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              {show ? (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode={mode}
+                  is24Hour={true}
+                  display="spinner"
+                  onChange={onChange}
+                />
+              ) : null}
+            </View>
           </View>
           <View style={{ alignItems: "center" }}>
             <Image
@@ -312,7 +412,19 @@ const EditPlanScreen = ({ navigation, route }) => {
           </View>
 
           <View>
-            <Divider style={{ margin: 10, backgroundColor: "black" }} />
+            <View>
+              <Button
+                icon={<Icon name="add" size={25} color="white" />}
+                buttonStyle={{ marginHorizontal: 5, borderRadius: 10 }}
+                title="Add Places"
+                style={{ marginVertical: 20 }}
+                onPress={() => {
+                  navigation.navigate("PlacePick", {
+                    pickedLocationFromMap: null,
+                  });
+                }}
+              />
+            </View>
             {departureAddress && departureAddress.title ? (
               <View
                 style={{
@@ -412,9 +524,10 @@ const EditPlanScreen = ({ navigation, route }) => {
                         </TouchableOpacity>
                       </View>
 
-                      <View style={{ marginRight: 30, width: 20, height: 20 }}>
+                      <View style={{ marginRight: 35, width: 30, height: 30 }}>
                         <Icon
                           name="delete"
+                          type="antdesign"
                           onPress={() => {
                             dispatch(removeDestinationPlace(item.placeId));
                             console.log("delete clicked :");
@@ -427,30 +540,21 @@ const EditPlanScreen = ({ navigation, route }) => {
                 })
               : null}
           </View>
-          <Button
-            buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
-            title="Add Places"
-            style={{ marginVertical: 20 }}
-            onPress={() => {
-              navigation.navigate("PlacePick", {
-                pickedLocationFromMap: null,
-              });
-            }}
-          />
-          <Button
+
+          {/* <Button
             buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
             title="submit"
             style={{ marginVertical: 20 }}
             onPress={updatePlan}
-          />
-          <Button
+          /> */}
+          {/* <Button
             buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
             title="cleare des and dp"
             style={{ marginVertical: 20 }}
             onPress={() => {
               dispatch(clearDepartureAndDestinationAddress());
             }}
-          />
+          /> */}
         </KeyboardAvoidingView>
       </View>
     </ScrollView>

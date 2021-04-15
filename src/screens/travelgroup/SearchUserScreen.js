@@ -24,16 +24,29 @@ import {
 } from "react-native";
 import React, { createRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
+import {
+  GROUP_SERVICE,
+  PLAN_SERVICE,
+  USER_SERVICE,
+  UPLOAD_IMAGE_URL,
+} from "../../config/urls";
 
 import { USER_DATA } from "../travelgroup/Data";
 
 const SearchUserScreen = ({ navigation, route }) => {
   const [search, setSearch] = useState("");
+  const [userSearched, setUserSearched] = useState();
+  const [users, setUsers] = useState([]);
+  const [friends, setFriends] = useState([]);
   const { groupId, foraddrole, group } = route.params;
+  const userProfile = useSelector((state) => state.user);
 
   console.log("group passed is");
-  console.log(group);
+  console.log(groupId);
+  useEffect(() => {
+    getFriend();
+  }, []);
+
   if (!group.groupMembers) {
     group.groupMembers = [];
   }
@@ -41,10 +54,61 @@ const SearchUserScreen = ({ navigation, route }) => {
   if (!group.groupManagers) {
     group.groupManagers = [];
   }
-  const userProfile = useSelector((state) => state.user);
 
-  const searchUser = () => {
-    console.log("search is operated");
+  // const searchUser = () => {
+  //   console.log("search is operated");
+  // };
+
+  const getFriend = () => {
+    axios({
+      method: "get",
+      url: USER_SERVICE + "/friends/" + userProfile.id,
+      headers: {
+        Authorization: "Bearer " + userProfile.token,
+      },
+    })
+      .then(function (response) {
+        console.log("friends get");
+        console.log(response.data);
+        setFriends(response.data);
+      })
+      .catch(function (error) {
+        console.log(error.response);
+      });
+  };
+
+  const fetchUserInfo = (userId) => {
+    axios({
+      method: "get",
+      url: USER_SERVICE + "/profile/basic/" + userId,
+      headers: {
+        Authorization: "Bearer " + userProfile.token,
+      },
+    })
+      .then(function (response) {
+        //need to check API
+        const searchedUser = response.data;
+        console.log("searched user info:");
+        console.log(searchedUser);
+        navigation.navigate("UserBasicInfo", {
+          userInfo: searchedUser,
+          foraddrole,
+          groupId,
+        });
+        setUserSearched(basicUserInfo);
+
+        //setAllPeopleInGroup((oldarr) => [...oldarr, basicUserInfo]);
+        // setAll([..all, basicUserInfo]);
+
+        // setAllPeopleInGroup((old) => {
+        //   [...old, basicUserInfo];
+        // });
+      })
+      .catch(function (error) {
+        setErrorMessage(error.response.data);
+        Alert.alert(error.response.data.error);
+        console.log(error.response.data.error);
+      });
   };
 
   const addUserToGroup = (idToAdd) => {
@@ -73,7 +137,7 @@ const SearchUserScreen = ({ navigation, route }) => {
       group.groupManagers.includes(item.id) ||
       group.groupOwner === item.id ? null : (
         <TouchableOpacity
-          onPress={() => {
+          onLongPress={() => {
             Alert.alert("Alert", "Are you sure to add this user?", [
               { text: "Cancel", style: "cancel" },
               {
@@ -84,21 +148,27 @@ const SearchUserScreen = ({ navigation, route }) => {
               },
             ]);
           }}
+          onPress={() => {
+            navigation.navigate("UserBasicInfo", {
+              userInfo: item,
+              foraddrole,
+              groupId,
+            });
+          }}
         >
           <ListItem bottomDivider>
             <Avatar
               avatarStyle={{ borderRadius: 10 }}
               size="large"
               source={{
-                uri:
-                  "https://avatars0.githubusercontent.com/u/32242596?s=460&u=1ea285743fc4b083f95d6ee0be2e7bb8dcfc676e&v=4",
+                uri: UPLOAD_IMAGE_URL + item.avatarUrl,
               }}
             />
             <ListItem.Content>
               <ListItem.Title>
                 {item.firstName} {` ${item.lastName}`}
               </ListItem.Title>
-              <ListItem.Subtitle>{item.id}</ListItem.Subtitle>
+              <ListItem.Subtitle>Id: {item.id}</ListItem.Subtitle>
             </ListItem.Content>
           </ListItem>
         </TouchableOpacity>
@@ -123,7 +193,7 @@ const SearchUserScreen = ({ navigation, route }) => {
 
             onPress: () => {
               if (search) {
-                searchUser();
+                fetchUserInfo(search);
                 setSearch("");
               }
             },
@@ -132,7 +202,7 @@ const SearchUserScreen = ({ navigation, route }) => {
       </View>
       <View>
         <FlatList
-          data={USER_DATA}
+          data={friends}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
         />

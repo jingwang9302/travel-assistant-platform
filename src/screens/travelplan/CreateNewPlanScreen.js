@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  Platform,
 } from "react-native";
 
 import { USER_SERVICE, GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
@@ -42,6 +43,7 @@ import {
   removeDeparturPlace,
   removeDestinationPlace,
 } from "../../redux/actions/travelPlanAction";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateNewPlanScreen = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -59,6 +61,9 @@ const CreateNewPlanScreen = ({ navigation }) => {
   ] = useState("");
   const [planNameInputErrorMessage, setPlanNameInputError] = useState("");
   const [timeInputError, setTimeInputError] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState("date");
+  const [show, setShow] = useState(false);
 
   const userProfile = useSelector((state) => state.user);
   const { departureAddress, destinationAddress } = useSelector(
@@ -81,7 +86,14 @@ const CreateNewPlanScreen = ({ navigation }) => {
         </HeaderButtons>
       ),
     });
-  }, [planName, planDescription, destinationAddress, departureAddress]);
+  }, [
+    planName,
+    planDescription,
+    destinationAddress,
+    departureAddress,
+    estimatedStartTime,
+    date,
+  ]);
 
   const openImagePickerAsync = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -101,7 +113,6 @@ const CreateNewPlanScreen = ({ navigation }) => {
     setErrorMessage("");
     setPlanNameInputError("");
     setPlanDescriptionInputError("");
-
     if (!planName) {
       setPlanNameInputError("Please enter the planName");
       return;
@@ -110,10 +121,14 @@ const CreateNewPlanScreen = ({ navigation }) => {
       setPlanDescriptionInputError("Please enter the description");
       return;
     }
-    if (!estimatedStartTime) {
-      setTimeInputError("Please enter the date and time");
+    if (!date) {
+      setTimeInputError("Please pick date and time");
 
       return;
+    }
+    const nowDate = new Date();
+    if (date < nowDate) {
+      setTimeInputError("Please pick the valid date and time ");
     }
 
     if (!destinationAddress || destinationAddress.length === 0) {
@@ -123,9 +138,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
     if (!departureAddress) {
       departureAddress = {};
     }
-
     setLoading(true);
-
     axios({
       method: "POST",
       url: PLAN_SERVICE + "create/" + userProfile.id,
@@ -134,7 +147,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
         planDescription,
         departureAddress,
         destinationAddress,
-        estimatedStartDate: estimatedStartTime,
+        startDate: date.toLocaleString(),
       },
     })
       .then((res) => {
@@ -147,6 +160,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
         setLoading(false);
         //clear departure and destination addresses in redux
         dispatch(clearDepartureAndDestinationAddress());
+        navigation.navigate("PlanListTab", { planCreated: true });
       })
       .catch((error) => {
         //setErrorMessage(error.response.data.error);
@@ -194,6 +208,25 @@ const CreateNewPlanScreen = ({ navigation }) => {
         Alert.alert("Creation Failed!", error.response.data.error);
         console.log(error.response.data.error);
       });
+  };
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode) => {
+    setShow(!show);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode("date");
+  };
+
+  const showTimepicker = () => {
+    showMode("time");
   };
 
   return (
@@ -267,16 +300,15 @@ const CreateNewPlanScreen = ({ navigation }) => {
             />
             <Input
               style={styles.inputStyle}
-              onChangeText={(input) => {
-                setEstimatedStartTime(input);
-              }}
+              // onChangeText={(input) => {
+              //   setEstimatedStartTime(input);
+              // }}
               underlineColorAndroid="#f000"
-              placeholder="Estimated Start Time: MM/DD/YYYY + Time"
+              placeholder="Plan Starting Date and Time"
               placeholderTextColor="#8b9cb5"
-              autoCapitalize="sentences"
               errorMessage={timeInputError}
               blurOnSubmit={false}
-              value={estimatedStartTime}
+              value={date.toLocaleString()}
               leftIcon={
                 <Icon
                   name="account"
@@ -292,12 +324,36 @@ const CreateNewPlanScreen = ({ navigation }) => {
                   size={20}
                   onPress={() => {
                     setTimeInputError("");
-                    setEstimatedStartTime("");
+                    //setDate()
                     setErrorMessage("");
                   }}
                 />
               }
             />
+          </View>
+          <View>
+            <View
+              style={{
+                marginHorizontal: 40,
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button title="Pick Date" onPress={showDatepicker} />
+              <Button title="Pick Time" onPress={showTimepicker} />
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              {show ? (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode={mode}
+                  is24Hour={true}
+                  display="spinner"
+                  onChange={onChange}
+                />
+              ) : null}
+            </View>
           </View>
           <View style={{ alignItems: "center" }}>
             {selectedImage.localUri && selectedImage.localUri !== "" ? (

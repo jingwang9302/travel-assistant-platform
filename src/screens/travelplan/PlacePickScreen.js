@@ -19,7 +19,7 @@ import {
   Alert,
 } from "react-native";
 import { Button, Input, Icon } from "react-native-elements";
-import { PLACES_API_KEY } from "../../config/config";
+import { config } from "../../../config";
 import {
   HeaderButtons,
   HeaderButton,
@@ -59,8 +59,6 @@ const PlacePickScreen = ({ navigation, route }) => {
   let { pickedLocationFromMap, placeInfo } = route.params;
   const dispatch = useDispatch();
   const placeTitleInputRef = useRef();
-  console.log("loaction from map");
-  console.log(pickedLocationFromMap);
 
   let placeTitle_S = "";
   let errorMessage_S = "";
@@ -103,17 +101,6 @@ const PlacePickScreen = ({ navigation, route }) => {
     });
   }, [placeInfo, placeTitle, pickedLocationFromMap]);
 
-  //let pickedLocation = { lat: 48.8152937, lng: 2.4597668 };
-  //   if (!route.params.pickedLocation) {
-  //     pickedLocation = route.params.pickedLocation;
-  //   }
-
-  //const placeTitle = placeTitleInputRef.current.value;
-
-  //   const imageTakenHandler = (imagePath) => {
-  //     setSelectedImage(imagePath);
-  //   };
-
   const locationPickedHandler = useCallback((location) => {
     setSelectedLocation(location);
   }, []);
@@ -131,40 +118,12 @@ const PlacePickScreen = ({ navigation, route }) => {
     }
     if (type === "departure") {
       dispatch(addDeparturePlace({ ...placeInfo, title: placeTitle }));
+      Alert.alert("Success", "Departure Place is Added");
     } else {
       dispatch(addDestinationPlace({ ...placeInfo, title: placeTitle }));
+      Alert.alert("Success", "Destination Place is Added");
     }
     setPlaceTitle("");
-
-    // if (!placeTitle) {
-    //   setPlaceTitleInputError("Please Input Place Title");
-    //   return;
-    // }
-    //   if (type === 'departure') {
-    //       axios({
-    //           method: "POST",
-    //           url: PLAN_SERVICE + `create/${userProfile.id}`,
-    //           data: {}
-    //       })
-    //   }
-    // axios
-    //   .get(
-    //     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${PLACES_API_KEY}`
-    //   )
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     const result = res.data.results[0];
-    //     const address = result.formatted_address;
-    //     const placeId = result.place_id;
-    //     const { lat } = result.geometry.location;
-    //     const { lng } = result.geometry.location;
-
-    //     navigation.goBack();
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.response.data.error.errors);
-    //     Alert.alert("Failed!", "feching google place has problem");
-    //   });
   };
   const clearInputCallback = useCallback(() => {
     setPlaceTitle("");
@@ -183,7 +142,7 @@ const PlacePickScreen = ({ navigation, route }) => {
   const fetchLoaction = () => {
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=48.8152937,2.4597668&key=${PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=48.8152937,2.4597668&key=${config.PLACES_API_KEY}`
       )
       .then((res) => {
         console.log(res.data);
@@ -202,13 +161,6 @@ const PlacePickScreen = ({ navigation, route }) => {
         Alert.alert("Failed!", "feching google place has problem");
       });
   };
-  // const resData = await response.json();
-
-  //const address = resData.results[0].formatted_address;
-
-  //   dispatch(
-  //     placesActions.addPlace(titleValue, selectedImage, selectedLocation)
-  //   );
 
   return (
     <ScrollView>
@@ -250,6 +202,7 @@ const PlacePickScreen = ({ navigation, route }) => {
         />
         {placeInfo ? (
           <View>
+            <Text>Place Picked From Map: </Text>
             <Text style={styles.label}>{placeInfo.address}</Text>
           </View>
         ) : null}

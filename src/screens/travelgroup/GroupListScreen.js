@@ -1,7 +1,11 @@
 import React, { createRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
-import { UPDATE_ERRORS, CLEAR_ERRORS } from "../../redux/actions/errorAction";
+import {
+  GROUP_SERVICE,
+  PLAN_SERVICE,
+  GROUP_BASE_URL,
+  GCS_URL,
+} from "../../config/urls";
 import axios from "axios";
 
 import {
@@ -75,14 +79,13 @@ const GroupListScreen = ({ navigation, route }) => {
       setLoading(false);
     } else {
       dispatch(clearTravelgroup());
-      //dispatch(clearCurrGroup());
     }
   }, [userProfile.isLogin]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <HeaderButtons>
+        <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
           <OverflowMenu
             style={{ marginHorizontal: 10 }}
             OverflowIcon={() => <Icon name="menu" size={30} />}
@@ -102,7 +105,6 @@ const GroupListScreen = ({ navigation, route }) => {
           </OverflowMenu>
           {ongoingPlan ? (
             <Item
-              title="Ongoing"
               iconName="airplane-outline"
               onPress={() => {
                 navigation.navigate("PlanDetail", { planId: ongoingPlan });
@@ -115,8 +117,6 @@ const GroupListScreen = ({ navigation, route }) => {
   }, [ongoingPlan]);
 
   const IoniconsHeaderButton = (props) => (
-    // the `props` here come from <Item ... />
-    // you may access them and pass something else to `HeaderButton` if you like
     <HeaderButton IconComponent={Ionicons} iconSize={23} {...props} />
   );
 
@@ -232,7 +232,8 @@ const GroupListScreen = ({ navigation, route }) => {
           avatarStyle={{ borderRadius: 10 }}
           size="large"
           source={{
-            uri: `http://localhost:5000/uploads/${item.groupImage}`,
+            uri: `${GCS_URL}${item.groupImage}`,
+            //uri: `${GROUP_BASE_URL}/uploads/${item.groupImage}`,
           }}
         />
         <ListItem.Content>
@@ -278,6 +279,7 @@ const GroupListScreen = ({ navigation, route }) => {
 
             onPress: () => {
               if (search) {
+                console.log(`search is: ${search}`);
                 navigation.navigate("GroupDetail", {
                   groupId: search,
                 });

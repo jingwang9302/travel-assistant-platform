@@ -21,7 +21,14 @@ import {
   removeOngoingPlan,
 } from "../../redux/actions/travelPlanAction";
 
-import { USER_SERVICE, GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
+import {
+  USER_SERVICE,
+  GROUP_SERVICE,
+  PLAN_SERVICE,
+  PLAN_BASE_URL,
+  UPLOAD_IMAGE_URL,
+  GCS_URL,
+} from "../../config/urls";
 import {
   Icon,
   Input,
@@ -54,6 +61,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
     planName: "",
     planDescription: "",
     image: "",
+    likes: [],
+    dislikes: [],
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [allUserInPlan, setAllUserInPlan] = useState([]);
@@ -66,6 +75,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const [isUserInPlan, setIsUserInPlan] = useState(false);
   const [positionSharing, setPositionSharing] = useState(false);
   const [notation, setNotation] = useState("");
+  const [intervalObj, setIntervalObj] = useState(null);
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const COMMENTS_DATA = [
@@ -75,6 +85,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   const { planId } = route.params;
   const { ongoingPlan } = useSelector((state) => state.plans);
+  //let intervalObj = null;
 
   const dispatch = useDispatch();
 
@@ -87,7 +98,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
     //   if()
 
     // }
-  }, [positionSharing, ongoingPlan]);
+  }, [ongoingPlan]);
 
   React.useLayoutEffect(() => {
     if (userProfile.id === selectedPlan.initiator) {
@@ -108,7 +119,9 @@ const PlanDetailScreen = ({ navigation, route }) => {
             ) : null}
             <OverflowMenu
               style={{ marginRight: 10 }}
-              OverflowIcon={() => <Icon name="more" size={30} />}
+              OverflowIcon={() => (
+                <Icon name="more-horizontal" type="feather" size={30} />
+              )}
             >
               {selectedPlan.status === 0 ? (
                 <HiddenItem
@@ -152,17 +165,18 @@ const PlanDetailScreen = ({ navigation, route }) => {
       });
     } else if (selectedPlan.status !== 3) {
       navigation.setOptions({
-        headerRight: () => {
+        headerRight: () => (
           <HeaderButtons>
             <OverflowMenu
               style={{ marginRight: 10 }}
-              OverflowIcon={() => <Icon name="more" size={30} />}
+              OverflowIcon={() => (
+                <Icon name="more-horizontal" type="feather" size={30} />
+              )}
             >
               {isUserInPlan && selectedPlan.status === 2 && !ongoingPlan ? (
                 <HiddenItem
                   title="Start Travel"
                   onPress={() => {
-                    startPositionSharingAlert();
                     dispatch(setOngoingPlan(selectedPlan));
                   }}
                 />
@@ -179,17 +193,17 @@ const PlanDetailScreen = ({ navigation, route }) => {
                 <HiddenItem title="Join Travel" onPress={joinPlan} />
               )}
             </OverflowMenu>
-          </HeaderButtons>;
-        },
+          </HeaderButtons>
+        ),
       });
     }
-    <HiddenItem
-      title="Stop Position Sharing"
-      onPress={() => {
-        setPositionSharing(false);
-      }}
-    />;
-  }, [selectedPlan, isUserInPlan, positionSharing, ongoingPlan]);
+    // <HiddenItem
+    //   title="Stop Position Sharing"
+    //   onPress={() => {
+    //     setPositionSharing(false);
+    //   }}
+    // />;
+  }, [selectedPlan, isUserInPlan, positionSharing, ongoingPlan, notation]);
 
   if (!userProfile.isLogin) {
     return <LoginAlertScreen />;
@@ -209,11 +223,40 @@ const PlanDetailScreen = ({ navigation, route }) => {
     setNotation("You are not in this plan");
   };
 
+  // const fechUserInfo = (userId) => {
+  //   const user = USER_DATA.filter((item) => item.id === userId)[0];
+  //   console.log("feched user is");
+  //   console.log(user);
+  //   setAllUserInPlan((old) => [...old, user]);
+  // };
+
   const fechUserInfo = (userId) => {
-    const user = USER_DATA.filter((item) => item.id === userId)[0];
-    console.log("feched user is");
-    console.log(user);
-    setAllUserInPlan((old) => [...old, user]);
+    axios({
+      method: "get",
+      url: USER_SERVICE + "/profile/basic/" + userId,
+      headers: {
+        Authorization: "Bearer " + userProfile.token,
+      },
+    })
+      .then(function (response) {
+        //need to check API
+        const basicUserInfo = { ...response.data };
+        console.log("basic user info:");
+        console.log(basicUserInfo);
+        // allInGroup.push(basicUserInfo);
+        //console.log("allin Gorup:");
+        //console.log(allInGroup);
+        setAllUserInPlan((oldarr) => [...oldarr, basicUserInfo]);
+        // setAll([..all, basicUserInfo]);
+
+        // setAllPeopleInGroup((old) => {
+        //   [...old, basicUserInfo];
+        // });
+      })
+      .catch(function (error) {
+        setErrorMessage(error.response.data);
+        console.log(error.response.data);
+      });
   };
 
   const loadTravelMembers = (travelMembers) => {
@@ -230,14 +273,12 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const fechSinglePlan = () => {
     setIsRefreshing(true);
     setAllUserInPlan([]);
+    console.log(`Plan Id is ${planId}`);
     axios
       .get(PLAN_SERVICE + `read/${planId}`)
       .then((res) => {
-        const { data } = res.data;
-
-        console.log("plans fetched");
-        console.log(data);
         //plan is ended remove ongoing plan from redux
+        const { data } = res.data;
         if (data.status === 3) {
           dispatch(removeOngoingPlan());
         }
@@ -313,10 +354,11 @@ const PlanDetailScreen = ({ navigation, route }) => {
     if (positionSharing) {
       stopSharingPosition();
     }
+    const date = new Date();
     axios({
       method: "PUT",
       url: PLAN_SERVICE + `update/${userProfile.id}/${planId}`,
-      data: { status: 3, endDate: Date.now() },
+      data: { status: 3, endDate: date.toLocaleString() },
     })
       .then((res) => {
         dispatch(removeOngoingPlan());
@@ -336,18 +378,39 @@ const PlanDetailScreen = ({ navigation, route }) => {
       [
         {
           text: "Cancel",
-          onPress: () => {
-            setPositionSharing(false);
-          },
         },
         {
           text: "OK",
           onPress: () => {
-            setPositionSharing(true);
+            startSharingPosition();
           },
         },
       ]
     );
+  };
+
+  const fechPositionAndUpload = async (sharePosition) => {
+    if (sharePosition) {
+      const hasPermission = verifyPermissions();
+
+      if (hasPermission) {
+        // const interval = setInterval(async () => {
+        //   let location = await Location.getCurrentPositionAsync({});
+        //   uploadPostion(location.coords.latitude, location.coords.longitude);
+        //   console.log("Location is feched");
+        //   console.log(location.coords.latitude);
+        // }, 60000);
+        // setIntervalObj(interval);
+        // console.log(" start interValObj");
+        // console.log(intervalObj);
+      }
+    } else {
+      console.log(" clear interValObj");
+      console.log(intervalObj);
+      clearInterval(intervalObj);
+      setIntervalObj(null);
+      //intervalObj = null;
+    }
   };
 
   // uploading user's postion to DB
@@ -368,28 +431,32 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   // uploading user's postion to DB
   const startSharingPosition = async () => {
-    setPositionSharing(true);
-    const hasPermission = verifyPermissions();
-    if (hasPermission) {
-      Alert.alert("Position Sharing", "Position is being shared");
-      try {
-        await Location.watchPositionAsync(
-          { distanceInterval: 100 },
-          (location) => {
-            uploadPostion(location.coords.latitude, location.coords.longitude);
-            console.log(`location updated is: ${location.coords.latitude}`);
-          }
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    axios({
+      method: "POST",
+      url: PLAN_SERVICE + `ongoing/${userProfile.id}/${planId}`,
+    })
+      .then((res) => {
+        console.log("create ongoing Travelplan success");
+        setPositionSharing(true);
+        fechPositionAndUpload(true);
+      })
+      .catch((error) => {
+        Alert.alert("Failed", error.response.data.error);
+        console.log(error.response.data.error);
+      });
+    // setPositionSharing(true);
   };
 
   const stopSharingPosition = () => {
     //unsubscribe to Location.watchPositionAsync
     //delete the existing ongoing travelplan
     setPositionSharing(false);
+    fechPositionAndUpload(false);
+    // console.log("before clear");
+    // console.log(intervalObj);
+    // clearInterval(intervalObj);
+    // console.log("intervalOBj");
+    // console.log(intervalObj);
     deleteOngoingTravelplan();
   };
 
@@ -447,10 +514,11 @@ const PlanDetailScreen = ({ navigation, route }) => {
   };
 
   const initiatorStartPlan = () => {
+    const date = new Date();
     axios({
       method: "PUT",
       url: PLAN_SERVICE + `update/${userProfile.id}/${planId}`,
-      data: { status: 2, startDate: Date.now() },
+      data: { status: 2, startDate: date.toLocaleString() },
     })
       .then((res) => {
         const { data } = res.data;
@@ -471,6 +539,33 @@ const PlanDetailScreen = ({ navigation, route }) => {
   };
 
   //const participantStartPlan = () => {};
+  const likePlan = () => {
+    axios({
+      method: "PUT",
+      url: PLAN_SERVICE + `like/${userProfile.id}/${planId}`,
+    })
+      .then((res) => {
+        const { data } = res.data;
+        setSelectedPlan(data);
+      })
+      .catch((error) => {
+        Alert.alert("Waring", error.response.data.message);
+      });
+  };
+
+  const dislikePlan = () => {
+    axios({
+      method: "PUT",
+      url: PLAN_SERVICE + `dislike/${userProfile.id}/${planId}`,
+    })
+      .then((res) => {
+        const { data } = res.data;
+        setSelectedPlan(data);
+      })
+      .catch((error) => {
+        Alert.alert("Waring", error.response.data.message);
+      });
+  };
 
   if (errorMessage) {
     return (
@@ -482,38 +577,39 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const listHeader = () => {
     return (
       <SafeAreaView>
-        <View>
+        <View style={{ marginBottom: 20 }}>
           <ImageBackground
             source={{
-              uri: `http://localhost:5001/uploads/${selectedPlan.image}`,
+              uri: `${GCS_URL}${selectedPlan.image}`,
             }}
-            //source={require("../travelplan/images/planimage.jpeg")}
             style={{
               height: 200,
               justifyContent: "center",
               resizeMode: "contain",
             }}
           >
-            <View style={{ marginVertical: 5 }}>
-              <Text
-                style={{ color: "white", fontSize: 25, fontWeight: "bold" }}
-              >
-                {selectedPlan.planName}
-              </Text>
-            </View>
-            <View style={{ marginVertical: 5 }}>
-              <Text
-                style={{ color: "white", fontSize: 20, fontWeight: "bold" }}
-              >
-                PlanID: {selectedPlan._id}
-              </Text>
-            </View>
-            <View style={{ marginVertical: 2 }}>
-              <Text
-                style={{ fontSize: 15, color: "white", fontWeight: "bold" }}
-              >
-                Created at:{selectedPlan.createdAt}
-              </Text>
+            <View style={{ marginTop: 60 }}>
+              <View style={{ marginVertical: 5 }}>
+                <Text
+                  style={{ color: "white", fontSize: 25, fontWeight: "bold" }}
+                >
+                  {selectedPlan.planName}
+                </Text>
+              </View>
+              <View style={{ marginVertical: 5 }}>
+                <Text
+                  style={{ color: "white", fontSize: 21, fontWeight: "bold" }}
+                >
+                  PlanID: {selectedPlan._id}
+                </Text>
+              </View>
+              <View style={{ marginVertical: 2 }}>
+                <Text
+                  style={{ fontSize: 17, color: "white", fontWeight: "bold" }}
+                >
+                  Created at:{selectedPlan.createdAt}
+                </Text>
+              </View>
             </View>
           </ImageBackground>
         </View>
@@ -523,7 +619,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              alignItems: "center",
+
+              height: 35,
             }}
           >
             <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
@@ -531,7 +628,9 @@ const PlanDetailScreen = ({ navigation, route }) => {
             </Text>
             {selectedPlan.status !== 0 ? (
               <Button
+                containerStyle={{ justifyContent: "center" }}
                 title="To Group >>"
+                titleStyle={{ fontSize: 15 }}
                 onPress={() => {
                   navigation.navigate("GroupDetail", {
                     groupId: selectedPlan.travelGroup,
@@ -560,117 +659,90 @@ const PlanDetailScreen = ({ navigation, route }) => {
           <Text style={{ color: "black", fontSize: 20 }}>
             {selectedPlan.planDescription}
           </Text>
-          {selectedPlan.startDate ? (
-            <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
-              Start Date: {selectedPlan.startDate}
-            </Text>
-          ) : null}
-          {selectedPlan.endDate ? (
-            <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
-              End Date: {selectedPlan.endDate}
-            </Text>
-          ) : null}
-          {selectedPlan.cancelledDate ? (
-            <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
-              Cancelled Date: {selectedPlan.cancelledDate}
-            </Text>
-          ) : null}
-          <Divider style={{ marginVertical: 5, backgroundColor: "black" }} />
-        </View>
-        <View>
-          {selectedPlan.likes ? (
-            <Text style={{ fontSize: 20 }}>
-              Number Of likes: {selectedPlan.likes.length}
-            </Text>
-          ) : (
-            <Text style={{ fontSize: 20 }}>Number Of likes: 0</Text>
-          )}
-          {selectedPlan.dislikes ? (
-            <Text style={{ fontSize: 20 }}>
-              Number Of dislikes: {selectedPlan.dislikes.length}
-            </Text>
-          ) : (
-            <Text style={{ fontSize: 20 }}>Number Of dislikes: 0</Text>
-          )}
-        </View>
-        <Divider style={{ marginVertical: 5, backgroundColor: "black" }} />
-        <View>
-          <Button
-            title="Comments"
-            // onPress
-            onPress={
-              () => {
-                setCommentsVisible(!commentsVisible);
-              }
-              //
-            }
-          />
 
-          <View style={styles.centeredView}>
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={commentsVisible}
-              onRequestClose={() => {
-                console.log("close modal");
-              }}
-            >
-              <View style={styles.modalBackground}>
-                <SafeAreaView style={{ marginVertical: 40 }}>
-                  <ScrollView>
-                    {COMMENTS_DATA && COMMENTS_DATA.length !== 0 ? (
-                      COMMENTS_DATA.map((item, index) => {
-                        return (
-                          <View
-                            key={index}
-                            style={{
-                              marginBottom: 15,
-                              alignItems: "flex-start",
-                            }}
-                          >
-                            <View>
-                              <Text style={{ color: "black", fontSize: 20 }}>
-                                {item.text}
-                              </Text>
-                            </View>
-
-                            <View style={{ marginHorizontal: 10 }}>
-                              <Text style={{ color: "black", fontSize: 20 }}>
-                                {" "}
-                                {item.user}
-                              </Text>
-                            </View>
-                            <View style={{ marginHorizontal: 5 }}>
-                              <Text style={{ color: "black" }}>
-                                {item.date}
-                              </Text>
-                            </View>
-                          </View>
-                        );
-                      })
-                    ) : (
-                      <View>
-                        <Text> No Comments</Text>
-                      </View>
-                    )}
-                  </ScrollView>
-                </SafeAreaView>
-
-                <View>
-                  <Button
-                    title="Close"
-                    onPress={() => {
-                      setCommentsVisible(!commentsVisible);
-                      //visible = false;
-                      console.log("close is clicked, visible is");
-                      //console.log(visible);
-                    }}
-                  />
-                </View>
+          <View>
+            {selectedPlan.startDate ? (
+              <View>
+                <Divider
+                  style={{ marginVertical: 5, backgroundColor: "black" }}
+                />
+                <Text
+                  style={{ color: "black", fontSize: 20, fontWeight: "bold" }}
+                >
+                  Start Date: {selectedPlan.startDate}
+                </Text>
               </View>
-            </Modal>
+            ) : null}
+            {selectedPlan.endDate ? (
+              <Text
+                style={{ color: "black", fontSize: 20, fontWeight: "bold" }}
+              >
+                End Date: {selectedPlan.endDate}
+              </Text>
+            ) : null}
           </View>
         </View>
+        <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            marginBottom: 2,
+          }}
+        >
+          <View style={{ flexDirection: "row" }}>
+            <View>
+              <Text style={{ fontSize: 20 }}>Likes</Text>
+            </View>
+            <View style={{ marginLeft: 20 }}>
+              <Icon
+                name="thumbs-up-outline"
+                type="ionicon"
+                onPress={() => {
+                  likePlan();
+                }}
+              />
+              {selectedPlan.likes.length === 0 ? null : (
+                <Badge
+                  value={selectedPlan.likes.length}
+                  status="success"
+                  containerStyle={{
+                    position: "absolute",
+                    bottom: 5,
+                    left: 25,
+                  }}
+                />
+              )}
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", marginLeft: 160 }}>
+            <View>
+              <Text style={{ fontSize: 20 }}>Dislikes</Text>
+            </View>
+            <View style={{ marginLeft: 20 }}>
+              <Icon
+                name="thumbs-down-outline"
+                type="ionicon"
+                onPress={() => {
+                  dislikePlan();
+                }}
+              />
+              {selectedPlan.dislikes.length === 0 ? null : (
+                <Badge
+                  value={selectedPlan.dislikes.length}
+                  status="warning"
+                  containerStyle={{
+                    position: "absolute",
+                    bottom: 5,
+                    left: 25,
+                  }}
+                />
+              )}
+            </View>
+          </View>
+        </View>
+        <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
       </SafeAreaView>
     );
   };
@@ -679,7 +751,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
     return (
       <View>
         <View>
-          <Divider style={{ marginVertical: 5, backgroundColor: "black" }} />
+          <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
           {selectedPlan.departureAddress &&
           selectedPlan.departureAddress.title ? (
             <View
@@ -729,6 +801,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
               <View tyle={{ marginRight: 40, width: 20, height: 20 }}>
                 <Icon
                   name="navigation"
+                  type="feather"
                   onPress={() => {
                     Alert.alert("Alert", "Go to navigation screen");
                   }}
@@ -794,6 +867,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                     <View tyle={{ marginRight: 40, width: 20, height: 20 }}>
                       <Icon
                         name="navigation"
+                        type="feather"
                         onPress={() => {
                           Alert.alert("Alert", "Go to navigation screen");
                         }}
@@ -809,40 +883,41 @@ const PlanDetailScreen = ({ navigation, route }) => {
   };
   const keyExtractor = (item, index) => index.toString();
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={{ borderBottomColor: "black" }}
-      onPress={() =>
-        navigation.navigate("GroupManage", {
-          selectedUserDetail: item,
-          readOnly: true,
-        })
-      }
-    >
-      <View
-        style={{
-          flex: 1,
-
-          margin: 5,
-          //alignContent: "stretch",
-          alignItems: "center",
-          borderColor: "black",
-          borderRadius: 5,
-
-          backgroundColor: "white",
-        }}
+    <View style={{ marginTop: 6 }}>
+      <TouchableOpacity
+        style={{ borderBottomColor: "black" }}
+        onPress={() =>
+          navigation.navigate("GroupManage", {
+            selectedUserDetail: item,
+            readOnly: true,
+          })
+        }
       >
-        <Avatar
-          rounded
-          source={{
-            uri:
-              "https://avatars0.githubusercontent.com/u/32242596?s=460&u=1ea285743fc4b083f95d6ee0be2e7bb8dcfc676e&v=4",
-          }}
-          size="large"
-        />
+        <View
+          style={{
+            flex: 1,
 
-        <Text>{item.firstName}</Text>
-      </View>
-    </TouchableOpacity>
+            margin: 5,
+            //alignContent: "stretch",
+            alignItems: "center",
+            borderColor: "black",
+            borderRadius: 5,
+
+            backgroundColor: "white",
+          }}
+        >
+          <Avatar
+            rounded
+            source={{
+              uri: UPLOAD_IMAGE_URL + item.avatarUrl,
+            }}
+            size="large"
+          />
+
+          <Text>{item.firstName}</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -861,6 +936,17 @@ const PlanDetailScreen = ({ navigation, route }) => {
           ListFooterComponent={listFooter}
         />
       ) : null}
+      <View style={styles.touchableOpacityStyleFloating}>
+        {!positionSharing && ongoingPlan ? (
+          <Button
+            title="Start Sharing Position"
+            onPress={startSharingPosition}
+          />
+        ) : null}
+        {positionSharing && ongoingPlan ? (
+          <Button title="Stop Sharing Position" onPress={stopSharingPosition} />
+        ) : null}
+      </View>
     </View>
   );
 };

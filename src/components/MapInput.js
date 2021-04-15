@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View, Dimensions } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-<<<<<<< HEAD
-import config from "../config/config";
-import screen from "../screens/travelgroup/GroupListScreen";
-=======
 import { config } from "../../config";
 import useResults from "../hooks/useResults";
 import ResultsList from "../screens/maps/ResultsList";
->>>>>>> 428ffa77c845ced0f1bf9b52f65c3ac48d0867cd
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;

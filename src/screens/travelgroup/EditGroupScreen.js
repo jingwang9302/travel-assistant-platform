@@ -14,7 +14,7 @@ import {
   Alert,
 } from "react-native";
 
-import { USER_SERVICE, GROUP_SERVICE } from "../../config/urls";
+import { USER_SERVICE, GROUP_SERVICE, GROUP_BASE_URL } from "../../config/urls";
 import Loader from "../../components/Loader";
 import { Icon, Input, Image, Button } from "react-native-elements";
 import { set } from "react-native-reanimated";
@@ -24,7 +24,7 @@ import { Item } from "react-navigation-header-buttons";
 const EditGroupScreen = ({ navigation, route }) => {
   const { groupName, groupImage, _id } = route.params;
   const [selectedImage, setSelectedImage] = useState({
-    localUri: `http://localhost:5000/uploads/${groupImage}`,
+    localUri: `${GROUP_BASE_URL}/uploads/${groupImage}`,
   });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,7 +33,7 @@ const EditGroupScreen = ({ navigation, route }) => {
   const [newGroupNameInputError, setNewGroupNameInputError] = useState("");
 
   const groupNameInputRef = createRef();
-  const oldUri = `http://localhost:5000/uploads/${groupImage}`;
+  const oldUri = `${GROUP_BASE_URL}/uploads/${groupImage}`;
 
   if (!userProfile.isLogin) {
     return <LoginAlertScreen />;
@@ -119,9 +119,6 @@ const EditGroupScreen = ({ navigation, route }) => {
       .then((res) => {
         const { data } = res.data;
         console.log(`image name is ${data}`);
-        // setSelectedImage({
-        //   localUri: `http://localhost:5001/uploads/${data}`,
-        // });
       })
       .catch((error) => {
         setErrorMessage(error.response.data.error);

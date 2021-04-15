@@ -77,10 +77,10 @@ export const removeGroupForPlanPublish = () => {
   };
 };
 
-export const setOngoingPlan = (plan) => {
+export const setOngoingPlan = (planId) => {
   return {
     type: SET_ONGOING_PLAN,
-    payload: plan,
+    payload: planId,
   };
 };
 

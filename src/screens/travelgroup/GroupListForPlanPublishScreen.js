@@ -1,7 +1,12 @@
 import React, { createRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
-import { UPDATE_ERRORS, CLEAR_ERRORS } from "../../redux/actions/errorAction";
+import {
+  GROUP_SERVICE,
+  PLAN_SERVICE,
+  GROUP_BASE_URL,
+  GCS_URL,
+} from "../../config/urls";
+
 import axios from "axios";
 
 import {
@@ -44,7 +49,7 @@ import {
   UPDATE_GROUP,
   SET_CURRENTGROUP,
 } from "../../redux/actions/travelgroupAction";
-import { GROUP_DATA } from "./Data";
+
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import { set } from "react-native-reanimated";
 import { Alert } from "react-native";
@@ -57,120 +62,7 @@ const GroupListForPlanPublishScreen = ({ navigation, route }) => {
   const { groups } = useSelector((state) => state.groups);
   const userProfile = useSelector((state) => state.user);
 
-  //const [buttonDisplay, setButtonDisplay] = useState([]);
-
   const { planId } = route.params;
-
-  // let forPlan = false;
-  // if (forPlanPublish) {
-  //   forPlan = forPlanPublish;
-  // }
-  //forPlan = forPlanPublish
-
-  // any hooks must be put on the top of any condition function or element
-  //   useEffect(() => {
-  //     if (userProfile.isLogin) {
-  //       setLoading(true);
-  //       fetchGroups();
-  //       setLoading(false);
-  //     } else {
-  //       dispatch(clearTravelgroup());
-  //       //dispatch(clearCurrGroup());
-  //     }
-  //   }, [userProfile.isLogin]);
-
-  //   React.useLayoutEffect(() => {
-  //     navigation.setOptions({
-  //       headerRight: () => (
-  //         <HeaderButtons>
-  //           <OverflowMenu
-  //             style={{ marginHorizontal: 10 }}
-  //             OverflowIcon={() => <Icon name="menu" size={30} />}
-  //           >
-  //             <HiddenItem
-  //               title="Create a Plan"
-  //               onPress={() => {
-  //                 navigation.navigate("PlanCreate");
-  //               }}
-  //             />
-  //             <HiddenItem
-  //               title="Create a Group"
-  //               onPress={() => {
-  //                 navigation.navigate("GroupCreate");
-  //               }}
-  //             />
-  //             <HiddenItem
-  //               title="Plans Created"
-  //               onPress={() => {
-  //                 navigation.navigate("PlanList", {
-  //                   forInitiator: true,
-  //                 });
-  //               }}
-  //             />
-  //           </OverflowMenu>
-  //         </HeaderButtons>
-  //       ),
-  //     });
-  //   }, []);
-
-  //   function fetchGroups() {
-  //     setErrorMessage("");
-  //     setIsRefreshing(true);
-  //     console.log("before axios");
-  //     axios({
-  //       method: "get",
-  //       url: GROUP_SERVICE + "read/groups_in/" + userProfile.id,
-  //     })
-  //       .then(function (res) {
-  //         const { data } = res.data;
-  //         //setGroups(data);
-  //         dispatch(setGroupsUserIn(data));
-  //         console.log("fech is operated");
-  //         setIsRefreshing(false);
-  //       })
-  //       .catch(function (error) {
-  //         console.log(error.response.data.error);
-  //         setErrorMessage(error.response.data.error);
-  //         setIsRefreshing(false);
-  //       });
-  //   }
-
-  //if (errorMessage) {
-  //dispatch({ type: CLEAR_ERRORS });
-  //     return (
-  //       <SafeAreaView style={styles.container}>
-  //         <View style={{ backgroundColor: "white", marginVertical: 20 }}>
-  //           <SearchBar
-  //             lightTheme={true}
-  //             color="black"
-  //             round={true}
-  //             placeholder="Search Travelgroups Here..."
-  //             onChangeText={(content) => setSearch(content)}
-  //             value={search}
-  //             searchIcon={{
-  //               name: "search",
-  //               onPress: () => {
-  //                 if (search) {
-  //                   //console.log(`search is ${search}`);
-  //                   navigation.navigate("GroupDetail", {
-  //                     //for test
-  //                     groupId: search,
-  //                   });
-  //                 }
-  //               },
-  //             }}
-  //           />
-  //         </View>
-  //         <ListItem bottomDivider>
-  //           <ListItem.Content>
-  //             <ListItem.Title>{errorMessage}</ListItem.Title>
-  //           </ListItem.Content>
-  //           <ListItem.Chevron />
-  //         </ListItem>
-  //         <Button title="Try Again" onPress={fetchGroups} />
-  //       </SafeAreaView>
-  //     );
-  //   }
   const publishPlanToGroup = (groupId) => {
     axios({
       method: "PUT",
@@ -182,7 +74,7 @@ const GroupListForPlanPublishScreen = ({ navigation, route }) => {
         navigation.goBack();
       })
       .catch((error) => {
-        setErrorMessage(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
         console.log(error.response.data.error);
       });
   };
@@ -212,9 +104,10 @@ const GroupListForPlanPublishScreen = ({ navigation, route }) => {
           avatarStyle={{ borderRadius: 10 }}
           size="large"
           source={{
-            uri: `http://localhost:5000/uploads/${item.groupImage}`,
+            uri: `${GCS_URL}${item.groupImage}`,
           }}
         />
+
         <ListItem.Content>
           <ListItem.Title style={styles.itemTitle}>
             {item.groupName}

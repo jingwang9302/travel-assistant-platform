@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Image, StyleSheet } from "react-native";
 
-import config from "../../config/config";
+import { config } from "../../../config";
 
 const MapPreview = (props) => {
   let imagePreviewUrl;

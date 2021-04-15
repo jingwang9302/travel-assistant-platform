@@ -1,27 +1,30 @@
 /** Define URLs */
 
 /** Backend system url */
-export const BASE_URL = 'http://35.188.32.151:8080';
+export const BASE_URL = "http://35.188.32.151:8080";
+export const GROUP_BASE_URL = "https://travel-group-service.wn.r.appspot.com/";
+export const PLAN_BASE_URL = "https://travel-plan-service.wn.r.appspot.com";
 
 /** Entry point */
 
 /** User-related service */
-export const USER_SERVICE = BASE_URL + '/user/api/user';
-export const LOGIN_URL = BASE_URL + '/login';
-
-
-
+export const USER_SERVICE = BASE_URL + "/user/api/user";
+export const LOGIN_URL = BASE_URL + "/login";
 
 /** Plan related service */
-export const PLAN_SERVICE = "http://localhost:5001/v1/travelplan/";
-export const NOTIFICATION_SERVICE = BASE_URL + '/notification/api/notification';
-export const NOTIFICATION_WEBSOCKET_SERVICE = BASE_URL + '/notification-ws/notification';
-export const BLOG_SERVICE = BASE_URL + '/user/api/blog';
-export const UPLOAD_IMAGE_URL = BASE_URL + '/user';
+export const PLAN_SERVICE =
+  "https://travel-plan-service.wn.r.appspot.com/v1/travelplan/";
+export const NOTIFICATION_SERVICE = BASE_URL + "/notification/api/notification";
+export const NOTIFICATION_WEBSOCKET_SERVICE =
+  BASE_URL + "/notification-ws/notification";
+export const BLOG_SERVICE = BASE_URL + "/user/api/blog";
+export const UPLOAD_IMAGE_URL = BASE_URL + "/user";
 
 /** Group related service */
-export const GROUP_SERVICE = 'http://localhost:5000/v1/travelgroup/';
-
-
+export const GROUP_SERVICE =
+  "https://travel-group-service.wn.r.appspot.com/v1/travelgroup/";
+//google cloud storage
+export const GCS_URL =
+  "https://storage.googleapis.com/travel-group-service-bucket/";
 
 /** Travel related service */
