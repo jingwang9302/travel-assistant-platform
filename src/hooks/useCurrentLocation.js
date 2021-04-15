@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import * as Permissions from "expo-permissions";
 import * as Location from "expo-location";
 
-const useCurrentLocation = () => {
+const useCurrentLocation = (isNavigating) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,7 +27,18 @@ const useCurrentLocation = () => {
   };
 
   useEffect(() => {
-    getCurrentLocation();
+    let timer = null;
+    if (isNavigating) {
+      timer = setInterval(() => {
+        console.log("timer function");
+        getCurrentLocation();
+      }, 5000);
+    } else {
+      getCurrentLocation();
+    }
+    return () => {
+      timer && clearInterval(timer);
+    };
   }, []);
   return { currentLocation, loading, error };
 };

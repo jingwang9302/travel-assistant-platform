@@ -14,6 +14,8 @@ import NotificationScreen from "../screens/user/NotificationScreen";
 import PostScreen from "../screens/blog/PostScreen";
 import PostCreationScreen from "../screens/blog/PostCreationScreen";
 import CommentScreen from "../screens/blog/CommentScreen";
+import TravelReviewHome from '../screens/travelreview/TravelReviewHome';
+import TravelReviewDetails from '../screens/travelreview/TravelReviewDetails';
 
 const UserStack = () => {
     const Stack = createStackNavigator();
@@ -30,6 +32,8 @@ const UserStack = () => {
             <Stack.Screen name="Post" component={PostScreen} />
             <Stack.Screen name="PostCreation" component={PostCreationScreen} />
             <Stack.Screen name="Comment" component={CommentScreen} />
+            <Stack.Screen name="TravelReviewHome" component={TravelReviewHome} />
+            <Stack.Screen name="TravelReviewDetails" component={TravelReviewDetails} />
         </Stack.Navigator>
     );
 

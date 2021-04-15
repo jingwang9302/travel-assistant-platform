@@ -57,7 +57,7 @@ const ChatScreen = (props) => {
       );
 
     /**
-     * Append new 'added' messages to previous messages.
+     * Append newly 'added' messages to previous messages.
      */
     const appendMessages = useCallback(
         (messages) => {

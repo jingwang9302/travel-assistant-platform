@@ -67,7 +67,14 @@ const SearchScreen = ({ navigation }) => {
         showsUserLocation={true}
         showsMyLocationButton={true}
         initialRegion={initRegion}
+        loadingEnabled
+        loadingIndicatorColor="#666666"
+        loadingBackgroundColor="#eeeeee"
+        followsUserLocation={true}
         region={region || initRegion}
+        // onUserLocationChange={() => {
+        //   console.log();
+        // }}
         // onPress={(e) => {
         //   if (e.nativeEvent.action) return;
         //   setMarker([e.nativeEvent.coordinate]);
@@ -157,7 +164,7 @@ const SearchScreen = ({ navigation }) => {
             )}
             <Button
               onPress={() => {
-                navigation.navigate("Navigation");
+                navigation.navigate("Navigation", { info: curMarker });
               }}
               icon={<Icon name="arrow-right" size={20} color="white" />}
               iconRight
