@@ -11,6 +11,7 @@ web-build/
 screens/user/
 screens/maps/
 config.js
+packagen-lock.json
 
 # macOS
 .DS_Store
