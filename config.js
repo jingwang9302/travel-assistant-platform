@@ -1,0 +1,7 @@
+const config = {
+  IOS_API_KEY: "REPLACE_WITH_YOU_API_KEY",
+  ANDROID_API_KEY: "REPLACE_WITH_YOU_API_KEY",
+  PLACES_API_KEY: "REPLACE_WITH_YOU_API_KEY",
+};
+
+export { config };

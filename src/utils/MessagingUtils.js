@@ -1,11 +1,12 @@
 // @refresh reset
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
 import firebaseConfig from '../config/messagingConfig';
 
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+
+const SOSTextIdLength = 6;
 
 export function sendSOSToOngoingPlanGroupChat(){
     if (firebase.apps.length === 0){
@@ -19,19 +20,33 @@ export function sendSOSToOngoingPlanGroupChat(){
 
     const userId = currentUserProfile.id;
     const userFirstName = currentUserProfile.firstName;
-    const SOSText = "SOS";
+    //TODO: change SOS text.
+    const SOSText = "This is an SOS.";
 
     messagesRef.add(
         {
-            chatGroup:ongoingPlanId,
+            // TODO: for test only.
+            _id: getRandomString(SOSTextIdLength),
+            chatGroup:2,
             text:SOSText,
             user:{
                 _id: userId,
                 name: userFirstName,
-            }
+            },
+            createdAt: new Date(),
         }
     ).then( ()=>{
         console.log("SOS sent.");
     });
 }
+
+function getRandomString(length) {
+    var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    for ( var i = 0; i < length; i++ ) {
+        result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+    }
+    return result;
+}
+
 
