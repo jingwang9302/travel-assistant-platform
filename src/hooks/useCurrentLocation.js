@@ -28,6 +28,7 @@ const useCurrentLocation = (isNavigating) => {
 
   useEffect(() => {
     let timer = null;
+    let mounted = true;
     if (isNavigating) {
       timer = setInterval(() => {
         console.log("timer function");
@@ -37,6 +38,7 @@ const useCurrentLocation = (isNavigating) => {
       getCurrentLocation();
     }
     return () => {
+      mounted = false;
       timer && clearInterval(timer);
     };
   }, []);
