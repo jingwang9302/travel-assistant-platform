@@ -21,9 +21,6 @@ const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
-const userLocation = {
-  user1: {},
-};
 
 const NavigationScreen = ({ route, navigation }) => {
   const mapView = useRef();
@@ -38,7 +35,7 @@ const NavigationScreen = ({ route, navigation }) => {
   if (!currentLocation) {
     return (
       <View>
-        <Text>Map Loading</Text>
+        <Text>Please wait while we get your navigation map.</Text>
       </View>
     );
   }
@@ -142,12 +139,18 @@ const NavigationScreen = ({ route, navigation }) => {
             type="solid"
             title="End Navigation"
             onPress={() => {
-              navigation.navigate("Search");
+              navigation.replace("UsersLocation", { marker: info });
             }}
           />
         </View>
         <View style={styles.buttonContainer}>
-          <Button type="solid" title="Modify Plan" />
+          <Button
+            type="solid"
+            title="Modify Plan"
+            onPress={() => {
+              navigation.replace("Search");
+            }}
+          />
         </View>
       </View>
     </View>
