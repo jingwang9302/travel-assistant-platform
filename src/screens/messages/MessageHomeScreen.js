@@ -32,13 +32,16 @@ if (firebase.apps.length === 0){
 const db = firebase.firestore();
 const messagesRef = db.collection('messages');
 
+/** TODO: Below is an example of user group information. */
 const sampleUserGroupListData = [
   {
     id: 1,
+    title: "Seattle road trip",
     members: ["Jason", "Luke", "Smith"] 
   },
   {
     id: 2,
+    title: "San Diego spring vacation",
     members: ["Mary", "Mike", "Jesse"]
   }
 ];
@@ -92,15 +95,15 @@ const MessageHomeScreen = () => {
 
     // TODO: adjust information displayed on each card. (e.g. what type of information should be there?)
     const renderItem = ({ item }) => (
-      <TouchableOpacity key={item.id} onPress={()=> navigation.navigate("Chat", {chatGroup: item.id, members:item.members.join(", ")})}>
-        <Card pointerEvents="none">
-          <Text>{item.id}</Text>
-          <Text>{item.members.join(", ")}</Text>
+      <TouchableOpacity key={item.id} onPress={()=> navigation.navigate("Chat", {chatGroup: item.id, members:item.members.join(", "), chatTitle: item.title})}>
+        <Card pointerEvents="none" style={styles.chatItem}>
+          <Text style={styles.chatTitleText}> {item.title}</Text>
+          <Text> includes: {item.members.join(", ")}</Text>
         </Card>
       </TouchableOpacity>
     );
 
-    // TODO: re-confirm process.
+    // TODO: re-confirm process. CURRENTLY INACTIVE FUNCTION.
     /**
      * Create new chat steps:
      * 1. Verify if contact(s) exist in system from User Service --> verifyUserEmail()
@@ -236,7 +239,8 @@ const MessageHomeScreen = () => {
                 keyExtractor={(item) => item.id.toString()}
             />
 
-            <Fab
+            {/*  CREATE NEW CHAT CURRENTLY INACTIVE. */}
+            {/* <Fab
               direction="up"
               containerStyle={{ }}
               style={{ backgroundColor: '#96c8e9' }}
@@ -251,7 +255,7 @@ const MessageHomeScreen = () => {
               hintInput ={"aaa@bbb.com"}
               submitInput={ (inputText) => {createNewChat(inputText)} }
               closeDialog={ () => {setShowDialog(false)}}>
-            </DialogInput>
+            </DialogInput> */}
           </View>
         )
     } 
@@ -283,6 +287,15 @@ const styles = StyleSheet.create({
     },
     loginButton:{
       marginTop:40,
+    },
+    chatTitleText:{
+      color:'red',
+      paddingBottom:5,
+    },
+    chatItem:{
+      paddingTop:10,
+      paddingBottom:10,
+      marginBottom:0
     }
 });
 

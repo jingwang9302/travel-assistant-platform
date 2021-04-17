@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect, useDispatch} from "react-redux";
-import {Avatar, Card, Icon, Image, Input, Overlay} from "react-native-elements";
+import {Avatar, Card, Icon, Input, Overlay} from "react-native-elements";
 import LoginAlertScreen from "./LoginAlertScreen";
 import axios from "axios";
 import {UPLOAD_IMAGE_URL, USER_SERVICE} from "../../config/urls";
@@ -112,16 +112,16 @@ const ProfileScreen = ({userProfile}) => {
                 return response.json();
             })
             .then((data)=>{
-                dispatch(setAvatar(data.avatarUrl));
-                setAvatarVisible(false);
+                if(data.status === 500){
+                    alert(data.message);
+                }else{
+                    dispatch(setAvatar(data.avatarUrl));
+                    setAvatarVisible(false);
+                }
             })
             .catch((error)=> {
                 console.log('err: ' + error);
             });
-
-
-
-
     }
 
     const pickImage = async () => {
@@ -153,8 +153,8 @@ const ProfileScreen = ({userProfile}) => {
     return(
         <View style={styles.mainBody}>
             <Card containerStyle={styles.card}>
-                <Card.Title style={styles.cardTitleStyle}>
-                    <View style={{alignItems: 'center', flexDirections: 'column', }}>
+                <View style={styles.cardTitleStyle}>
+                    <View style={{alignItems: 'center', flexDirections: 'column',}}>
                         <Avatar
                             size="large"
                             rounded
@@ -172,7 +172,7 @@ const ProfileScreen = ({userProfile}) => {
                         </Avatar>
                         <Text style={{fontSize: 20, fontWeight:'bold'}}>{userProfile.firstName+' '+userProfile.lastName}</Text>
                     </View>
-                </Card.Title>
+                </View>
                 <Card.Divider/>
                 <View style={{flexDirections: 'column', paddingLeft:30, paddingRight:30}}>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
@@ -329,6 +329,7 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 25,
         alignContent: 'center',
+        marginBottom: 10,
     },
     cardTextStyle: {
         color: 'black',
