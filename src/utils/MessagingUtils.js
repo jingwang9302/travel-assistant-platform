@@ -8,15 +8,15 @@ import 'firebase/firestore';
 
 const SOSTextIdLength = 6;
 
-export function sendSOSToOngoingPlanGroupChat(){
+export const sendSOSToOngoingPlanGroupChat= (currentUserProfile, ongoingPlan) => {
     if (firebase.apps.length === 0){
         firebase.initializeApp(firebaseConfig);
     }
 
     const db = firebase.firestore();
     const messagesRef = db.collection('messages');
-    const currentUserProfile = useSelector(state => state.user);
-    const ongoingPlanId = useSelector(state => state.ongoingPlan);
+    // const currentUserProfile = useSelector(state => state.user);
+    // const ongoingPlanId = useSelector(state => state.ongoingPlan);
 
     const userId = currentUserProfile.id;
     const userFirstName = currentUserProfile.firstName;
@@ -35,7 +35,7 @@ export function sendSOSToOngoingPlanGroupChat(){
             },
             createdAt: new Date(),
         }
-    ).then( ()=>{
+    ).then(()=>{
         console.log("SOS sent.");
     });
 }

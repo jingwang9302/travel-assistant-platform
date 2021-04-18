@@ -62,6 +62,8 @@ const TravelReviewHome = ({navigation}) => {
             <ScrollView>
                 <Text style={styles.greetingText}> Hello {userProfile.firstName},</Text>
                 <Text style={styles.greetingText}> You have completed {travelRecords.length} trip(s)</Text>
+                {/* TO REMOVE */}
+                <Button onPress={()=> navigation.navigate("TravelReviewDetails")} title="Go"/>
                 <View style={styles.tripItem}>
                     {
                         travelRecords.map((item, i) => (
