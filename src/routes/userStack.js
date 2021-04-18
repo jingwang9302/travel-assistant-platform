@@ -15,7 +15,8 @@ import PostScreen from "../screens/blog/PostScreen";
 import PostCreationScreen from "../screens/blog/PostCreationScreen";
 import CommentScreen from "../screens/blog/CommentScreen";
 import TravelReviewHome from '../screens/travelreview/TravelReviewHome';
-import TravelReviewDetails from '../screens/travelreview/TravelReviewDetails';
+import PlanDetailScreen from "../screens/travelplan/PlanDetailScreen";
+import GroupDetailScreen from "../screens/travelgroup/GroupDetailScreen";
 
 const UserStack = () => {
     const Stack = createStackNavigator();
@@ -33,7 +34,9 @@ const UserStack = () => {
             <Stack.Screen name="PostCreation" component={PostCreationScreen} />
             <Stack.Screen name="Comment" component={CommentScreen} />
             <Stack.Screen name="TravelReviewHome" component={TravelReviewHome} />
-            <Stack.Screen name="TravelReviewDetails" component={TravelReviewDetails} />
+            <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
+            <Stack.Screen name="GroupDetail"component={GroupDetailScreen} options={{ title: "Group Detail" }}
+      />
         </Stack.Navigator>
     );
 

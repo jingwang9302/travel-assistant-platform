@@ -2,9 +2,8 @@ import React, {useState, useEffect} from 'react';
 import { ScrollView } from 'react-native';
 import {useSelector} from 'react-redux';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button, Alert } from 'react-native';
-import { ListItem } from "react-native-elements";
-import {GET_FINISHED_TRAVEL_PLANS_BY_USER_ID} from '../../config/urls';
-import { useNavigation } from '@react-navigation/native';
+import { ListItem, Avatar } from "react-native-elements";
+import {GET_FINISHED_TRAVEL_PLANS_BY_USER_ID, GCS_URL} from '../../config/urls';
 import axios from "axios";
 
 const TravelReviewHome = ({navigation}) => {
@@ -29,19 +28,13 @@ const TravelReviewHome = ({navigation}) => {
             }
           })
             .then(function (response) {
-                // TODO: fill travelRecords
-                // console.log(response.data);
                 updateTravelRecords(response.data.data);
-                // console.log(travelRecords.length);
             })
             .catch((error) => {
                 console.log(error);
                 Alert.alert("Failed! Fetching completed trips error.");
       });
     }
-
-
-
 
     return (
         <View style={{flex:1}}>
@@ -51,9 +44,11 @@ const TravelReviewHome = ({navigation}) => {
                 <View style={styles.tripItem}>
                     {
                         travelRecords.map((item, i) => (
-                            <ListItem key={i} bottomDivider onPress={()=>navigation.navigate("TravelReviewDetails")}>
+                            <ListItem key={i} bottomDivider onPress={()=>navigation.navigate("PlanDetail", {planId: item._id})}>
+                                <Avatar source={{uri: GCS_URL + item.image}} />
                                 <ListItem.Content>
                                     <ListItem.Title>{item.planName}</ListItem.Title>
+                                    <ListItem.Subtitle>{item.planDescription}</ListItem.Subtitle>
                                 </ListItem.Content>
                                 <ListItem.Chevron />
                             </ListItem>
