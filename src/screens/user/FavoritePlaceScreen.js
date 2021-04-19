@@ -230,56 +230,7 @@ const FavoritePlaceScreen = ({ navigation }) => {
           onBackdropPress={toggleOverlay}
         >
           <View style={{ flex: 1 }}>
-            <View style={{ flex: 0.1 }}>
-              <GooglePlacesAutocomplete
-                placeholder="Search"
-                fetchDetails={true}
-                onPress={(data, details) => {
-                  // 'details' is provided when fetchDetails = true
-                  // console.log(data);
-                  setPlace(data);
-                  // console.log(details);
-                  setPlaceDetail(details);
 
-                  mapRef.current.animateCamera({
-                    center: {
-                      latitude: details.geometry.location.lat,
-                      longitude: details.geometry.location.lng,
-                    },
-                  });
-                }}
-                query={{
-                  key: config.PLACES_API_KEY,
-                  language: "en",
-                }}
-                styles={{
-                  container: {
-                    flex: 1,
-                  },
-                  textInputContainer: {
-                    flexDirection: "row",
-                    height: 30,
-                  },
-                  textInput: {
-                    backgroundColor: "#FFFFFF",
-                    height: 30,
-                    borderRadius: 5,
-                    paddingVertical: 0,
-                    paddingHorizontal: 5,
-                    fontSize: 15,
-                    flex: 1,
-                  },
-                  listView: {
-                    zIndex: 10,
-                    width: "100%",
-                    height: 200,
-                    backgroundColor: "#fff",
-                    position: "absolute",
-                    top: 30,
-                  },
-                }}
-              />
-            </View>
             <View style={{ flex: 1 }}>
               <MapView
                 ref={mapRef}
@@ -327,6 +278,56 @@ const FavoritePlaceScreen = ({ navigation }) => {
                   </Marker>
                 ) : null}
               </MapView>
+            </View>
+            <View style={{ position: "absolute", height: 80, width: "100%"}}>
+              <GooglePlacesAutocomplete
+                  placeholder="Search"
+                  fetchDetails={true}
+                  onPress={(data, details) => {
+                    // 'details' is provided when fetchDetails = true
+                    // console.log(data);
+                    setPlace(data);
+                    // console.log(details);
+                    setPlaceDetail(details);
+
+                    mapRef.current.animateCamera({
+                      center: {
+                        latitude: details.geometry.location.lat,
+                        longitude: details.geometry.location.lng,
+                      },
+                    });
+                  }}
+                  query={{
+                    key: config.PLACES_API_KEY,
+                    language: "en",
+                  }}
+                  styles={{
+                    container: {
+                      flex: 1,
+                    },
+                    textInputContainer: {
+                      flexDirection: "row",
+                      height: 30,
+                    },
+                    textInput: {
+                      backgroundColor: "#FFFFFF",
+                      height: 30,
+                      borderRadius: 5,
+                      paddingVertical: 0,
+                      paddingHorizontal: 5,
+                      fontSize: 15,
+                      flex: 1,
+                    },
+                    listView: {
+                      zIndex: 10,
+                      width: "100%",
+                      height: 200,
+                      backgroundColor: "#fff",
+                      position: "absolute",
+                      top: 30,
+                    },
+                  }}
+              />
             </View>
             <View>
               <TouchableOpacity
