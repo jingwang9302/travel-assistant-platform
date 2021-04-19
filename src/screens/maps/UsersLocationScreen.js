@@ -67,7 +67,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
 
   const { ongoingPlan } = useSelector((state) => state.plans);
   const currentUserProfile = useSelector((state) => state.user);
-  const ongoingPlanId = useSelector((state) => state.ongoingPlan);
+  // const ongoingPlan = "123";
 
   // Fetch users' location from PlanService
   const fetchUsersLocation = async () => {
@@ -92,12 +92,17 @@ const UsersLocationScreen = ({ route, navigation }) => {
 
   // fetch users location and render on map every 10 seconds
   useEffect(() => {
-    if (ongoingPlanId) {
-      const interval = setInterval(() => {
+    let mounted = true;
+    let timer = null;
+    if (ongoingPlan) {
+      const timer = setInterval(() => {
         fetchUsersLocation();
       }, 10000);
-      return () => clearInterval(interval);
     }
+    return () => {
+      mounted = false;
+      timer && clearInterval(timer);
+    };
   }, []);
 
   function renderSOSButton() {
@@ -168,7 +173,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
             <Marker coordinate={user} key={user.userId} />
           ))}
       </MapView>
-      {ongoingPlanId && renderSOSButton()}
+      {ongoingPlan && renderSOSButton()}
       <View>
         <Button>SOS</Button>
       </View>
