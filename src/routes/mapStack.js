@@ -9,6 +9,7 @@ import SearchScreen from "../screens/maps/SearchScreen";
 import ResultScreen from "../screens/maps/ResultScreen";
 import ResultList from "../screens/maps/ResultsList";
 import NavigationScreen from "../screens/maps/NavigationScreen";
+import UsersLocationScreen from "../screens/maps/UsersLocationScreen";
 
 const MapStack = () => {
   const Stack = createStackNavigator();
@@ -19,6 +20,7 @@ const MapStack = () => {
       <Stack.Screen name="Result" component={ResultScreen} />
       <Stack.Screen name="ResultList" component={ResultList} />
       <Stack.Screen name="Navigation" component={NavigationScreen} />
+      <Stack.Screen name="UsersLocation" component={UsersLocationScreen} />
     </Stack.Navigator>
   );
 };
