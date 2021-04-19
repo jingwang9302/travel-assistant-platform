@@ -5,16 +5,11 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import MapView, {
-  Marker,
-  PROVIDER_GOOGLE,
-  Callout,
-  AnimatedRegion,
-} from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import { useSelector } from "react-redux";
 import { Button, Icon } from "react-native-elements";
-import { config } from "../../../config";
 import { sendSOSToOngoingPlanGroupChat } from "../../utils/MessagingUtils";
 import { PLAN_SERVICE } from "../../config/urls";
 
@@ -132,6 +127,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
           }}
           onPress={() => {
             sendSOSToOngoingPlanGroupChat(currentUserProfile, ongoingPlan);
+            alert("SOS message sent.");
           }}
         >
           <View style={{ flex: 1 }}>
