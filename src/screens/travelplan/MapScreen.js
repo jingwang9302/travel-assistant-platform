@@ -59,11 +59,12 @@ const MapScreen = ({ navigation, route }) => {
   const fetchLocationInfo = () => {
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.GEOCODE_API_KEY}`
       )
       .then((res) => {
+        console.log("res: \n" + JSON.stringify(res));
         const result = res.data.results[0];
-        console.log(result);
+        // console.log("result: \n" + result);
 
         const address = result.formatted_address;
         const placeId = result.place_id;
@@ -79,8 +80,7 @@ const MapScreen = ({ navigation, route }) => {
         });
       })
       .catch((error) => {
-        console.log(error.response.data.error.errors);
-
+        console.log(error);
         Alert.alert("Failed!", "feching google place has problem");
       });
   };
