@@ -23,31 +23,12 @@ const TravelgroupStack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator initialRouteName="GroupList">
-      <Stack.Screen
-        name="GroupList"
-        component={GroupListScreen}
-        options={{ title: "Travelgroups" }}
-      />
-      <Stack.Screen
-        name="GroupDetail"
-        component={GroupDetailScreen}
-        options={{ title: "Group Detail" }}
-      />
-      <Stack.Screen name="UserSearch" component={SearchUserScreen} />
-
-      <Stack.Screen
-        name="GroupEdit"
-        component={EditGroupScreen}
-        options={{ title: "Edit Group" }}
-      />
-      <Stack.Screen
-        name="GroupCreate"
-        component={CreateNewGroupScreen}
-        options={{ title: "New Group" }}
-      />
-      <Stack.Screen
-        name="GroupManage"
-        component={GroupManageScreen}
+    <Stack.Screen name="GroupList" component={GroupListScreen} options={{ title: "Travelgroups" }}/>
+    <Stack.Screen name="GroupDetail" component={GroupDetailScreen} options={{ title: "Group Detail" }}/>
+    <Stack.Screen name="UserSearch" component={SearchUserScreen} />
+    <Stack.Screen name="GroupEdit" component={EditGroupScreen} options={{ title: "Edit Group" }} />
+    <Stack.Screen name="GroupCreate" component={CreateNewGroupScreen} options={{ title: "New Group" }} />
+    <Stack.Screen name="GroupManage" component={GroupManageScreen}
         options={{
           headerRightContainerStyle: { marginRight: 40, marginTop: 20 },
           title: "",
