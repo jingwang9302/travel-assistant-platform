@@ -4,11 +4,15 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button, Alert } fro
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 
+
+
 const TravelReviewDetails = () => {
 
     /** TODO: display travel details. */
     return (
-        <Text>Hello</Text>
+        <View>
+            <Text>Hello</Text>
+        </View>
     );
 }
 

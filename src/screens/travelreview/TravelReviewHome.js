@@ -1,81 +1,84 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import { ScrollView } from 'react-native';
 import {useSelector} from 'react-redux';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button, Alert } from 'react-native';
-import { ListItem } from "react-native-elements";
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-community/async-storage';
+import { ListItem, Avatar } from "react-native-elements";
+import {GET_FINISHED_TRAVEL_PLANS_BY_USER_ID, GCS_URL, USER_BASIC_PROFILE_BY_USERID_URL} from '../../config/urls';
 import axios from "axios";
-
-const TRAVEL_REVIEW_SERVICE_URL = '';
-const FETCH_ALL_RECORDS_URL = '';
 
 const TravelReviewHome = ({navigation}) => {
     const userProfile = useSelector(state => state.user);
     const userId = userProfile.id;
 
-    /** TODO: sample travel reocords */
-    const travelRecords = [
-        {
-          title: "Seattle road trip",
-          Date: "2016-3-12"
-        },
-        {
-          title: "NYC spring break",
-          Date: "2012-2-12"
-        },
-        {
-          title: "Florida Disney",
-          Date: "2009-8-12"
-        }
-    ];
+    const [travelRecords, updateTravelRecords] = useState([]);
+    // const [travelMembers, updateTravelMembers] = useState([]);
+    
+    useEffect(() => {
+        fetchTravelRecords();
+    }, []);
 
 
     /** send request to Service */
     async function fetchTravelRecords(){
         axios({
             method: 'get',
-            url: TRAVEL_REVIEW_SERVICE_URL + FETCH_ALL_RECORDS_URL + '/' + userProfile.id,
+            url: GET_FINISHED_TRAVEL_PLANS_BY_USER_ID + userProfile.id,
             headers: {
                 'Authorization': 'Bearer '+ userProfile.token
-            },
-            data: {
-                title: title,
-                content: content,
-                authorId: userProfile.id,
-                privacy: privacy
             }
           })
             .then(function (response) {
-                // TODO: fill travelRecords
+                updateTravelRecords(response.data.data);
+                // response.data.data[0].travelMembers.forEach(userId => {
+                //     fetchTravelMembersInfo(userId);
+                // });
             })
-            .catch(function (error) {
-                if(error.response.data.message === null){
-                    console.log(error.message);
-                }else {
-                    console.log(error.response.data.message);
-                }
-            });
+            .catch((error) => {
+                console.log(error);
+                Alert.alert("Failed! Fetching completed trips error.");
+      });
     }
 
 
+    async function fetchTravelMembersInfo(userId){
+        axios({
+            method: 'get',
+            url: USER_BASIC_PROFILE_BY_USERID_URL + userId,
+            headers: {
+                'Authorization': 'Bearer '+ userProfile.token
+            }
+          })
+            .then(function (response) {
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+                Alert.alert("Failed to fetching user profile.");
+      });
+    }
+
     return (
-        <View>
-            <Text style={styles.greetingText}> Hello {userProfile.firstName},</Text>
-            <Text style={styles.greetingText}> You have completed {travelRecords.length} trip(s)</Text>
-            <View style={styles.tripItem}>
-                {
-                    travelRecords.map((item, i) => (
-                        <ListItem key={i} bottomDivider onPress={()=>navigation.navigate("TravelReviewDetails")}>
-                            <ListItem.Content>
-                                <ListItem.Title>{item.title}</ListItem.Title>
-                            </ListItem.Content>
-                            <ListItem.Chevron />
-                        </ListItem>
-                    ))
-                }
-            </View>
+        <View style={{flex:1}}>
+            <ScrollView>
+                <Text style={styles.greetingText}> Hello {userProfile.firstName},</Text>
+                <Text style={styles.greetingText}> You have completed {travelRecords.length} trip(s)</Text>
+                <View style={styles.tripItem}>
+                    {
+                        travelRecords.map((item, i) => (
+                            <ListItem key={i} bottomDivider onPress={()=>navigation.navigate("PlanDetail", {planId: item._id})}>
+                                <Avatar source={{uri: GCS_URL + item.image}} />
+                                <ListItem.Content>
+                                    <ListItem.Title>{item.planName}</ListItem.Title>
+                                    <ListItem.Subtitle>{item.planDescription}</ListItem.Subtitle>
+                                    <ListItem.Subtitle>{item.startDate}</ListItem.Subtitle>
+                                </ListItem.Content>
+                                <ListItem.Chevron />
+                            </ListItem>
+                        ))
+                    }
+                </View>
+            </ScrollView>
         </View>
-        
     );
 }
 

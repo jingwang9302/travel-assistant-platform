@@ -16,39 +16,14 @@ const TravelplanStack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator initialRouteName="PlanListTab">
-      <Stack.Screen
-        name="PlanListTab"
-        component={TravelPlanListTabScreen}
-        options={{ title: "Your Plans" }}
-      />
-      <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
-      <Stack.Screen
-        name="PlanPublish"
-        component={GroupListForPlanPublishScreen}
-      />
-      <Stack.Screen name="PlanEdit" component={EditPlanScreen} />
-
-      <Stack.Screen
-        name="PlanCreate"
-        component={CreateNewPlanScreen}
-        options={{
-          title: "New Plan",
-        }}
-      />
-      <Stack.Screen
-        name="PlacePick"
-        component={PlacePickScreen}
-        options={{
-          title: "Add a Place",
-        }}
-      />
-      <Stack.Screen
-        name="Map"
-        component={MapScreen}
-        options={{ title: "Map" }}
-      />
-
-      <Stack.Screen name="Test" component={TestScreen} />
+    <Stack.Screen name="PlanListTab" component={TravelPlanListTabScreen} options={{ title: "Your Plans" }}/>
+    <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
+    <Stack.Screen name="PlanPublish"component={GroupListForPlanPublishScreen} />
+    <Stack.Screen name="PlanEdit" component={EditPlanScreen} />
+    <Stack.Screen name="PlanCreate"component={CreateNewPlanScreen} options={{title: "New Plan"}} />
+    <Stack.Screen name="PlacePick" component={PlacePickScreen} options={{title: "Add a Place"}} />
+    <Stack.Screen name="Map" component={MapScreen} options={{ title: "Map" }} />
+    <Stack.Screen name="Test" component={TestScreen} />
     </Stack.Navigator>
   );
 };
