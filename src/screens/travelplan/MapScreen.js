@@ -31,12 +31,18 @@ const MapScreen = ({ navigation, route }) => {
   const mapRef = useRef(null);
   const mapDetailRef = useRef(null);
 
+  console.log("initiallocation is:");
+  console.log(initialLocation);
+
   const mapRegion = {
     latitude: initialLocation ? initialLocation.lat : 37.2329,
     longitude: initialLocation ? initialLocation.lng : -122.406417,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
+
+  console.log("mapRegi0n is:");
+  console.log(mapRegion);
 
   React.useLayoutEffect(() => {
     if (!readOnly) {
@@ -211,9 +217,6 @@ const MapScreen = ({ navigation, route }) => {
           style={styles.map}
           initialRegion={mapRegion}
           zoomEnabled={true}
-          onMapReady={() => {
-            showMyLocation();
-          }}
           onPress={selectLocationHandler}
         >
           {markerCoordinates && (

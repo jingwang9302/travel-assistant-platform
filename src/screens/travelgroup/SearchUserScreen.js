@@ -77,10 +77,10 @@ const SearchUserScreen = ({ navigation, route }) => {
       });
   };
 
-  const fetchUserInfo = (userId) => {
+  const fetchUserInfo = (userEmail) => {
     axios({
       method: "get",
-      url: USER_SERVICE + "/profile/basic/" + userId,
+      url: USER_SERVICE + `/profile/${userEmail}`,
       headers: {
         Authorization: "Bearer " + userProfile.token,
       },
@@ -88,14 +88,14 @@ const SearchUserScreen = ({ navigation, route }) => {
       .then(function (response) {
         //need to check API
         const searchedUser = response.data;
-        console.log("searched user info:");
-        console.log(searchedUser);
+        // console.log("searched user info:");
+        // console.log(searchedUser);
         navigation.navigate("UserBasicInfo", {
           userInfo: searchedUser,
           foraddrole,
           groupId,
         });
-        setUserSearched(basicUserInfo);
+        //setUserSearched(searchedUser);
 
         //setAllPeopleInGroup((oldarr) => [...oldarr, basicUserInfo]);
         // setAll([..all, basicUserInfo]);
@@ -105,9 +105,9 @@ const SearchUserScreen = ({ navigation, route }) => {
         // });
       })
       .catch(function (error) {
-        setErrorMessage(error.response.data);
-        Alert.alert(error.response.data.error);
-        console.log(error.response.data.error);
+        //setErrorMessage(error.response.data);
+        Alert.alert(error.response);
+        console.log(error);
       });
   };
 
@@ -119,7 +119,7 @@ const SearchUserScreen = ({ navigation, route }) => {
         `update/${foraddrole}/${userProfile.id}/${groupId}/${idToAdd}`,
     })
       .then((res) => {
-        Alert.alert("Successful");
+        //Alert.alert("Successful");
         navigation.goBack();
       })
       .catch((error) => {
@@ -183,7 +183,7 @@ const SearchUserScreen = ({ navigation, route }) => {
           lightTheme={true}
           color="black"
           round={false}
-          placeholder="Search Users Here..."
+          placeholder="Input Email Here..."
           onChangeText={(input) => setSearch(input)}
           value={search}
           searchIcon={{

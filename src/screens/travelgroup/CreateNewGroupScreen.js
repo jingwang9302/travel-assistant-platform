@@ -24,13 +24,17 @@ const CreateNewGroupScreen = ({ navigation }) => {
   const userProfile = useSelector((state) => state.user);
   const { groups } = useSelector((state) => state.groups);
   const [groupName, setGroupName] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState({ localUri: "" });
 
   //const [isGroupCreateSuccess, setGroupCreateSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [groupNameInputError, setGroupNameInputError] = useState("");
+  const [groupDescriptionInputError, setGroupDescriptionInputError] = useState(
+    ""
+  );
   const groupNameInputRef = createRef();
+  const groupDescriptionRef = createRef();
 
   if (!userProfile.isLogin) {
     return <LoginAlertScreen />;
@@ -38,11 +42,18 @@ const CreateNewGroupScreen = ({ navigation }) => {
 
   const createNewGroup = () => {
     setGroupNameInputError("");
+    setGroupDescriptionInputError("");
+
     setErrorMessage("");
 
     if (!groupName) {
       //setErrorMessage("please add a group name");
       setGroupNameInputError("please add a group name");
+      return;
+    }
+
+    if (!groupDescription) {
+      setGroupDescriptionInputError("please add a group description");
       return;
     }
 
@@ -53,17 +64,18 @@ const CreateNewGroupScreen = ({ navigation }) => {
       data: {
         groupName,
         groupOwner: userProfile.id,
+        groupDescription,
       },
     })
       .then(function (res) {
         // getGroupsUserIn(userProfile.id);
         const { data } = res.data;
-        console.log(res.data.data);
+        //console.log(res.data.data);
         setLoading(false);
 
         if (selectedImage.localUri && selectedImage.localUri !== "") {
-          console.log("before upload image, groupId is:");
-          console.log(data._id);
+          // console.log("before upload image, groupId is:");
+          // console.log(data._id);
           upLoadImage(selectedImage.localUri, data._id);
         }
 
@@ -75,11 +87,9 @@ const CreateNewGroupScreen = ({ navigation }) => {
       })
       .catch(function (error) {
         setLoading(false);
-        setErrorMessage(error.response.data.error);
+        //setErrorMessage(error.response.data.error);
         console.log(error.response.data.error);
-        Alert.alert("Creation Failed", error.response.data.error, {
-          onPress: () => setErrorMessage(""),
-        });
+        Alert.alert("Alert", error.response.data.error);
       });
   };
 
@@ -111,10 +121,8 @@ const CreateNewGroupScreen = ({ navigation }) => {
         console.log(`image name is ${data}`);
       })
       .catch((error) => {
-        setErrorMessage(error.response.data.error);
-        Alert.alert("Creation Failed", `${errorMessage}`, {
-          onPress: () => setErrorMessage(""),
-        });
+        //setErrorMessage(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
         console.log(error.response.data.error);
       });
   };
@@ -173,6 +181,31 @@ const CreateNewGroupScreen = ({ navigation }) => {
                 />
               }
             />
+
+            <Input
+              style={styles.inputStyle}
+              onChangeText={(input) => setGroupDescription(input)}
+              underlineColorAndroid="#f000"
+              placeholder="Input Travelgroup Description"
+              placeholderTextColor="#8b9cb5"
+              autoCapitalize="sentences"
+              returnKeyType="next"
+              ref={groupDescriptionRef}
+              errorMessage={groupDescriptionInputError}
+              blurOnSubmit={false}
+              leftIcon={<Icon name="people" size={24} color="black" />}
+              rightIcon={
+                <Icon
+                  name="close"
+                  size={20}
+                  onPress={() => {
+                    groupDescriptionRef.current.clear();
+                    setGroupDescription("");
+                    setGroupDescriptionInputError("");
+                  }}
+                />
+              }
+            />
           </View>
 
           <View style={{ alignItems: "center", marginTop: 30 }}>
@@ -205,12 +238,14 @@ const CreateNewGroupScreen = ({ navigation }) => {
               />
             )}
           </View>
-          <Button
-            buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
-            title="submit"
-            style={{ marginVertical: 20 }}
-            onPress={createNewGroup}
-          />
+          <View style={{ marginTop: 10 }}>
+            <Button
+              buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
+              title="submit"
+              //style={{ marginVertical: 20 }}
+              onPress={createNewGroup}
+            />
+          </View>
         </KeyboardAvoidingView>
       </ScrollView>
     </View>
@@ -225,9 +260,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
   },
   SectionStyle: {
-    flexDirection: "row",
-    height: 40,
-
     marginHorizontal: 10,
   },
   buttonStyle: {

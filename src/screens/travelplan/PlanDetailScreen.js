@@ -152,12 +152,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                 />
               ) : null}
               {selectedPlan.status === 0 || selectedPlan.status === 1 ? (
-                <HiddenItem
-                  title="Delete Plan"
-                  onPress={() => {
-                    navigation.navigate("PlanListTab");
-                  }}
-                />
+                <HiddenItem title="Delete Plan" onPress={deletePlan} />
               ) : null}
             </OverflowMenu>
           </HeaderButtons>
@@ -494,7 +489,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
         console.log("create ongoing Travelplan success");
       })
       .catch((error) => {
-        Alert.alert("Failed", error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
         console.log(error.response.data.error);
       });
   };
@@ -529,6 +524,19 @@ const PlanDetailScreen = ({ navigation, route }) => {
       })
       .catch((error) => {
         console.log(error.response.data.error);
+        Alert.alert("Failed", error.response.data.error);
+      });
+  };
+
+  const deletePlan = () => {
+    axios({
+      method: "DELETE",
+      url: PLAN_SERVICE + `delete/${userProfile.id}/${planId}`,
+    })
+      .then((res) => {
+        navigation.navigate("PlanListTab");
+      })
+      .catch((error) => {
         Alert.alert("Failed", error.response.data.error);
       });
   };
@@ -577,7 +585,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const listHeader = () => {
     return (
       <SafeAreaView>
-        <View style={{ marginBottom: 20 }}>
+        <View style={{ marginBottom: 5 }}>
           <ImageBackground
             source={{
               uri: `${GCS_URL}${selectedPlan.image}`,
@@ -588,39 +596,32 @@ const PlanDetailScreen = ({ navigation, route }) => {
               resizeMode: "contain",
             }}
           >
-            <View style={{ marginTop: 60 }}>
-              <View style={{ marginVertical: 5 }}>
-                <Text
-                  style={{ color: "white", fontSize: 25, fontWeight: "bold" }}
-                >
-                  {selectedPlan.planName}
-                </Text>
-              </View>
-              <View style={{ marginVertical: 5 }}>
-                <Text
-                  style={{ color: "white", fontSize: 21, fontWeight: "bold" }}
-                >
-                  PlanID: {selectedPlan._id}
-                </Text>
-              </View>
-              <View style={{ marginVertical: 2 }}>
-                <Text
-                  style={{ fontSize: 17, color: "white", fontWeight: "bold" }}
-                >
-                  Created at:{selectedPlan.createdAt}
-                </Text>
-              </View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{ color: "white", fontSize: 35, fontWeight: "bold" }}
+              >
+                {selectedPlan.planName}
+              </Text>
+              <Text
+                style={{ color: "white", fontSize: 20, fontWeight: "bold" }}
+              >
+                {selectedPlan.planDescription}
+              </Text>
             </View>
           </ImageBackground>
         </View>
 
-        <View>
+        <View style={{ marginHorizontal: 5 }}>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-
-              height: 35,
+              marginBottom: 5,
             }}
           >
             <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
@@ -640,54 +641,28 @@ const PlanDetailScreen = ({ navigation, route }) => {
             ) : null}
           </View>
 
-          <Divider style={{ margin: 10, backgroundColor: "black" }} />
-
-          {notation ? (
-            <View>
-              <Text
-                style={{ color: "black", fontSize: 20, fontWeight: "bold" }}
-              >
-                {notation}
-              </Text>
-              <Divider style={{ margin: 10, backgroundColor: "black" }} />
-            </View>
-          ) : null}
-
-          <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
-            Description:
-          </Text>
-          <Text style={{ color: "black", fontSize: 20 }}>
-            {selectedPlan.planDescription}
-          </Text>
-
-          <View>
+          <View style={{ marginBottom: 10 }}>
             {selectedPlan.startDate ? (
               <View>
-                <Divider
-                  style={{ marginVertical: 5, backgroundColor: "black" }}
-                />
-                <Text
-                  style={{ color: "black", fontSize: 20, fontWeight: "bold" }}
-                >
+                <Text style={{ color: "black", fontSize: 20 }}>
                   Start Date: {selectedPlan.startDate}
                 </Text>
               </View>
             ) : null}
             {selectedPlan.endDate ? (
-              <Text
-                style={{ color: "black", fontSize: 20, fontWeight: "bold" }}
-              >
+              <Text style={{ color: "black", fontSize: 20 }}>
                 End Date: {selectedPlan.endDate}
               </Text>
             ) : null}
           </View>
         </View>
-        <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
+
         <View
           style={{
             flexDirection: "row",
             justifyContent: "flex-start",
             marginBottom: 2,
+            marginHorizontal: 5,
           }}
         >
           <View style={{ flexDirection: "row" }}>
@@ -742,14 +717,13 @@ const PlanDetailScreen = ({ navigation, route }) => {
             </View>
           </View>
         </View>
-        <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
       </SafeAreaView>
     );
   };
 
   const listFooter = () => {
     return (
-      <View>
+      <View style={{ marginHorizontal: 5 }}>
         <View>
           <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
           {selectedPlan.departureAddress &&
@@ -908,10 +882,17 @@ const PlanDetailScreen = ({ navigation, route }) => {
         >
           <Avatar
             rounded
+            title={item.firstName}
             source={{
               uri: UPLOAD_IMAGE_URL + item.avatarUrl,
             }}
             size="large"
+            onPress={() =>
+              navigation.navigate("GroupManage", {
+                selectedUserDetail: item,
+                readOnly: true,
+              })
+            }
           />
 
           <Text>{item.firstName}</Text>
@@ -1032,6 +1013,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginTop: 80,
     marginBottom: 120,
+  },
+  SectionStyle: {
+    marginTop: 5,
+    marginBottom: 10,
+    margin: 5,
   },
 });
 

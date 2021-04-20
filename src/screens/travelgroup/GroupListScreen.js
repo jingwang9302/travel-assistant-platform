@@ -65,12 +65,6 @@ const GroupListScreen = ({ navigation, route }) => {
 
   const [buttonDisplay, setButtonDisplay] = useState([]);
 
-  // let forPlan = false;
-  // if (forPlanPublish) {
-  //   forPlan = forPlanPublish;
-  // }
-  //forPlan = forPlanPublish
-
   // any hooks must be put on the top of any condition function or element
   useEffect(() => {
     if (userProfile.isLogin) {
@@ -147,84 +141,14 @@ const GroupListScreen = ({ navigation, route }) => {
       });
   }
 
-  if (errorMessage) {
-    //dispatch({ type: CLEAR_ERRORS });
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={{ backgroundColor: "white", marginVertical: 20 }}>
-          <SearchBar
-            lightTheme={true}
-            color="black"
-            round={true}
-            placeholder="Search Travelgroups Here..."
-            onChangeText={(content) => setSearch(content)}
-            value={search}
-            searchIcon={{
-              name: "search",
-              onPress: () => {
-                if (search) {
-                  //console.log(`search is ${search}`);
-                  navigation.navigate("GroupDetail", {
-                    //for test
-                    groupId: search,
-                  });
-                }
-              },
-            }}
-          />
-        </View>
-        <ListItem bottomDivider>
-          <ListItem.Content>
-            <ListItem.Title>{errorMessage}</ListItem.Title>
-          </ListItem.Content>
-          <ListItem.Chevron />
-        </ListItem>
-        <Button title="Try Again" onPress={fetchGroups} />
-      </SafeAreaView>
-    );
-  }
-  const publishPlanToGroup = (groupId) => {
-    axios({
-      method: "PUT",
-      url: PLAN_SERVICE + `update/${userProfile.id}/${planId}`,
-      data: { status: 1, travelGroup: groupId },
-    })
-      .then((res) => {
-        //go back to plan detail
-        navigation.back();
-      })
-      .catch((error) => {
-        setErrorMessage(error.response.data.error);
-        console.log(error.response.data.error);
-      });
-  };
-
   const keyExtractor = (item, index) => index.toString();
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
-        // if (forPlanPublish) {
-        //   Alert.alert(
-        //     "Alert",
-        //     `Plan will be publshed to this group with Id ${item._id}`,
-        //     [
-        //       { text: "Cancel", style: "cancel" },
-        //       {
-        //         text: "Ok",
-        //         onPress: () => {
-        //           publishPlanToGroup(item._id);
-        //         },
-        //       },
-        //     ]
-        //   );
-        // } else {
         navigation.navigate("GroupDetail", {
           groupId: item._id,
         });
-        // }
-
-        //dispatch(setCurrentGroup(item));
       }}
     >
       <ListItem bottomDivider>
@@ -233,7 +157,6 @@ const GroupListScreen = ({ navigation, route }) => {
           size="large"
           source={{
             uri: `${GCS_URL}${item.groupImage}`,
-            //uri: `${GROUP_BASE_URL}/uploads/${item.groupImage}`,
           }}
         />
         <ListItem.Content>
@@ -249,20 +172,6 @@ const GroupListScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-        <OverflowMenu
-          style={{ marginHorizontal: 10 }}
-          OverflowIcon={({ color }) => (
-            <Ionicons name="ios-more" size={23} color={color} />
-          )}
-        >
-          <Item
-            title="Create a Group"
-            onPress={() => alert("create new group")}
-          />
-          <Item title="Create a plan " onPress={() => alert("create a plan")} />
-        </OverflowMenu>
-      </HeaderButtons> */}
       <Loader loading={loading} />
       <View>
         <SearchBar
@@ -290,14 +199,19 @@ const GroupListScreen = ({ navigation, route }) => {
         />
       </View>
       <View>
-        <FlatList
-          onRefresh={fetchGroups}
-          refreshing={isRefreshing}
-          data={groups}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-        />
+        {errorMessage ? (
+          <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
+        ) : (
+          <FlatList
+            onRefresh={fetchGroups}
+            refreshing={isRefreshing}
+            data={groups}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+          />
+        )}
       </View>
+
       <TouchableOpacity
         style={styles.touchableOpacityStyleFloating}
         onPress={() => navigation.navigate("GroupCreate")}

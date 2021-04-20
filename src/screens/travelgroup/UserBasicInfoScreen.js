@@ -50,10 +50,14 @@ const UserBasicInfoScreen = ({ navigation, route }) => {
           <ListItem.Subtitle style={{ fontSize: 20 }}>
             Id: {userInfo.id}
           </ListItem.Subtitle>
+          <ListItem.Subtitle style={{ fontSize: 20 }}>
+            Email: {userInfo.email}
+          </ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>
       <Button
         title="Add To Group"
+        buttonStyle={{ marginHorizontal: 10, borderRadius: 5 }}
         onPress={() => {
           addUserToGroup(userInfo.id);
         }}

@@ -202,7 +202,7 @@ const PlacePickScreen = ({ navigation, route }) => {
         />
         {placeInfo ? (
           <View>
-            <Text>Place Picked From Map: </Text>
+            <Text style={styles.label}>Place Picked From Map: </Text>
             <Text style={styles.label}>{placeInfo.address}</Text>
           </View>
         ) : null}

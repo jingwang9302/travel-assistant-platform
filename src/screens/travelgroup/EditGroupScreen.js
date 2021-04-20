@@ -14,7 +14,12 @@ import {
   Alert,
 } from "react-native";
 
-import { USER_SERVICE, GROUP_SERVICE, GROUP_BASE_URL } from "../../config/urls";
+import {
+  USER_SERVICE,
+  GROUP_SERVICE,
+  GROUP_BASE_URL,
+  GCS_URL,
+} from "../../config/urls";
 import Loader from "../../components/Loader";
 import { Icon, Input, Image, Button } from "react-native-elements";
 import { set } from "react-native-reanimated";
@@ -22,18 +27,26 @@ import LoginAlertScreen from "../user/LoginAlertScreen";
 import { Item } from "react-navigation-header-buttons";
 
 const EditGroupScreen = ({ navigation, route }) => {
-  const { groupName, groupImage, _id } = route.params;
+  const { groupName, groupDescription, groupImage, _id } = route.params;
   const [selectedImage, setSelectedImage] = useState({
-    localUri: `${GROUP_BASE_URL}/uploads/${groupImage}`,
+    localUri: `${GCS_URL}${groupImage}`,
   });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const userProfile = useSelector((state) => state.user);
   const [newGroupName, setNewGroupName] = useState(groupName);
+  const [newGroupDescription, setNewGroupDescription] = useState(
+    groupDescription
+  );
   const [newGroupNameInputError, setNewGroupNameInputError] = useState("");
+  const [
+    newGroupDescriptionInputError,
+    setNewGroupDescriptionInputError,
+  ] = useState("");
 
   const groupNameInputRef = createRef();
-  const oldUri = `${GROUP_BASE_URL}/uploads/${groupImage}`;
+  const groupDescriptionRef = createRef();
+  const oldUri = `${GCS_URL}${groupImage}`;
 
   if (!userProfile.isLogin) {
     return <LoginAlertScreen />;
@@ -46,11 +59,16 @@ const EditGroupScreen = ({ navigation, route }) => {
     //   //groupName: ,
     // });
     setNewGroupNameInputError("");
+    setNewGroupDescriptionInputError("");
 
     if (!newGroupName) {
       //setErrorMessage("please add a group name");
       setNewGroupNameInputError("please add a group name");
       //console.log(errorMessage);
+      return;
+    }
+    if (!newGroupDescription) {
+      setNewGroupDescriptionInputError("please add a group description");
       return;
     }
 
@@ -60,12 +78,13 @@ const EditGroupScreen = ({ navigation, route }) => {
       url: GROUP_SERVICE + `updateinfo/${userProfile.id}/${_id}`,
       data: {
         groupName: newGroupName,
+        groupDescription: newGroupDescription,
       },
     })
       .then(function (res) {
         // getGroupsUserIn(userProfile.id);
-        const { success } = res.data;
-        console.log(success);
+        // const { success } = res.data;
+        // console.log();
         if (
           selectedImage.localUri &&
           selectedImage.localUri !== "" &&
@@ -84,11 +103,8 @@ const EditGroupScreen = ({ navigation, route }) => {
       })
       .catch(function (error) {
         setLoading(false);
-        setErrorMessage(error.response.data.error);
-        Alert.alert("Edition Failed", error.response.data.error, {
-          onPress: () => setErrorMessage(""),
-        });
-
+        // setErrorMessage(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
         console.log(error.response.data.error);
       });
   };
@@ -121,12 +137,10 @@ const EditGroupScreen = ({ navigation, route }) => {
         console.log(`image name is ${data}`);
       })
       .catch((error) => {
-        setErrorMessage(error.response.data.error);
+        //setErrorMessage(error.response.data.error);
         // Alert.alert(`${errorMessage}`);
         console.log(error.response.data.error);
-        Alert.alert("Edition Failed", error.response.data.error, {
-          onPress: () => setErrorMessage(""),
-        });
+        Alert.alert("Alert", error.response.data.error);
       });
   };
 
@@ -168,10 +182,10 @@ const EditGroupScreen = ({ navigation, route }) => {
               placeholderTextColor="#8b9cb5"
               autoCapitalize="sentences"
               returnKeyType="next"
+              value={newGroupName}
               ref={groupNameInputRef}
               errorMessage={newGroupNameInputError}
               blurOnSubmit={false}
-              value={newGroupName}
               leftIcon={<Icon name="people" size={24} color="black" />}
               rightIcon={
                 <Icon
@@ -186,13 +200,33 @@ const EditGroupScreen = ({ navigation, route }) => {
                 />
               }
             />
+            <Input
+              style={styles.inputStyle}
+              onChangeText={(input) => setNewGroupDescription(input)}
+              underlineColorAndroid="#f000"
+              placeholder="Input Travelgroup Description"
+              placeholderTextColor="#8b9cb5"
+              autoCapitalize="sentences"
+              returnKeyType="next"
+              ref={groupDescriptionRef}
+              value={newGroupDescription}
+              errorMessage={newGroupDescriptionInputError}
+              blurOnSubmit={false}
+              leftIcon={<Icon name="people" size={24} color="black" />}
+              rightIcon={
+                <Icon
+                  name="close"
+                  size={20}
+                  onPress={() => {
+                    groupDescriptionRef.current.clear();
+                    setNewGroupDescription("");
+                    setNewGroupDescriptionInputError("");
+                  }}
+                />
+              }
+            />
           </View>
 
-          {/* <View style={styles.SectionStyle}>
-            {errorMessage !== "" ? (
-              <Text style={styles.errorTextStyle}>{errorMessage}</Text>
-            ) : null}
-          </View> */}
           <View style={{ alignItems: "center", marginTop: 35 }}>
             <Image
               source={{ uri: selectedImage.localUri }}
@@ -233,9 +267,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
   },
   SectionStyle: {
-    flexDirection: "row",
-    height: 40,
-
     marginHorizontal: 10,
   },
   buttonStyle: {

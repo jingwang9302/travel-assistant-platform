@@ -40,21 +40,8 @@ import {
   OverflowMenu,
 } from "react-navigation-header-buttons";
 
-import { USER_DATA, GROUP_DATA } from "./Data";
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import Loader from "../../components/Loader";
-import {
-  setGroupsUserIn,
-  setCurrentGroup,
-  clearCurrGroup,
-  clearTravelgroup,
-  UPDATE_GROUP,
-  SET_CURRENTGROUP,
-} from "../../redux/actions/travelgroupAction";
-import { user } from "../../redux/reducers/user";
-import { ForceTouchGestureHandler } from "react-native-gesture-handler";
-//import { ScrollView } from "react-native-gesture-handler";
-
 const GroupDetailScreen = ({ navigation, route }) => {
   //const [groupMembers, setGroupMembers] = useState([]);
   const [notation, setNotation] = useState("");
@@ -70,6 +57,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
     _id: "",
     groupOwner: 0,
     groupName: "",
+    groupDescription: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -80,15 +68,10 @@ const GroupDetailScreen = ({ navigation, route }) => {
   const { groupId } = route.params;
 
   const [allPeopleInGroup, setAllPeopleInGroup] = useState([]);
-  const [all, setAll] = useState([]);
   const [currUserRole, setCurrUserRole] = useState("");
   const [buttonDisplay, setButtonDisplay] = useState([]);
-  //const [isOwner, setIsOwner] = useState(false);
   const [isGroupOwner, setIsGroupOwner] = useState(false);
 
-  // console.log(`groupId is passed: ${groupId}`);
-  // console.log("loading is: ");
-  // console.log(loading);
   let groupSelected;
   const allInGroup = [];
 
@@ -230,11 +213,11 @@ const GroupDetailScreen = ({ navigation, route }) => {
       .then(function (response) {
         //need to check API
         const basicUserInfo = { ...response.data, role: userRole };
-        console.log("basic user info:");
-        console.log(basicUserInfo);
+        // console.log("basic user info:");
+        // console.log(basicUserInfo);
         allInGroup.push(basicUserInfo);
-        console.log("allin Gorup:");
-        console.log(allInGroup);
+        // console.log("allin Gorup:");
+        // console.log(allInGroup);
         setAllPeopleInGroup((oldarr) => [...oldarr, basicUserInfo]);
         // setAll([..all, basicUserInfo]);
 
@@ -262,60 +245,9 @@ const GroupDetailScreen = ({ navigation, route }) => {
         );
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
+        Alert.alert("Alert", error.response.data.error);
       });
   };
-
-  // const addUserToGroup = (idToAdd) => {
-  //   axios({
-  //     method: "PUT",
-  //     url:
-  //       GROUP_SERVICE +
-  //       `update/${foraddrole}/${userProfile.id}/${groupId}/${idToAdd}`,
-  //   })
-  //     .then((res) => {
-  //       Alert.alert("Successful");
-  //       navigation.goBack();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error.response.data.error);
-  //       Alert.alert(error.response.data.error);
-  //     });
-  // };
-  // const getFriend = () => {
-  //   axios({
-  //     method: "get",
-  //     url: USER_SERVICE + "/friends/" + userProfile.id,
-  //     headers: {
-  //       Authorization: "Bearer " + userProfile.token,
-  //     },
-  //   })
-  //     .then(function (response) {
-  //       setFriends(response.data);
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error.response);
-  //     });
-  // };
-
-  // const fetchUserInfo = (token) => {
-  //   axios({
-  //     method: "get",
-  //     url: USER_SERVICE + "/profile/" + username,
-  //     headers: {
-  //       Authorization: "Bearer " + token,
-  //     },
-  //   })
-  //     .then(function (response) {
-  //       dispatch(setProfile(response.data));
-  //       getNotifications(token, response.data.id);
-  //       getUserAvatar(token, response.data.id);
-  //       dispatch(setLogin(true));
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error.response);
-  //     });
-  // };
 
   const fetchSingleGroup = () => {
     setAllPeopleInGroup([]);
@@ -325,8 +257,8 @@ const GroupDetailScreen = ({ navigation, route }) => {
       .get(GROUP_SERVICE + "read/" + groupId)
       .then(function (res) {
         const { data } = res.data;
-        console.log("feched group:");
-        console.log(data);
+        //console.log("feched group:");
+        //console.log(data);
         loadSingleGroup(data);
         groupSelected = data;
         setSelectedGroup(data);
@@ -335,7 +267,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
       })
       .catch(function (error) {
         setErrorMessage(error.response.data.error);
-        console.log(errorMessage);
+        // console.log(errorMessage);
         setLoading(false);
         setIsRefreshing(false);
       });
@@ -350,8 +282,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
       let isOwner = false;
 
       const groupMembers = group.groupMembers;
-      console.log("members:");
-      console.log(groupMembers);
+
       if (groupMembers && groupMembers.length !== 0) {
         if (groupMembers.includes(userProfile.id)) {
           setUserNotInGroup(false);
@@ -375,10 +306,8 @@ const GroupDetailScreen = ({ navigation, route }) => {
           isManager = true;
           setButtonDisplay([buttonList[0], buttonList[2]]);
 
-          //setCurrUserRole("manager");
           setCurrUserRole("manager");
           setNotation("You are the manager of this group");
-          // notation = "You are the manager of this group";
         }
 
         groupManagers.forEach((id) => {
@@ -386,13 +315,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
         });
       }
 
-      console.log("managers:");
-      console.log(groupManagers);
-      //get groupOwner id
       const groupOwner = group.groupOwner;
-
-      console.log("groupowner:");
-      console.log(groupOwner);
 
       if (groupOwner === userProfile.id) {
         setIsGroupOwner(true);
@@ -400,135 +323,64 @@ const GroupDetailScreen = ({ navigation, route }) => {
         isOwner = true;
         setButtonDisplay([buttonList[0], buttonList[1], buttonList[3]]);
         setCurrUserRole("owner");
-        //currUserRole = "owner";
 
         setNotation("You are the owner of this group");
-        console.log("your are owner");
-        //notation = "You are the owner of this group";
       }
 
       if (!isOwner && !isManager && !isMember) {
         setNotation("You are not in this group");
         setUserNotInGroup(true);
-        return;
       }
 
       if (!isOwner) {
         fetchUserInfo(groupOwner, "owner");
-
-        // let owner = USER_DATA.filter((user) => user.id === groupOwner)[0];
-        // owner = { ...owner, role: "owner" };
-
-        // setAllPeopleInGroup((old) => [...old, owner]);
-        //allPeopleInGroup.push({ ...owner, role: "owner" });
       } else {
         setNotation("You are the owner of this group");
         fetchUserInfo(userProfile.id, "owner");
-        // const owner = { ...userProfile, role: "owner" };
-        // setAllPeopleInGroup((old) => [...old, owner]);
       }
-
-      // if (groupManagers && groupManagers.length !== 0) {
-      //   groupManagers.forEach((item) => {
-      //     // if (item !== userProfile.id) {
-      //     //   fetchUserInfo(item, "manager");
-      //     // }
-      //     fetchUserInfo(item, "manager");
-      //     console.log("After Fetch Manager");
-      //     console.log(allPeopleInGroup);
-
-      //     //for test
-      //     //console.log(item);
-      //     // const manager = USER_DATA.filter((user) => user.id === item)[0];
-      //     // console.log("manager is:");
-      //     // console.log(manager);
-      //     // setAllPeopleInGroup((old) => [
-      //     //   ...old,
-      //     //   { ...manager, role: "manager" },
-      //     // ]);
-      //     // console.log("Fetchc Manager");
-      //     // console.log(allPeopleInGroup);
-
-      //     //allPeopleInGroup.push({ ...manager, role: "manager" });
-      //   });
-      // }
-
-      // if (groupMembers && groupMembers.length !== 0) {
-      //   //fectch memebrs' info
-      //   groupMembers.forEach((item) => {
-      //     fetchUserInfo(item, "member");
-
-      //     //for test only
-      //     // let member = USER_DATA.filter((user) => user.id === item)[0];
-      //     // member = { ...member, role: "member" };
-
-      //     // // console.log("members is");
-      //     // // console.log(member);
-      //     // setAllPeopleInGroup((old) => [...old, member]);
-
-      //     //allPeopleInGroup.push({ ...member, role: "member" });
-      //   });
-
-      //   console.log("all members in group:");
-      //   console.log(allPeopleInGroup);
-      // }
     }
   };
 
   const keyExtractor = (item, index) => index.toString();
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={{ borderBottomColor: "black" }}
-      onPress={() =>
-        navigation.navigate("GroupManage", {
-          selectedUserDetail: item,
-          currUserRole: currUserRole,
-          groupId,
-        })
-      }
+    <View
+      style={{
+        margin: 5,
+        //alignContent: "stretch",
+        alignItems: "center",
+        borderColor: "black",
+        borderRadius: 5,
+
+        backgroundColor: "white",
+      }}
     >
-      <View
-        style={{
-          flex: 1,
-
-          margin: 5,
-          //alignContent: "stretch",
-          alignItems: "center",
-          borderColor: "black",
-          borderRadius: 5,
-
-          backgroundColor: "white",
+      <Avatar
+        rounded
+        title={item.firstName}
+        source={{
+          uri: UPLOAD_IMAGE_URL + item.avatarUrl,
         }}
-      >
-        {item.avatarUrl && item.avatarUrl !== "" ? (
-          <Avatar
-            rounded
-            source={{
-              uri: UPLOAD_IMAGE_URL + item.avatarUrl,
-            }}
-            size="large"
-          />
-        ) : (
-          <Avatar rounded title={item.firstName} size="large" />
-        )}
+        size="large"
+        onPress={() =>
+          navigation.navigate("GroupManage", {
+            selectedUserDetail: item,
+            currUserRole: currUserRole,
+            groupId,
+          })
+        }
+      />
 
-        {item.role !== "member" ? (
-          <Badge
-            value={item.role}
-            status="success"
-            containerStyle={{ position: "absolute", top: 0, right: 0 }}
-          />
-        ) : null}
-        <Text>{item.firstName}</Text>
-      </View>
-    </TouchableOpacity>
+      {item.role !== "member" ? (
+        <Badge
+          value={item.role}
+          status="success"
+          containerStyle={{ position: "absolute", top: 0, right: 0 }}
+        />
+      ) : null}
+      <Text>{item.firstName}</Text>
+    </View>
   );
-  if (userNotInGroup) {
-    {
-      listHeader;
-    }
-  }
 
   if (errorMessage) {
     return (
@@ -551,75 +403,22 @@ const GroupDetailScreen = ({ navigation, route }) => {
               resizeMode: "contain",
             }}
           >
-            <View style={{ marginTop: 80 }}>
-              <View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={styles.text}>{selectedGroup.groupName}</Text>
+              {selectedGroup.groupDescription ? (
                 <Text style={styles.text}>{selectedGroup.groupName}</Text>
-              </View>
-              <View>
-                <Text
-                  style={{ color: "white", fontSize: 23, fontWeight: "bold" }}
-                >
-                  GroupID: {selectedGroup._id}
-                </Text>
-              </View>
-
-              <View>
-                <Text
-                  style={{ fontSize: 18, color: "white", fontWeight: "bold" }}
-                >
-                  Created at:{selectedGroup.createdAt}
-                </Text>
-              </View>
+              ) : null}
             </View>
           </ImageBackground>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: 40,
-          }}
-        >
-          <Text style={{ fontSize: 22, color: "black", fontWeight: "bold" }}>
-            {notation}
-          </Text>
-          <View style={{ marginTop: 5, marginRight: 5 }}>
-            {userNotInGroup ? (
-              <Button
-                //contentContainerStyle={{ fontSize: 14 }}
-                titleStyle={{ fontSize: 14 }}
-                size={20}
-                title="Join Group"
-                onPress={joinGroup}
-              />
-            ) : null}
-          </View>
-        </View>
-        <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
 
-        <View>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("PlanList", {
-                groupId: groupId,
-              })
-            }
-          >
-            <View
-              style={{
-                height: 40,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginVertical: 10,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontSize: 30, fontWeight: "bold" }}>Travels </Text>
-              <Text style={{ fontSize: 20 }}>more{" >>   "}</Text>
-            </View>
-          </TouchableOpacity>
-          <Divider style={{ margin: 5, backgroundColor: "black" }} />
+        <View style={{ marginVertical: 10 }}>
+          <Text style={{ fontSize: 20 }}>Group Members:</Text>
         </View>
       </SafeAreaView>
     );
@@ -628,13 +427,23 @@ const GroupDetailScreen = ({ navigation, route }) => {
   const listFooter = () => {
     return (
       <View style={styles.buttonContainer}>
-        <Divider style={{ margin: 20, backgroundColor: "black" }} />
+        <Divider style={{ marginBottom: 10, backgroundColor: "black" }} />
+        <Button
+          buttonStyle={{ borderRadius: 10, backgroundColor: "green" }}
+          title="Group Travels"
+          style={{ marginVertical: 5 }}
+          onPress={() =>
+            navigation.navigate("PlanList", {
+              groupId: groupId,
+            })
+          }
+        />
         {buttonDisplay.length !== 0
           ? buttonDisplay.map((item, index) => {
               return (
                 <View key={index}>
                   <Button
-                    buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
+                    buttonStyle={{ borderRadius: 10 }}
                     title={item.name}
                     style={{ marginVertical: 5 }}
                     onPress={item.onPress}
@@ -643,6 +452,14 @@ const GroupDetailScreen = ({ navigation, route }) => {
               );
             })
           : null}
+        {userNotInGroup ? (
+          <Button
+            titleStyle={{ fontSize: 14 }}
+            size={20}
+            title="Join Group"
+            onPress={joinGroup}
+          />
+        ) : null}
       </View>
     );
   };
@@ -705,6 +522,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: "white",
     marginTop: 10,
+    marginHorizontal: 15,
 
     justifyContent: "space-between",
   },
@@ -740,6 +558,7 @@ const styles = StyleSheet.create({
     fontSize: 35,
     fontWeight: "bold",
     textAlign: "left",
+    //backgroundColor: "skyblue",
   },
 });
 

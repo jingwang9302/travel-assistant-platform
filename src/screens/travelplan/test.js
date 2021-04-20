@@ -24,22 +24,12 @@ const TestScreen = () => {
 
   const userProfile = useSelector((state) => state.user);
 
+  let interval = null;
   useEffect(() => {
-    // let interval;
-    // if (positionSharing) {
-    //   interval = setInterval(() => {
-    //     console.log("Interval is operated");
-    //   }, 3000);
-    //   return () => clearInterval(interval);
-    // } else {
-    //   return () => clearInterval(interval);
-    // }
-    const interval = setInterval(() => {
-      console.log("Interval is operated");
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
+    return () => {
+      stopSharePostion();
+    };
+  });
   const fetchUserInfo = (userId, userRole) => {
     axios({
       method: "get",
@@ -62,22 +52,20 @@ const TestScreen = () => {
   };
 
   const startSharePosition = () => {
-    // interval = setInterval(() => {
-    //   console.log("Interval is operated");
-    // }, 3000);
-
-    // setIntervalObj(interval);
-    // console.log(`invalObj is ${intevalObj}`);
     setSharingPosition(true);
-    console.log(`position sharing is ${positionSharing}`);
+    if (!interval) {
+      interval = setInterval(() => {
+        console.log("Interval is operated");
+      }, 1000);
+    }
   };
 
   const stopSharePostion = () => {
-    // clearInterval(interval);
-    // console.log(`invalObj is ${interval}`);
-    // console.log("interval is stopped");
     setSharingPosition(false);
-    console.log(`position sharing is ${positionSharing}`);
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
   };
 
   // return <DatePicker date={date} onDateChange={setDate} />;
