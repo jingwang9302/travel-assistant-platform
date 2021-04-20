@@ -21,7 +21,7 @@ export const GET_FINISHED_TRAVEL_PLANS_BY_USER_ID = PLAN_SERVICE + "read_finishe
 
 /** Group related service */
 export const GROUP_SERVICE = "https://travel-group-service.wn.r.appspot.com/v1/travelgroup/";
-export const GET_ALL_GROUPS_USER_BELONGS_BY_USERID = GROUP_SERVICE + "read";
+export const GET_ALL_GROUPS_USER_BELONGS_BY_USERID = GROUP_SERVICE + "read/groups_in/";
 /** google cloud storage */
 export const GCS_URL = "https://storage.googleapis.com/travel-group-service-bucket/";
 
