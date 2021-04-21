@@ -29,9 +29,12 @@ const NavigationScreen = ({ route, navigation }) => {
   const [isReady, setIsReady] = useState(false);
 
   const info = route.params;
-  const { address, latitude, longitude, place_id, title, url } = info.info;
+  // address, latitude, longitude, place_id, title, url
+  const { address, latitude, longitude } = info.info;
 
-  const { currentLocation, loading, error } = useCurrentLocation(true);
+  const { currentLocation, loading, error, endNavigation } = useCurrentLocation(
+    true
+  );
   if (!currentLocation) {
     return (
       <View>
@@ -139,7 +142,8 @@ const NavigationScreen = ({ route, navigation }) => {
             type="solid"
             title="End Navigation"
             onPress={() => {
-              navigation.replace("UsersLocation", { marker: info });
+              endNavigation();
+              navigation.navigate("Search");
             }}
           />
         </View>
