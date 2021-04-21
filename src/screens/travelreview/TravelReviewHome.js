@@ -34,8 +34,8 @@ const TravelReviewHome = ({navigation}) => {
                 // });
             })
             .catch((error) => {
-                console.log(error);
-                Alert.alert("Failed! Fetching completed trips error.");
+                // console.log();
+                Alert.alert(error.response.data.error);
       });
     }
 

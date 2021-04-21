@@ -137,7 +137,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
         console.log(error.response.data.error);
         setIsRefreshing(false);
         setLoading(false);
-        //Alert.alert("Alert", `${error.response.data.error}`);
+        Alert.alert("Alert", `${error.response.data.error}`);
       });
   };
 
