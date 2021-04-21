@@ -93,16 +93,15 @@ const UsersLocationScreen = ({ route, navigation }) => {
   // fetch users location and render on map every 10 seconds
   useEffect(() => {
     let mounted = true;
-    let timer = null;
     if (ongoingPlan) {
       const timer = setInterval(() => {
         fetchUsersLocation();
       }, 10000);
+      return () => {
+        clearInterval(timer);
+        mounted = false;
+      };
     }
-    return () => {
-      mounted = false;
-      timer && clearInterval(timer);
-    };
   }, []);
 
   function renderSOSButton() {

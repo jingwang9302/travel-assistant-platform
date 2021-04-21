@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {
     View,
-    Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator,
+    Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Platform,
 } from 'react-native';
-import {Card, Icon, Image, Input} from "react-native-elements";
+import {ButtonGroup, Card, Icon, Image, Input} from "react-native-elements";
 import {useSelector} from "react-redux";
-import {Picker, Textarea} from "native-base"
+import {Textarea} from "native-base";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import {BLOG_SERVICE} from "../../config/urls";
@@ -16,21 +16,19 @@ const PostCreationScreen = ({navigation}) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [tags, setTags] = useState('');
-    const [privacy, setPrivacy] = useState('public');
+    const [privacyIndex, setPrivacyIndex] = useState(0);
     const [image, setImage] = useState(null);
 
-    useEffect(() => {
-        (async () => {
-            if (Platform.OS !== 'web') {
-                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                if (status !== 'granted') {
-                    alert('Sorry, we need camera roll permissions to make this work!');
-                }
-            }
-        })();
-    }, []);
-
     const pickImage = async () => {
+
+        if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+                return;
+            }
+        }
+
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -46,6 +44,15 @@ const PostCreationScreen = ({navigation}) => {
     };
 
     const takePhoto = async () => {
+
+        if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+                return;
+            }
+        }
+
         let result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -70,9 +77,21 @@ const PostCreationScreen = ({navigation}) => {
             alert('Please fill content');
             return;
         }
-        if (!privacy) {
-            alert('Please select privacy');
-            return;
+
+        let privacy;
+
+        switch (privacyIndex) {
+            case 0:
+                privacy = 'public';
+                break;
+            case 1:
+                privacy = 'friends';
+                break;
+            case 2:
+                privacy = 'private';
+                break;
+            default:
+                privacy = 'public';
         }
 
         axios({
@@ -192,17 +211,26 @@ const PostCreationScreen = ({navigation}) => {
                     </View>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
                         <Text style={styles.label}>Privacy:</Text>
-                        <Picker
-                            itemTextStyle={{fontSize:20}}
-                            mode="dropdown"
-                            iosHeader="Select Privacy"
-                            selectedValue={privacy}
-                            onValueChange={(value)=>setPrivacy(value)}
-                        >
-                            <Picker.Item label="Public" value="public" />
-                            <Picker.Item label="Friends" value="friends" />
-                            <Picker.Item label="Private" value="private" />
-                        </Picker>
+                        {/*<Picker*/}
+                        {/*    itemTextStyle={{fontSize:20}}*/}
+                        {/*    mode="dropdown"*/}
+                        {/*    iosHeader="Select Privacy"*/}
+                        {/*    iosIcon={<Icon name={'arrow-down-drop-circle'} type={'material-community'} />}*/}
+                        {/*    selectedValue={privacy}*/}
+                        {/*    onValueChange={(value)=>setPrivacy(value)}*/}
+                        {/*>*/}
+                        {/*    <Picker.Item label="Public" value="public" />*/}
+                        {/*    <Picker.Item label="Friends" value="friends" />*/}
+                        {/*    <Picker.Item label="Private" value="private" />*/}
+                        {/*</Picker>*/}
+
+                        <ButtonGroup
+                            onPress={(index)=>setPrivacyIndex(index)}
+                            selectedIndex={privacyIndex}
+                            buttons={['Public', 'Friends', 'Private']}
+                            containerStyle={{flex:1}}
+                        />
+
                     </View>
                 </Card>
 
