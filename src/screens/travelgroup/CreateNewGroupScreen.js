@@ -44,7 +44,7 @@ const CreateNewGroupScreen = ({ navigation }) => {
     setGroupNameInputError("");
     setGroupDescriptionInputError("");
 
-    setErrorMessage("");
+    // setErrorMessage("");
 
     if (!groupName) {
       //setErrorMessage("please add a group name");
