@@ -86,6 +86,17 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     fechSinglePlan();
+    Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+      .then((res) => {
+        if (res) {
+          setPositionSharing(true);
+        } else {
+          setPositionSharing(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [ongoingPlan]);
 
   React.useLayoutEffect(() => {
@@ -224,8 +235,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
       .then(function (response) {
         //need to check API
         const basicUserInfo = { ...response.data };
-        console.log("basic user info:");
-        console.log(basicUserInfo);
+        // console.log("basic user info:");
+        // console.log(basicUserInfo);
         // allInGroup.push(basicUserInfo);
         //console.log("allin Gorup:");
         //console.log(allInGroup);
@@ -419,7 +430,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
             if (!res) {
               Location.startLocationUpdatesAsync("UpdateLocation", {
                 accuracy: Location.Accuracy.Low,
-                distanceInterval: 10,
+                distanceInterval: 30,
               });
             }
           })
@@ -774,11 +785,11 @@ const PlanDetailScreen = ({ navigation, route }) => {
                   name="navigation"
                   type="feather"
                   onPress={() => {
-                    //     navigation.navigate("Navigation", {
-                    //       lat: selectedPlan.departureAddress.lat,
-                    //       lng: selectedPlan.departureAddress.lng,
-                    //  });
-                    Alert.alert("Alert", "Go to navigation screen");
+                    navigation.navigate("Navigation", {
+                      lat: selectedPlan.departureAddress.lat,
+                      lng: selectedPlan.departureAddress.lng,
+                    });
+                    //Alert.alert("Alert", "Go to navigation screen");
                   }}
                 />
               </View>
@@ -844,7 +855,14 @@ const PlanDetailScreen = ({ navigation, route }) => {
                         name="navigation"
                         type="feather"
                         onPress={() => {
-                          Alert.alert("Alert", "Go to navigation screen");
+                          navigation.navigate("Navigation", {
+                            info: {
+                              address: item.address,
+                              longitude: item.lng,
+                              latitude: item.lat,
+                            },
+                          });
+                          //Alert.alert("Alert", "Go to navigation screen");
                         }}
                       />
                     </View>

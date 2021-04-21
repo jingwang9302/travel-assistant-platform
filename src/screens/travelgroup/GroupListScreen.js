@@ -124,7 +124,7 @@ const GroupListScreen = ({ navigation, route }) => {
     // setErrorMessage("");
     setGroupsSearched([]);
     setIsRefreshing(true);
-    console.log("before axios");
+    //console.log("before axios");
     axios({
       method: "get",
       url: GROUP_SERVICE + "read/groups_in/" + userProfile.id,
@@ -146,9 +146,7 @@ const GroupListScreen = ({ navigation, route }) => {
   const searchGroups = (groupName) => {
     axios({
       method: "GET",
-      url:
-        "http://localhost:5000/v1/travelgroup/" +
-        `search/${userProfile.id}/${groupName}`,
+      url: GROUP_SERVICE + `search/${userProfile.id}/${groupName}`,
     })
       .then((res) => {
         const { data } = res.data;
@@ -219,13 +217,28 @@ const GroupListScreen = ({ navigation, route }) => {
       </View>
       <View>
         {groupsSearched && groupsSearched.length !== 0 ? (
-          <FlatList
-            onRefresh={fetchGroups}
-            refreshing={isRefreshing}
-            data={groupsSearched}
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-          />
+          <View>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text style={{ fontSize: 20 }}>Travel Groups Searched: </Text>
+              <Icon
+                name="close"
+                onPress={() => {
+                  setGroupsSearched([]);
+                }}
+              />
+            </View>
+            <View>
+              <FlatList
+                onRefresh={fetchGroups}
+                refreshing={isRefreshing}
+                data={groupsSearched}
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
+              />
+            </View>
+          </View>
         ) : (
           <FlatList
             onRefresh={fetchGroups}

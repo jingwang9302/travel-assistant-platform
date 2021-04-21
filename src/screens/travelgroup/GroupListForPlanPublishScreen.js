@@ -86,7 +86,7 @@ const GroupListForPlanPublishScreen = ({ navigation, route }) => {
       onPress={() => {
         Alert.alert(
           "Alert",
-          `Plan will be publshed to this group with Id ${item._id}`,
+          `Plan will be publshed to group: ${item.groupName}`,
           [
             { text: "Cancel", style: "cancel" },
             {

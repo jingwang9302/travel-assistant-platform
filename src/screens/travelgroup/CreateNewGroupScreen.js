@@ -13,6 +13,14 @@ import {
   View,
   Alert,
 } from "react-native";
+import {
+  setGroupsUserIn,
+  setCurrentGroup,
+  clearCurrGroup,
+  clearTravelgroup,
+  UPDATE_GROUP,
+  SET_CURRENTGROUP,
+} from "../../redux/actions/travelgroupAction";
 
 import { USER_SERVICE, GROUP_SERVICE, GROUP_BASE_URL } from "../../config/urls";
 import Loader from "../../components/Loader";
@@ -22,7 +30,7 @@ import LoginAlertScreen from "../user/LoginAlertScreen";
 
 const CreateNewGroupScreen = ({ navigation }) => {
   const userProfile = useSelector((state) => state.user);
-  const { groups } = useSelector((state) => state.groups);
+  //const { groups } = useSelector((state) => state.groups);
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState({ localUri: "" });
@@ -35,6 +43,7 @@ const CreateNewGroupScreen = ({ navigation }) => {
   );
   const groupNameInputRef = createRef();
   const groupDescriptionRef = createRef();
+  const dispatch = useDispatch();
 
   if (!userProfile.isLogin) {
     return <LoginAlertScreen />;
@@ -70,8 +79,9 @@ const CreateNewGroupScreen = ({ navigation }) => {
       .then(function (res) {
         // getGroupsUserIn(userProfile.id);
         const { data } = res.data;
-        //console.log(res.data.data);
+        console.log(res.data.data);
         setLoading(false);
+        fetchGroups();
 
         if (selectedImage.localUri && selectedImage.localUri !== "") {
           // console.log("before upload image, groupId is:");
@@ -79,7 +89,7 @@ const CreateNewGroupScreen = ({ navigation }) => {
           upLoadImage(selectedImage.localUri, data._id);
         }
 
-        navigation.goBack();
+        // navigation.goBack();
 
         // navigation.navigate("GroupDetail", {
         //   groupId: res.data.data._id,
@@ -92,6 +102,22 @@ const CreateNewGroupScreen = ({ navigation }) => {
         Alert.alert("Alert", error.response.data.error);
       });
   };
+
+  function fetchGroups() {
+    axios({
+      method: "get",
+      url: GROUP_SERVICE + "read/groups_in/" + userProfile.id,
+    })
+      .then(function (res) {
+        const { data } = res.data;
+        dispatch(setGroupsUserIn(data));
+        navigation.goBack();
+      })
+      .catch(function (error) {
+        console.log(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
+      });
+  }
 
   const upLoadImage = (uri, groupId) => {
     //const uri = selectedImage.localUri;
