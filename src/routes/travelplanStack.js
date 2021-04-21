@@ -11,6 +11,7 @@ import EditPlanScreen from "../screens/travelplan/EditPlanScreen";
 import GroupListForPlanPublishScreen from "../screens/travelgroup/GroupListForPlanPublishScreen";
 import TestScreen from "../screens/travelplan/test";
 import TravelPlanListTabScreen from "../screens/travelplan/PlanListTabScreen";
+import GroupManageScreen from "../screens/travelgroup/GroupManageScreen";
 
 const TravelplanStack = () => {
   const Stack = createStackNavigator();
@@ -24,6 +25,7 @@ const TravelplanStack = () => {
     <Stack.Screen name="PlacePick" component={PlacePickScreen} options={{title: "Add a Place"}} />
     <Stack.Screen name="Map" component={MapScreen} options={{ title: "Map" }} />
     <Stack.Screen name="Test" component={TestScreen} />
+    <Stack.Screen name="GroupManage" component={GroupManageScreen} />
     </Stack.Navigator>
   );
 };
