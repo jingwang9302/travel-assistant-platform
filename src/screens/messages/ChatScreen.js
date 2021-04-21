@@ -23,7 +23,7 @@ const ChatScreen = (props) => {
     const navigation = useNavigation();
 
     useEffect(()=>{
-        console.log(JSON.stringify(props.route.params.chatId));
+        console.log("chatGroup: " + JSON.stringify(props.route.params.chatGroup));
         readUser();
         const unsubscribe = messagesRef
             .where('chatGroup', '==', props.route.params.chatGroup)
@@ -49,7 +49,7 @@ const ChatScreen = (props) => {
     useFocusEffect(
         React.useCallback(() => {
             console.log("[ChatScreen::useFocusEffect] Chat focused");
-            console.log(JSON.stringify(currentUserProfile));
+            console.log(currentUserProfile);
             if (!currentUserProfile.isLogin) {
                 navigation.navigate("Message");
             }
