@@ -23,6 +23,7 @@ if (firebase.apps.length === 0){
 const db = firebase.firestore();
 const messagesRef = db.collection('messages');
 
+// TODO: refresh after new user logs in.
 const MessageHomeScreen = () => {
     const userProfile = useSelector(state => state.user);
     /** List of groups that current user is in. */
