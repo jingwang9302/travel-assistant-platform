@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native';
+import {
+    Keyboard,
+    KeyboardAvoidingView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import Post from "../../components/Post";
 import Comment from "../../components/Comment";
 import {Icon} from "react-native-elements";
@@ -48,13 +57,13 @@ const CommentScreen = ({route, navigation}) => {
     }
 
     return(
-        <View style={styles.mainBody}>
+        <KeyboardAvoidingView style={styles.mainBody} behavior={"padding"}>
             <ScrollView>
                 <Post postId={id} />
                 <View style={{marginRight:15, marginLeft:15, marginTop:10,}}/>
                 <Comment postId={id} />
             </ScrollView>
-            <View style={{padding:5, backgroundColor:'#abb1b5', flexDirection:'row', justifyContent:'space-evenly', alignItems:'center'}}>
+            <View style={{padding:5, backgroundColor:'#abb1b5', flexDirection:'row', justifyContent:'space-evenly', alignItems:'flex-start'}}>
                 <Icon name='comment-text-outline' size={24} type = 'material-community' color='white'/>
                 <TextInput
                     style={{
@@ -64,7 +73,7 @@ const CommentScreen = ({route, navigation}) => {
                         fontSize: 15,
                     }}
                     multiline={true} onFocus={()=>setInputHeight(100)} onBlur={()=>setInputHeight(30)}
-                    onChangeText={(test)=>setCommentContent(test)}
+                    onChangeText={(text)=>setCommentContent(text)}
                     defaultValue={commentContent}
                 />
                 <TouchableOpacity
@@ -74,7 +83,8 @@ const CommentScreen = ({route, navigation}) => {
                     <Text style={styles.buttonTextStyle} onPress={()=>{sendComment(); setInputHeight(30); Keyboard.dismiss()}}>Say</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
+
     );
 };
 
