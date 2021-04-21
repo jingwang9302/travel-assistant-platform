@@ -93,7 +93,7 @@ const PostCreationScreen = ({navigation}) => {
                 if(tags !== ''){
                     saveTags(postId);
                 }
-                if(image !== ''){
+                if(image !== null){
                     uploadImage(postId)
                 }
                 navigation.navigate('Post');
@@ -196,7 +196,6 @@ const PostCreationScreen = ({navigation}) => {
                             itemTextStyle={{fontSize:20}}
                             mode="dropdown"
                             iosHeader="Select Privacy"
-                            iosIcon={<Icon name="arrow-down" />}
                             selectedValue={privacy}
                             onValueChange={(value)=>setPrivacy(value)}
                         >
