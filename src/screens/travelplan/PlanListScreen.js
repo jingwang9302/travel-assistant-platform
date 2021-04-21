@@ -57,8 +57,6 @@ const TravelPlanListScreen = ({ navigation, route }) => {
 
   const keyExtractor = (item, index) => index.toString();
   const renderItem = ({ item }) => {
-    console.log("each plan");
-    console.log(item);
     return (
       <PlanItem
         loading={loading}

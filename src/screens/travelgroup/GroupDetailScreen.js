@@ -411,7 +411,9 @@ const GroupDetailScreen = ({ navigation, route }) => {
             >
               <Text style={styles.text}>{selectedGroup.groupName}</Text>
               {selectedGroup.groupDescription ? (
-                <Text style={styles.text}>{selectedGroup.groupName}</Text>
+                <Text style={{ fontSize: 20, color: "white" }}>
+                  {selectedGroup.groupDescription}
+                </Text>
               ) : null}
             </View>
           </ImageBackground>
@@ -465,23 +467,25 @@ const GroupDetailScreen = ({ navigation, route }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Loader loading={loading} />
-      {allPeopleInGroup && allPeopleInGroup.length !== 0 ? (
-        <FlatList
-          contentContainerStyle={{ alignContent: "space-between" }}
-          style={{ backgroundColor: "white" }}
-          onRefresh={fetchSingleGroup}
-          refreshing={isRefreshing}
-          numColumns={5}
-          data={allPeopleInGroup}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          ListHeaderComponent={listHeader}
-          ListFooterComponent={listFooter}
-        />
-      ) : null}
-    </View>
+    <SafeAreaView>
+      <View style={{ flex: 1 }}>
+        <Loader loading={loading} />
+        {allPeopleInGroup && allPeopleInGroup.length !== 0 ? (
+          <FlatList
+            contentContainerStyle={{ alignContent: "space-between" }}
+            style={{ backgroundColor: "white" }}
+            onRefresh={fetchSingleGroup}
+            refreshing={isRefreshing}
+            numColumns={5}
+            data={allPeopleInGroup}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            ListHeaderComponent={listHeader}
+            ListFooterComponent={listFooter}
+          />
+        ) : null}
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -555,7 +559,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 35,
+    fontSize: 30,
     fontWeight: "bold",
     textAlign: "left",
     //backgroundColor: "skyblue",

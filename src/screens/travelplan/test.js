@@ -7,8 +7,8 @@ import axios from "axios";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { USER_SERVICE } from "../../config/urls";
 import { setOngoingPlan } from "../../redux/actions/travelPlanAction";
-
-const TestScreen = () => {
+import * as TaskManager from "expo-task-manager";
+const TestScreen = ({ navigation }) => {
   const [positionSharing, setSharingPosition] = useState(false);
   //const [location, setLocation] = useState();
   const [mylocation, setMylocatin] = useState();
@@ -67,6 +67,14 @@ const TestScreen = () => {
       interval = null;
     }
   };
+
+  TaskManager.defineTask("UpdateLocation", ({ data: { locations }, error }) => {
+    if (error) {
+      // check `error.message` for more details.
+      return;
+    }
+    console.log("Received new locations", locations[0].coords.longitude);
+  });
 
   // return <DatePicker date={date} onDateChange={setDate} />;
 
@@ -206,23 +214,6 @@ const TestScreen = () => {
 
   return (
     <View>
-      {/* <Button
-        title="share postion"
-        onPress={() => {
-          setSharingPosition(true);
-          //startSharingPosition();
-        }}
-      />
-      <Button
-        title="stop sharing"
-        onPress={async () => {
-          setSharingPosition(false);
-          await mylocation.remove();
-
-          console.log("removed");
-        }}
-      /> */}
-
       <Button title="Start Sharing" onPress={startSharePosition} />
       <Button title="Stop Sharing" onPress={stopSharePostion} />
       <Button
@@ -232,28 +223,42 @@ const TestScreen = () => {
         }}
       />
 
-      {/* <Button
-        title="show datepicker"
+      <Button
+        title="Start Sharing Backgroud"
         onPress={() => {
-          setShowDatePicker(true);
+          Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+            .then((res) => {
+              if (!res) {
+                Location.startLocationUpdatesAsync("UpdateLocation", {
+                  accuracy: Location.Accuracy.Low,
+                  distanceInterval: 10,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         }}
-      /> */}
-      {/* <View>
-        <Button title="show date picker" onPress={showDatepicker} />
-        <Button title="show time picker" onPress={showTimepicker} />
-        <Button title="show datetime picker" onPress={showDateTimePicker} />
-        <Button title="save" onPress={save} />
-      </View> */}
-      {/* {show ? (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode={mode}
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      ) : null} */}
+      />
+      <Button
+        title="go favorate"
+        onPress={() => {
+          navigation.navigate("GroupCreate");
+        }}
+      />
+
+      <Button
+        title="Stop Sharing Backgroud"
+        onPress={() => {
+          Location.hasStartedLocationUpdatesAsync("UpdateLocation").then(
+            (res) => {
+              if (res) {
+                Location.stopLocationUpdatesAsync("UpdateLocation");
+              }
+            }
+          );
+        }}
+      />
     </View>
   );
 };

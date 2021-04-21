@@ -26,8 +26,9 @@ export const travelplanReducer = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_PLANS:
       return { ...state, plans: action.payload };
+    // clear all plan related states after logout
     case ClEAR_PLANS:
-      return { ...state, plans: [] };
+      return {};
     case CLEAR_DEPARTURE_AND_DESTINATION:
       return { ...state, departureAddress: {}, destinationAddress: [] };
     case ADD_DEPARTURE_PLACE:

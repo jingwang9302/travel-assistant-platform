@@ -61,6 +61,7 @@ const GroupListScreen = ({ navigation, route }) => {
   const { groups } = useSelector((state) => state.groups);
   const userProfile = useSelector((state) => state.user);
   const { ongoingPlan } = useSelector((state) => state.plans);
+  const [groupsSearched, setGroupsSearched] = useState([]);
   const dispatch = useDispatch();
 
   const [buttonDisplay, setButtonDisplay] = useState([]);
@@ -120,7 +121,8 @@ const GroupListScreen = ({ navigation, route }) => {
   }
 
   function fetchGroups() {
-    setErrorMessage("");
+    // setErrorMessage("");
+    setGroupsSearched([]);
     setIsRefreshing(true);
     console.log("before axios");
     axios({
@@ -136,38 +138,57 @@ const GroupListScreen = ({ navigation, route }) => {
       })
       .catch(function (error) {
         console.log(error.response.data.error);
-        setErrorMessage(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
+        //setErrorMessage(error.response.data.error);
         setIsRefreshing(false);
       });
   }
+  const searchGroups = (groupName) => {
+    axios({
+      method: "GET",
+      url:
+        "http://localhost:5000/v1/travelgroup/" +
+        `search/${userProfile.id}/${groupName}`,
+    })
+      .then((res) => {
+        const { data } = res.data;
+        setGroupsSearched(data);
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
+      });
+  };
 
   const keyExtractor = (item, index) => index.toString();
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate("GroupDetail", {
-          groupId: item._id,
-        });
-      }}
-    >
-      <ListItem bottomDivider>
-        <Avatar
-          avatarStyle={{ borderRadius: 10 }}
-          size="large"
-          source={{
-            uri: `${GCS_URL}${item.groupImage}`,
-          }}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={styles.itemTitle}>
-            {item.groupName}
-          </ListItem.Title>
-          <ListItem.Subtitle>active</ListItem.Subtitle>
-        </ListItem.Content>
-        <ListItem.Chevron />
-      </ListItem>
-    </TouchableOpacity>
+    <SafeAreaView>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("GroupDetail", {
+            groupId: item._id,
+          });
+        }}
+      >
+        <ListItem bottomDivider>
+          <Avatar
+            avatarStyle={{ borderRadius: 10 }}
+            size="large"
+            source={{
+              uri: `${GCS_URL}${item.groupImage}`,
+            }}
+          />
+          <ListItem.Content>
+            <ListItem.Title style={styles.itemTitle}>
+              {item.groupName}
+            </ListItem.Title>
+            <ListItem.Subtitle>active</ListItem.Subtitle>
+          </ListItem.Content>
+          <ListItem.Chevron />
+        </ListItem>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 
   return (
@@ -189,18 +210,22 @@ const GroupListScreen = ({ navigation, route }) => {
             onPress: () => {
               if (search) {
                 console.log(`search is: ${search}`);
-                navigation.navigate("GroupDetail", {
-                  groupId: search,
-                });
-                setSearch("");
+                searchGroups(search);
+                //setSearch("");
               }
             },
           }}
         />
       </View>
       <View>
-        {errorMessage ? (
-          <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
+        {groupsSearched && groupsSearched.length !== 0 ? (
+          <FlatList
+            onRefresh={fetchGroups}
+            refreshing={isRefreshing}
+            data={groupsSearched}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+          />
         ) : (
           <FlatList
             onRefresh={fetchGroups}
@@ -227,6 +252,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: StatusBar.currentHeight || 2,
+    marginBottom: 59,
   },
   item: {
     backgroundColor: "#f9c2ff",

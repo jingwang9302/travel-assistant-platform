@@ -40,11 +40,9 @@ import {
   Divider,
 } from "react-native-elements";
 
-import { GROUP_DATA, PlAN_DATA, USER_DATA } from "../travelgroup/Data";
-
 import LoginAlertScreen from "../user/LoginAlertScreen";
 //import { ScrollView } from "react-native-gesture-handler";
-import CommentsModal from "../../components/travelgroup_and_travelplan/commentsModal";
+
 import {
   HeaderButtons,
   HeaderButton,
@@ -55,6 +53,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import * as Location from "expo-location";
+import * as TaskManager from "expo-task-manager";
 
 const PlanDetailScreen = ({ navigation, route }) => {
   const [selectedPlan, setSelectedPlan] = useState({
@@ -78,26 +77,15 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const [intervalObj, setIntervalObj] = useState(null);
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
-  const COMMENTS_DATA = [
-    { title: "commnt-1", text: "first comment", user: 1, date: "2021" },
-  ];
   const userProfile = useSelector((state) => state.user);
 
   const { planId } = route.params;
   const { ongoingPlan } = useSelector((state) => state.plans);
-  //let intervalObj = null;
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // only called once
     fechSinglePlan();
-
-    // if (userProfile.isLogin) {
-    //   fetchSinglePlanWithCallback();
-    //   if()
-
-    // }
   }, [ongoingPlan]);
 
   React.useLayoutEffect(() => {
@@ -133,7 +121,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                   }}
                 />
               ) : null}
-              {selectedPlan.status === 1 ? (
+              {selectedPlan.status === 1 && !ongoingPlan ? (
                 <HiddenItem
                   title="Start Travel"
                   onPress={() => {
@@ -172,7 +160,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                 <HiddenItem
                   title="Start Travel"
                   onPress={() => {
-                    dispatch(setOngoingPlan(selectedPlan));
+                    participantStartPlan();
                   }}
                 />
               ) : null}
@@ -272,10 +260,12 @@ const PlanDetailScreen = ({ navigation, route }) => {
     axios
       .get(PLAN_SERVICE + `read/${planId}`)
       .then((res) => {
-        //plan is ended remove ongoing plan from redux
+        //If plan is ended, remove ongoing plan from redux
         const { data } = res.data;
         if (data.status === 3) {
-          dispatch(removeOngoingPlan());
+          if (ongoingPlan && ongoingPlan === planId) {
+            dispatch(removeOngoingPlan());
+          }
         }
         //selectedPlan.destinationAddress;
         setDestinations(data.destinationAddress);
@@ -288,7 +278,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
       })
       .catch((error) => {
         console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
         setErrorMessage(error.response.data.error);
         setIsRefreshing(false);
       });
@@ -315,7 +305,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   //not available for initiator
   const quitPlan = () => {
-    if (ongoingPlan) {
+    if (ongoingPlan && ongoingPlan === planId) {
       dispatch(removeOngoingPlan());
     }
     if (positionSharing) {
@@ -343,7 +333,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   //only available for initiator
   const endPlan = () => {
-    if (ongoingPlan) {
+    if (ongoingPlan && ongoingPlan === planId) {
       dispatch(removeOngoingPlan());
     }
     if (positionSharing) {
@@ -356,13 +346,12 @@ const PlanDetailScreen = ({ navigation, route }) => {
       data: { status: 3, endDate: date.toLocaleString() },
     })
       .then((res) => {
-        dispatch(removeOngoingPlan());
-        deleteOngoingTravelplan();
-        Alert.alert("Successful", "End the plan successfully");
+        console.log("End Plan Successfully");
+        fechSinglePlan();
       })
       .catch((error) => {
         console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
       });
   };
 
@@ -372,7 +361,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
       "Are you sure to start sharing your postion",
       [
         {
-          text: "Cancel",
+          text: "Dismiss",
         },
         {
           text: "OK",
@@ -384,29 +373,19 @@ const PlanDetailScreen = ({ navigation, route }) => {
     );
   };
 
-  const fechPositionAndUpload = async (sharePosition) => {
-    if (sharePosition) {
-      const hasPermission = verifyPermissions();
-
-      if (hasPermission) {
-        // const interval = setInterval(async () => {
-        //   let location = await Location.getCurrentPositionAsync({});
-        //   uploadPostion(location.coords.latitude, location.coords.longitude);
-        //   console.log("Location is feched");
-        //   console.log(location.coords.latitude);
-        // }, 60000);
-        // setIntervalObj(interval);
-        // console.log(" start interValObj");
-        // console.log(intervalObj);
-      }
-    } else {
-      console.log(" clear interValObj");
-      console.log(intervalObj);
-      clearInterval(intervalObj);
-      setIntervalObj(null);
-      //intervalObj = null;
+  TaskManager.defineTask("UpdateLocation", ({ data: { locations }, error }) => {
+    if (error) {
+      console.log(error.message);
+      return;
     }
-  };
+    const pemission = verifyPermissions();
+    if (pemission)
+      uploadPostion(
+        locations[0].coords.longitude,
+        locations[0].coords.latitude
+      );
+    console.log("Received new locations", locations[0].coords.longitude);
+  });
 
   // uploading user's postion to DB
   const uploadPostion = (lat, lng) => {
@@ -417,10 +396,11 @@ const PlanDetailScreen = ({ navigation, route }) => {
     })
       .then((res) => {
         console.log("postion is uploaded");
+        console.log(`lat: ${lat}, lng: ${lng}`);
       })
       .catch((error) => {
         console.log(error.response.data.error);
-        Alert.alert("Postion Uploading Failed", error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
       });
   };
 
@@ -433,51 +413,48 @@ const PlanDetailScreen = ({ navigation, route }) => {
       .then((res) => {
         console.log("create ongoing Travelplan success");
         setPositionSharing(true);
-        fechPositionAndUpload(true);
+        //to check if backgroud task is already running
+        Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+          .then((res) => {
+            if (!res) {
+              Location.startLocationUpdatesAsync("UpdateLocation", {
+                accuracy: Location.Accuracy.Low,
+                distanceInterval: 10,
+              });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         Alert.alert("Failed", error.response.data.error);
         console.log(error.response.data.error);
       });
-    // setPositionSharing(true);
   };
 
   const stopSharingPosition = () => {
-    //unsubscribe to Location.watchPositionAsync
-    //delete the existing ongoing travelplan
     setPositionSharing(false);
-    fechPositionAndUpload(false);
-    // console.log("before clear");
-    // console.log(intervalObj);
-    // clearInterval(intervalObj);
-    // console.log("intervalOBj");
-    // console.log(intervalObj);
-    deleteOngoingTravelplan();
+    Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+      .then((res) => {
+        if (res) {
+          Location.stopLocationUpdatesAsync("UpdateLocation");
+          Alert.alert("Position Sharing is Stopped");
+        }
+        deleteOngoingTravelplan();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const verifyPermissions = async () => {
     let { status } = await Location.requestPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Warning", "Permission to access location was denied");
+      Alert.alert("Alert", "Permission to access location was denied");
       return false;
     }
     return true;
-  };
-
-  const createNewPositionSharing = () => {
-    axios({
-      method: "POST",
-      url: PLAN_SERVICE + `position/create/${userProfile.id}/${planId}`,
-    })
-      .then((res) => {
-        console.log("postionsharing is created");
-        startPositionSharingAlert();
-        // Alert.alert("Creation Successful", "You can start uploading postions");
-      })
-      .catch((error) => {
-        Alert.alert("Failed", error.response.data.error);
-        console.log(error.response.data.error);
-      });
   };
 
   const createOngoingTravelplan = () => {
@@ -503,7 +480,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
         console.log("Stop position sharing success");
       })
       .catch((error) => {
-        Alert.alert("Failed", error.response.data.error);
+        // Alert.alert("Failed", error.response.data.error);
         console.log(error.response.data.error);
       });
   };
@@ -518,13 +495,12 @@ const PlanDetailScreen = ({ navigation, route }) => {
       .then((res) => {
         const { data } = res.data;
         setSelectedPlan(data);
-        //Alert.alert("Successful", "Start the travel successfully");
-        createOngoingTravelplan();
+        startPositionSharingAlert();
         dispatch(setOngoingPlan(planId));
       })
       .catch((error) => {
         console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
       });
   };
 
@@ -543,7 +519,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   const participantStartPlan = () => {
     dispatch(setOngoingPlan(planId));
-    createOngoingTravelplan();
+    startPositionSharingAlert();
   };
 
   //const participantStartPlan = () => {};
@@ -627,16 +603,16 @@ const PlanDetailScreen = ({ navigation, route }) => {
             <Text style={{ color: "black", fontSize: 20, fontWeight: "bold" }}>
               Status: {planStatus[selectedPlan.status]}
             </Text>
-            {selectedPlan.status !== 0 ? (
+            {!positionSharing && ongoingPlan === planId ? (
               <Button
-                containerStyle={{ justifyContent: "center" }}
-                title="To Group >>"
-                titleStyle={{ fontSize: 15 }}
-                onPress={() => {
-                  navigation.navigate("GroupDetail", {
-                    groupId: selectedPlan.travelGroup,
-                  });
-                }}
+                title="Start Sharing Position"
+                onPress={startSharingPosition}
+              />
+            ) : null}
+            {positionSharing && ongoingPlan === planId ? (
+              <Button
+                title="Stop Sharing Position"
+                onPress={stopSharingPosition}
               />
             ) : null}
           </View>
@@ -717,13 +693,34 @@ const PlanDetailScreen = ({ navigation, route }) => {
             </View>
           </View>
         </View>
+        <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
+        {selectedPlan.travelMembers &&
+        selectedPlan.travelMembers.length !== 0 ? (
+          <View style={{ marginVertical: 10, marginHorizontal: 5 }}>
+            <Text style={{ fontSize: 20 }}>Participants:</Text>
+          </View>
+        ) : null}
       </SafeAreaView>
     );
   };
 
   const listFooter = () => {
     return (
-      <View style={{ marginHorizontal: 5 }}>
+      <View style={{ marginHorizontal: 5, marginVertical: 10 }}>
+        <View>
+          {selectedPlan.status !== 0 ? (
+            <Button
+              buttonStyle={{ borderRadius: 5 }}
+              title="To Group >>"
+              titleStyle={{ fontSize: 15 }}
+              onPress={() => {
+                navigation.navigate("GroupDetail", {
+                  groupId: selectedPlan.travelGroup,
+                });
+              }}
+            />
+          ) : null}
+        </View>
         <View>
           <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
           {selectedPlan.departureAddress &&
@@ -777,6 +774,10 @@ const PlanDetailScreen = ({ navigation, route }) => {
                   name="navigation"
                   type="feather"
                   onPress={() => {
+                    //     navigation.navigate("Navigation", {
+                    //       lat: selectedPlan.departureAddress.lat,
+                    //       lng: selectedPlan.departureAddress.lng,
+                    //  });
                     Alert.alert("Alert", "Go to navigation screen");
                   }}
                 />
@@ -858,46 +859,33 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const keyExtractor = (item, index) => index.toString();
   const renderItem = ({ item }) => (
     <View style={{ marginTop: 6 }}>
-      <TouchableOpacity
-        style={{ borderBottomColor: "black" }}
-        onPress={() =>
-          navigation.navigate("GroupManage", {
-            selectedUserDetail: item,
-            readOnly: true,
-          })
-        }
+      <View
+        style={{
+          margin: 5,
+          //alignContent: "stretch",
+          alignItems: "center",
+          borderColor: "black",
+          borderRadius: 5,
+          backgroundColor: "white",
+        }}
       >
-        <View
-          style={{
-            flex: 1,
-
-            margin: 5,
-            //alignContent: "stretch",
-            alignItems: "center",
-            borderColor: "black",
-            borderRadius: 5,
-
-            backgroundColor: "white",
+        <Avatar
+          rounded
+          title={item.firstName}
+          source={{
+            uri: UPLOAD_IMAGE_URL + item.avatarUrl,
           }}
-        >
-          <Avatar
-            rounded
-            title={item.firstName}
-            source={{
-              uri: UPLOAD_IMAGE_URL + item.avatarUrl,
-            }}
-            size="large"
-            onPress={() =>
-              navigation.navigate("GroupManage", {
-                selectedUserDetail: item,
-                readOnly: true,
-              })
-            }
-          />
+          size="large"
+          onPress={() =>
+            navigation.navigate("GroupManage", {
+              selectedUserDetail: item,
+              readOnly: true,
+            })
+          }
+        />
 
-          <Text>{item.firstName}</Text>
-        </View>
-      </TouchableOpacity>
+        <Text>{item.firstName}</Text>
+      </View>
     </View>
   );
 
@@ -917,17 +905,17 @@ const PlanDetailScreen = ({ navigation, route }) => {
           ListFooterComponent={listFooter}
         />
       ) : null}
-      <View style={styles.touchableOpacityStyleFloating}>
-        {!positionSharing && ongoingPlan ? (
+      {/* <View style={styles.touchableOpacityStyleFloating}>
+        {!positionSharing && ongoingPlan === planId ? (
           <Button
             title="Start Sharing Position"
             onPress={startSharingPosition}
           />
         ) : null}
-        {positionSharing && ongoingPlan ? (
+        {positionSharing && ongoingPlan === planId ? (
           <Button title="Stop Sharing Position" onPress={stopSharingPosition} />
         ) : null}
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -959,8 +947,8 @@ const styles = StyleSheet.create({
   },
   touchableOpacityStyleFloating: {
     position: "absolute",
-    width: 50,
-    height: 50,
+    // width: 50,
+    // height: 50,
     alignItems: "center",
     justifyContent: "center",
     right: 30,

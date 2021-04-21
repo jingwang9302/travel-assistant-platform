@@ -41,8 +41,8 @@ const SearchUserScreen = ({ navigation, route }) => {
   const { groupId, foraddrole, group } = route.params;
   const userProfile = useSelector((state) => state.user);
 
-  console.log("group passed is");
-  console.log(groupId);
+  // console.log("group passed is");
+  // console.log(groupId);
   useEffect(() => {
     getFriend();
   }, []);

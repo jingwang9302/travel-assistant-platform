@@ -65,7 +65,7 @@ const MapScreen = ({ navigation, route }) => {
   const fetchLocationInfo = () => {
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.GEOCODE_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.PLACES_API_KEY}`
       )
       .then((res) => {
         console.log("res: \n" + JSON.stringify(res));
@@ -77,8 +77,8 @@ const MapScreen = ({ navigation, route }) => {
         const { lat } = result.geometry.location;
         const { lng } = result.geometry.location;
         const place = { placeId, address, lat, lng };
-        console.log("place is: ");
-        console.log(`${place.address}`);
+        // console.log("place is: ");
+        // console.log(`${place.address}`);
 
         navigation.navigate("PlacePick", {
           placeInfo: place,
@@ -126,14 +126,14 @@ const MapScreen = ({ navigation, route }) => {
       return;
     }
 
-    console.log("picked location");
-    console.log(event.nativeEvent.coordinate.latitude);
-    console.log(event.nativeEvent.coordinate.longitude);
+    // console.log("picked location");
+    // console.log(event.nativeEvent.coordinate.latitude);
+    // console.log(event.nativeEvent.coordinate.longitude);
 
     if (placeDetail) {
-      console.log("atuo location");
-      console.log(placeDetail.geometry.location.lat);
-      console.log(placeDetail.geometry.location.lng);
+      // console.log("atuo location");
+      // console.log(placeDetail.geometry.location.lat);
+      // console.log(placeDetail.geometry.location.lng);
 
       if (
         event.nativeEvent.coordinate.latitude ===
@@ -145,8 +145,8 @@ const MapScreen = ({ navigation, route }) => {
       }
     }
     setPlaceDetail(null);
-    console.log("setplace detail is clicked");
-    console.log(placeDetail);
+    // console.log("setplace detail is clicked");
+    // console.log(placeDetail);
 
     setSelectedLocation({
       lat: event.nativeEvent.coordinate.latitude,
@@ -282,10 +282,6 @@ const styles = StyleSheet.create({
     right: 150,
     bottom: 2,
   },
-  //   headerButtonText: {
-  //     fontSize: 16,
-  //     color: Platform.OS === "android" ? "white" : "",
-  //   },
 });
 
 export default MapScreen;
