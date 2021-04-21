@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     View,
-    StyleSheet,
+    StyleSheet, Alert,
 } from 'react-native';
 import {Avatar, Badge, Icon, ListItem} from "react-native-elements";
 import {useDispatch, useSelector} from "react-redux";
@@ -51,8 +51,23 @@ const UserScreen = ({navigation}) => {
     ]
 
     const logout = () =>{
-        dispatch(clearNotifications());
-        dispatch(setLogout());
+        Alert.alert(
+            'Logout?',
+            'Are you sure to logout?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel'
+                },
+                { text: 'Yes',
+                    onPress: () => {
+                        dispatch(clearNotifications());
+                        dispatch(setLogout());
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
     }
 
     return(
