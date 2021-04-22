@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import {Icon, Avatar} from "react-native-elements";
 import {Card, Fab} from "native-base";
 import firebase from 'firebase/app';
@@ -29,16 +29,19 @@ const MessageHomeScreen = () => {
     /** List of groups that current user is in. */
     const [userGroupList, updateUserGroupList] = useState([]);
     const navigation = useNavigation();
-
+    const isFocused = useIsFocused();
+    
     useEffect(() => {
       fetchUserChatGroupInfo();
-    }, []);
+    }, [isFocused]);
 
     /** Call Group Service to fetch a list of groupId/chatId of which current user is in. */
     async function fetchUserChatGroupInfo(){
       if (!userProfile.isLogin) {
         return;
       }
+
+      updateUserGroupList([]);
 
       axios({
         method: 'GET',
@@ -52,7 +55,7 @@ const MessageHomeScreen = () => {
         })
         .catch(
           (function (error) {
-            console.log(error);
+            console.log("fetchUserChatGroupInfo error \n" + error);
           })
         );
     }
@@ -90,15 +93,24 @@ const MessageHomeScreen = () => {
     }
 
     if (userProfile.isLogin) {
+      if (userGroupList.length === 0) {
         return (
           <View style={{flex: 1}}>
-            <FlatList
-                data={userGroupList}
-                renderItem={renderItem}
-                keyExtractor={(item) => item._id.toString()}
-            />
+            <Text>You are not in any group.</Text>
+            <Text>Join a group to start chatting.</Text>
           </View>
         )
+      } else{
+        return (
+          <View style={{flex: 1}}>
+              <FlatList
+                  data={userGroupList}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item._id.toString()}
+              />
+          </View>
+        )
+      } 
     } 
     else return (
         <View style={styles.container}>
