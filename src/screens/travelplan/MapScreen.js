@@ -68,7 +68,7 @@ const MapScreen = ({ navigation, route }) => {
   const fetchLocationInfo = () => {
     axios
       .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.API_KEY_FOR_PLACES}`
       )
       .then((res) => {
         //console.log("res: \n" + JSON.stringify(res));

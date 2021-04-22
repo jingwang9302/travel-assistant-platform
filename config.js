@@ -5,6 +5,7 @@ const config = {
   PLACES_API_KEY: "AIzaSyDW4Z9Isw84xMrAtdw8IhNBzGQmNlIp0Pk",
   DIRECTION_API_KEY: "AIzaSyBL7lGdtl_KPP_Kp8V34ULIwOQKiF3Z2Ao",
   GEOCODE_API_KEY: "AIzaSyAnYxUamBQGo7fYkI68W3eehWI_znSVxoU",
+  API_KEY_FOR_PLACES: "AIzaSyDhARuvPnY3-bCJvu7FavCdichpag3-LDY",
 };
 
 export { config };
