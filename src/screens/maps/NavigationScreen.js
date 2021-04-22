@@ -13,9 +13,11 @@ import MapView, {
   PROVIDER_GOOGLE,
   AnimatedRegion,
 } from "react-native-maps";
+import { useSelector } from "react-redux";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import { config } from "../../../config";
 import { Ionicons } from "@expo/vector-icons";
+import SOSButton from "../../components/map/SOSButton";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -29,8 +31,9 @@ const NavigationScreen = ({ route, navigation }) => {
   const [isReady, setIsReady] = useState(false);
 
   const info = route.params;
-  // address, latitude, longitude, place_id, title, url
+  // address, latitude, longitude, place_id, title, url = info.info
   const { address, latitude, longitude } = info.info;
+  const { ongoingPlan } = useSelector((state) => state.plans);
 
   const { currentLocation, loading, error, endNavigation } = useCurrentLocation(
     true
@@ -157,6 +160,11 @@ const NavigationScreen = ({ route, navigation }) => {
           />
         </View>
       </View>
+      {ongoingPlan && (
+        <SOSButton
+          style={{ position: "absolute", top: 0.05 * height, zIndex: 999 }}
+        />
+      )}
     </View>
   );
 };

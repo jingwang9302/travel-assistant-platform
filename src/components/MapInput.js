@@ -10,15 +10,6 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
-const homePlace = {
-  description: "Home",
-  geometry: { location: { lat: 48.8152937, lng: 2.4597668 } },
-};
-const workPlace = {
-  description: "Work",
-  geometry: { location: { lat: 48.8496818, lng: 2.2940881 } },
-};
-
 const MapInput = ({ setRegion, setMarker, currentLocation }) => {
   const [text, setText] = useState("");
   const [getSearchResultApi, searchResult, errorMessage] = useResults(
@@ -114,9 +105,7 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
       }}
       nearbyPlacesAPI="GooglePlacesSearch"
       debounce={500}
-      predefinedPlaces={[homePlace, workPlace]}
       currentLocation={true}
-      currentLocationLabel="Current Location"
     ></GooglePlacesAutocomplete>
   );
 };

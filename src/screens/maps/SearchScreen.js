@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Text,
-  TextInput,
   View,
   StyleSheet,
   Dimensions,
@@ -9,13 +8,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
-import Polyline from "@mapbox/polyline";
 import { Card, ListItem, Button, Icon } from "react-native-elements";
 import MapInput from "../../components/MapInput";
 import ResultList from "./ResultsList";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import useDirection from "../../hooks/useDirection";
-import { config } from "../../../config";
+import { useSelector } from "react-redux";
+import SOSButton from "../../components/map/SOSButton";
+import UsersLocationButton from "../../components/map/UsersLocationButton";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -29,6 +29,8 @@ const SearchScreen = ({ navigation }) => {
   const [marker, setMarker] = useState([]);
   const [curMarker, setCurMarker] = useState(null);
   const { navigationInfo, getDirections } = useDirection();
+  const { ongoingPlan } = useSelector((state) => state.plans);
+  // const ongoingPlan = "123";
   const { currentLocation, loading, error } = useCurrentLocation();
   if (!currentLocation) {
     return (
@@ -58,7 +60,8 @@ const SearchScreen = ({ navigation }) => {
       }
     }
   };
-  console.log(navigationInfo);
+  // console.log(navigationInfo);
+
   return (
     <View>
       <MapView
@@ -72,13 +75,6 @@ const SearchScreen = ({ navigation }) => {
         loadingBackgroundColor="#eeeeee"
         followsUserLocation={true}
         region={region || initRegion}
-        // onUserLocationChange={() => {
-        //   console.log();
-        // }}
-        // onPress={(e) => {
-        //   if (e.nativeEvent.action) return;
-        //   setMarker([e.nativeEvent.coordinate]);
-        // }}
       >
         {navigationInfo &&
           navigationInfo.coords &&
@@ -123,7 +119,7 @@ const SearchScreen = ({ navigation }) => {
           style={{
             backgroundColor: "white",
             position: "absolute",
-            top: height - 392,
+            top: 0.51 * height,
             alignSelf: "center",
           }}
         >
@@ -173,6 +169,7 @@ const SearchScreen = ({ navigation }) => {
           </View>
         </View>
       )}
+
       <View style={styles.mapInput}>
         <MapInput
           setRegion={setRegion}
@@ -180,6 +177,17 @@ const SearchScreen = ({ navigation }) => {
           currentLocation={currentLocation}
         />
       </View>
+      {ongoingPlan && (
+        <SOSButton style={{ position: "absolute", top: 0.05 * height }} />
+      )}
+
+      {curMarker && (
+        <UsersLocationButton
+          style={{ position: "absolute", top: 0.05 * height }}
+          marker={curMarker}
+        />
+      )}
+
       {/* <View>
         <ResultList />
       </View> */}
