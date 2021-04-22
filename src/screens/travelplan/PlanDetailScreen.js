@@ -752,7 +752,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                       lat: selectedPlan.departureAddress.lat,
                       lng: selectedPlan.departureAddress.lng,
                     };
-                    navigation.navigate("Map", {
+                    navigation.navigate("MapForPlacePick", {
                       title: selectedPlan.departureAddress.title,
                       readOnly: true,
                       initialLocation: pickedLocation,
@@ -788,13 +788,24 @@ const PlanDetailScreen = ({ navigation, route }) => {
                   name="navigation"
                   type="feather"
                   onPress={() => {
-                    navigation.navigate("Navigation", {
-                      info: {
-                        address: selectedPlan.departureAddress.address,
-                        longitude: selectedPlan.departureAddress.lng,
-                        latitude: selectedPlan.departureAddress.lat,
+                    navigation.navigate("Map", {
+                      screen: "Navigation",
+                      params: {
+                        info: {
+                          address: selectedPlan.departureAddress.address,
+                          longitude: selectedPlan.departureAddress.lng,
+                          latitude: selectedPlan.departureAddress.lat,
+                        },
                       },
                     });
+
+                    // navigation.navigate("Navigation", {
+                    //   info: {
+                    //     address: selectedPlan.departureAddress.address,
+                    //     longitude: selectedPlan.departureAddress.lng,
+                    //     latitude: selectedPlan.departureAddress.lat,
+                    //   },
+                    // });
                     //Alert.alert("Alert", "Go to navigation screen");
                   }}
                 />
@@ -823,7 +834,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                             lat: item.lat,
                             lng: item.lng,
                           };
-                          navigation.navigate("Map", {
+                          navigation.navigate("MapForPlacePick", {
                             title: item.title,
                             readOnly: true,
                             initialLocation: pickedLocation,
@@ -862,13 +873,24 @@ const PlanDetailScreen = ({ navigation, route }) => {
                         name="navigation"
                         type="feather"
                         onPress={() => {
-                          navigation.navigate("Navigation", {
-                            info: {
-                              address: item.address,
-                              longitude: item.lng,
-                              latitude: item.lat,
+                          navigation.navigate("Map", {
+                            screen: "Navigation",
+                            params: {
+                              info: {
+                                address: item.address,
+                                longitude: item.lng,
+                                latitude: item.lat,
+                              },
                             },
                           });
+
+                          // navigation.navigate("Navigation", {
+                          //   info: {
+                          //     address: item.address,
+                          //     longitude: item.lng,
+                          //     latitude: item.lat,
+                          //   },
+                          // });
                           //Alert.alert("Alert", "Go to navigation screen");
                         }}
                       />

@@ -40,13 +40,12 @@ const TravelplanStack = () => {
         options={{ title: "Add a Place" }}
       />
       <Stack.Screen
-        name="Map"
+        name="MapForPlacePick"
         component={MapScreen}
         options={{ title: "Map" }}
       />
       <Stack.Screen name="Test" component={TestScreen} />
       <Stack.Screen name="GroupManage" component={GroupManageScreen} />
-      <Stack.Screen name="Navigation" component={NavigationScreen} />
     </Stack.Navigator>
   );
 };

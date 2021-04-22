@@ -32,7 +32,11 @@ const NavigationScreen = ({ route, navigation }) => {
 
   const info = route.params;
   // address, latitude, longitude, place_id, title, url = info.info
+
   const { address, latitude, longitude } = info.info;
+
+  console.log("info from planscreen:");
+  console.log(info.info);
   const { ongoingPlan } = useSelector((state) => state.plans);
 
   const { currentLocation, loading, error, endNavigation } = useCurrentLocation(
