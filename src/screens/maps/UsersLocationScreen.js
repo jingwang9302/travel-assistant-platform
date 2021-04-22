@@ -10,8 +10,8 @@ import {
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import { useSelector } from "react-redux";
 import { Button, Icon } from "react-native-elements";
-import { sendSOSToOngoingPlanGroupChat } from "../../utils/MessagingUtils";
 import { PLAN_SERVICE } from "../../config/urls";
+import SOSButton from "../../components/map/SOSButton";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -20,15 +20,9 @@ const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
 const UsersLocationScreen = ({ route, navigation }) => {
   const mapView = useRef();
-  const info = route.params;
-  const {
-    address,
-    latitude,
-    longitude,
-    place_id,
-    title,
-    url,
-  } = info.marker.info;
+  const marker = route.params.marker;
+  console.log(marker);
+  const { address, latitude, longitude, title } = marker;
 
   // const initusersList = [
   //   {
@@ -66,7 +60,6 @@ const UsersLocationScreen = ({ route, navigation }) => {
   };
 
   const { ongoingPlan } = useSelector((state) => state.plans);
-  const currentUserProfile = useSelector((state) => state.user);
   // const ongoingPlan = "123";
 
   // Fetch users' location from PlanService
@@ -90,57 +83,31 @@ const UsersLocationScreen = ({ route, navigation }) => {
     }
   };
 
+  let timer = null;
+
+  const endTimer = () => {
+    timer && clearInterval(timer);
+  };
+
   // fetch users location and render on map every 10 seconds
   useEffect(() => {
-    let mounted = true;
-    if (ongoingPlan) {
-      const timer = setInterval(() => {
-        fetchUsersLocation();
-      }, 10000);
-      return () => {
-        clearInterval(timer);
-        mounted = false;
-      };
-    }
+    navigation.addListener("focus", () => {
+      if (ongoingPlan) {
+        timer = setInterval(() => {
+          fetchUsersLocation();
+        }, 10000);
+      }
+    });
+    timer && clearInterval(timer);
   }, []);
 
-  function renderSOSButton() {
-    return (
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: width * 0.85,
-          right: 0,
-          height: 60,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            height: height * 0.05,
-            width: height * 0.05,
-            // paddingHorizontal: 1,
-            paddingLeft: 6,
-            paddingVertical: 1,
-            borderRadius: 20,
-            backgroundColor: "red",
-          }}
-          onPress={() => {
-            sendSOSToOngoingPlanGroupChat(currentUserProfile, ongoingPlan);
-            alert("SOS message sent.");
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Text>SOS</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  //clear timer when unfocus
+  useEffect(() => {
+    navigation.addListener("blur", () => {
+      endTimer();
+    });
+  }, []);
+
   return (
     <View style={{ flex: 1, flexDirection: "column" }}>
       <MapView
@@ -152,13 +119,16 @@ const UsersLocationScreen = ({ route, navigation }) => {
         initialRegion={initRegion}
         followsUserLocation={true}
         // minZoomLevel={10}
-        // camera={initRegion}
         region={initRegion}
       >
         <Marker
-          coordinate={info.marker.info}
+          coordinate={marker}
           title={title}
-          anchor={{ x: 0.5, y: 0.5 }}
+          image={{
+            uri:
+              "https://icons.iconarchive.com/icons/icons-land/vista-map-markers/128/Map-Marker-Flag-1-Right-Pink-icon.png",
+          }}
+          // anchor={{ x: 0.5, y: 0.5 }}
         >
           <Callout tooltip>
             <View style={styles.bubble}>
@@ -169,13 +139,19 @@ const UsersLocationScreen = ({ route, navigation }) => {
         </Marker>
         {usersList &&
           usersList.map((user) => (
-            <Marker coordinate={user} key={user.userId} />
+            <Marker
+              coordinate={user}
+              key={user.userId}
+              image={{
+                uri:
+                  "https://icons.iconarchive.com/icons/icons-land/vista-map-markers/128/Map-Marker-Ball-Azure-icon.png",
+              }}
+            />
           ))}
       </MapView>
-      {ongoingPlan && renderSOSButton()}
-      <View>
-        <Button>SOS</Button>
-      </View>
+      {ongoingPlan && (
+        <SOSButton style={{ position: "absolute", top: 0.05 * height }} />
+      )}
     </View>
   );
 };

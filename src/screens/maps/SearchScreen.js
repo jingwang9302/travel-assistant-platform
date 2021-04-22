@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Text,
-  TextInput,
   View,
   StyleSheet,
   Dimensions,
@@ -16,6 +15,7 @@ import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import useDirection from "../../hooks/useDirection";
 import { useSelector } from "react-redux";
 import SOSButton from "../../components/map/SOSButton";
+import UsersLocationButton from "../../components/map/UsersLocationButton";
 
 const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -29,8 +29,8 @@ const SearchScreen = ({ navigation }) => {
   const [marker, setMarker] = useState([]);
   const [curMarker, setCurMarker] = useState(null);
   const { navigationInfo, getDirections } = useDirection();
-  // const { ongoingPlan } = useSelector((state) => state.plans);
-  const { ongoingPlan } = "123";
+  const { ongoingPlan } = useSelector((state) => state.plans);
+  // const ongoingPlan = "123";
   const { currentLocation, loading, error } = useCurrentLocation();
   if (!currentLocation) {
     return (
@@ -160,7 +160,6 @@ const SearchScreen = ({ navigation }) => {
             )}
             <Button
               onPress={() => {
-                // unsubscribe;
                 navigation.navigate("Navigation", { info: curMarker });
               }}
               icon={<Icon name="arrow-right" size={20} color="white" />}
@@ -178,7 +177,16 @@ const SearchScreen = ({ navigation }) => {
           currentLocation={currentLocation}
         />
       </View>
-      {<SOSButton style={{ position: "absolute", top: 0.05 * height }} />}
+      {ongoingPlan && (
+        <SOSButton style={{ position: "absolute", top: 0.05 * height }} />
+      )}
+
+      {curMarker && (
+        <UsersLocationButton
+          style={{ position: "absolute", top: 0.05 * height }}
+          marker={curMarker}
+        />
+      )}
 
       {/* <View>
         <ResultList />
