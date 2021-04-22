@@ -81,7 +81,7 @@ const PlacePickScreen = ({ navigation, route }) => {
         <HeaderButtons>
           <OverflowMenu
             style={{ marginRight: 30 }}
-            OverflowIcon={() => <Icon name="add" size={30} color="skyblue" />}
+            OverflowIcon={() => <Icon name="add" size={30} color="blue" />}
           >
             <HiddenItem
               title="Add as Destination"
@@ -106,24 +106,26 @@ const PlacePickScreen = ({ navigation, route }) => {
   }, []);
 
   const savePlace = (type) => {
-    console.log(`save clicked placeTitel is ${placeTitle}`);
+    // console.log(`save clicked placeTitel is ${placeTitle}`);
     if (!placeTitle) {
       setPlaceTitleInputError("Please Input Place Title");
       return;
     }
 
     if (!placeInfo) {
-      Alert.alert("Warning", "Please Pick a Place");
+      Alert.alert("Alert", "Please Pick a Place");
       return;
     }
     if (type === "departure") {
       dispatch(addDeparturePlace({ ...placeInfo, title: placeTitle }));
-      Alert.alert("Success", "Departure Place is Added");
+      //Alert.alert("Success", "Departure Place is Added");
     } else {
       dispatch(addDestinationPlace({ ...placeInfo, title: placeTitle }));
-      Alert.alert("Success", "Destination Place is Added");
+      //Alert.alert("Success", "Destination Place is Added");
     }
+
     setPlaceTitle("");
+    navigation.goBack();
   };
   const clearInputCallback = useCallback(() => {
     setPlaceTitle("");
@@ -170,7 +172,6 @@ const PlacePickScreen = ({ navigation, route }) => {
             style={styles.inputStyle}
             onChangeText={(input) => {
               setPlaceTitle(input);
-              console.log(`test change placetitle is${placeTitle}`);
             }}
             underlineColorAndroid="#f000"
             placeholder="Input Place Title"
@@ -182,9 +183,9 @@ const PlacePickScreen = ({ navigation, route }) => {
             blurOnSubmit={false}
             leftIcon={
               <Icon
-                name="account"
+                name="reader-outline"
                 size={24}
-                type="material-community"
+                type="ionicon"
                 color="black"
               />
             }
@@ -197,8 +198,6 @@ const PlacePickScreen = ({ navigation, route }) => {
         <LocationPicker
           navigation={navigation}
           mapPickedLocation={pickedLocationFromMap}
-
-          //onLocationPicked={locationPickedHandler}
         />
         {placeInfo ? (
           <View>

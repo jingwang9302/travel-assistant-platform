@@ -6,6 +6,7 @@ import React from 'react';
 import {createStackNavigator} from "@react-navigation/stack";
 import MessageHomeScreen from "../screens/messages/MessageHomeScreen";
 import ChatScreen from "../screens/messages/ChatScreen";
+import {Button} from 'react-native';
 
 const MessageStack = () => {
   const Stack = createStackNavigator();
@@ -13,7 +14,7 @@ const MessageStack = () => {
   return (
       <Stack.Navigator initialRouteName="Message">
         <Stack.Screen name="Message" component={MessageHomeScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} options={({ route }) => ({ title: route.params.chatTitle })}/>
+        <Stack.Screen name="Chat" component={ChatScreen} options={({ route }) => ({ title: route.params.chatTitle, headerRight: ()=>(<Button title="info"/>) })}/>
       </Stack.Navigator>
   );
 

@@ -25,6 +25,14 @@ import { Icon, Input, Image, Button } from "react-native-elements";
 import { set } from "react-native-reanimated";
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import { Item } from "react-navigation-header-buttons";
+import {
+  setGroupsUserIn,
+  setCurrentGroup,
+  clearCurrGroup,
+  clearTravelgroup,
+  UPDATE_GROUP,
+  SET_CURRENTGROUP,
+} from "../../redux/actions/travelgroupAction";
 
 const EditGroupScreen = ({ navigation, route }) => {
   const { groupName, groupDescription, groupImage, _id } = route.params;
@@ -46,6 +54,7 @@ const EditGroupScreen = ({ navigation, route }) => {
 
   const groupNameInputRef = createRef();
   const groupDescriptionRef = createRef();
+  const dispatch = useDispatch();
   const oldUri = `${GCS_URL}${groupImage}`;
 
   if (!userProfile.isLogin) {
@@ -82,9 +91,6 @@ const EditGroupScreen = ({ navigation, route }) => {
       },
     })
       .then(function (res) {
-        // getGroupsUserIn(userProfile.id);
-        // const { success } = res.data;
-        // console.log();
         if (
           selectedImage.localUri &&
           selectedImage.localUri !== "" &&
@@ -95,11 +101,7 @@ const EditGroupScreen = ({ navigation, route }) => {
           upLoadImage(selectedImage.localUri, _id);
         }
         setLoading(false);
-        navigation.goBack();
-
-        // navigation.navigate("GroupDetail", {
-        //   groupId: res.data.data._id,
-        // });
+        fetchGroups();
       })
       .catch(function (error) {
         setLoading(false);
@@ -108,6 +110,22 @@ const EditGroupScreen = ({ navigation, route }) => {
         console.log(error.response.data.error);
       });
   };
+
+  function fetchGroups() {
+    axios({
+      method: "get",
+      url: GROUP_SERVICE + "read/groups_in/" + userProfile.id,
+    })
+      .then(function (res) {
+        const { data } = res.data;
+        dispatch(setGroupsUserIn(data));
+        navigation.goBack();
+      })
+      .catch(function (error) {
+        console.log(error.response.data.error);
+        Alert.alert("Alert", error.response.data.error);
+      });
+  }
 
   const upLoadImage = (uri, groupId) => {
     //const uri = selectedImage.localUri;
@@ -186,7 +204,14 @@ const EditGroupScreen = ({ navigation, route }) => {
               ref={groupNameInputRef}
               errorMessage={newGroupNameInputError}
               blurOnSubmit={false}
-              leftIcon={<Icon name="people" size={24} color="black" />}
+              leftIcon={
+                <Icon
+                  name="reader-outline"
+                  type="ionicon"
+                  size={24}
+                  color="black"
+                />
+              }
               rightIcon={
                 <Icon
                   name="close"
@@ -212,7 +237,14 @@ const EditGroupScreen = ({ navigation, route }) => {
               value={newGroupDescription}
               errorMessage={newGroupDescriptionInputError}
               blurOnSubmit={false}
-              leftIcon={<Icon name="people" size={24} color="black" />}
+              leftIcon={
+                <Icon
+                  name="reader-outline"
+                  type="ionicon"
+                  size={24}
+                  color="black"
+                />
+              }
               rightIcon={
                 <Icon
                   name="close"

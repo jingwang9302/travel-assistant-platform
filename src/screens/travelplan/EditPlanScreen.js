@@ -20,6 +20,7 @@ import {
   GROUP_SERVICE,
   PLAN_SERVICE,
   PLAN_BASE_URL,
+  GCS_URL,
 } from "../../config/urls";
 
 import Loader from "../../components/Loader";
@@ -59,7 +60,7 @@ const EditPlanScreen = ({ navigation, route }) => {
   // const [destinationAddress, setDestinationAddress] = useState([]);
   //const [departureAddress, setDepartureAddress] = useState("");
   const [selectedImage, setSelectedImage] = useState({
-    localUri: `${PLAN_BASE_URL}/uploads/${plan.image}`,
+    localUri: `${GCS_URL}${plan.image}`,
   });
   const [planUpdated, setPlanUpdated] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -81,7 +82,7 @@ const EditPlanScreen = ({ navigation, route }) => {
   const userProfile = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-  const oldUrl = `${PLAN_BASE_URL}/${plan.image}`;
+  const oldUrl = `${GCS_URL}${plan.image}`;
 
   useEffect(() => {
     setPlanName(plan.planName);
@@ -283,9 +284,9 @@ const EditPlanScreen = ({ navigation, route }) => {
               value={planName}
               leftIcon={
                 <Icon
-                  name="account"
+                  name="reader-outline"
                   size={24}
-                  type="material-community"
+                  type="ionicon"
                   color="black"
                 />
               }
@@ -316,9 +317,9 @@ const EditPlanScreen = ({ navigation, route }) => {
               value={planDescription}
               leftIcon={
                 <Icon
-                  name="account"
+                  name="reader-outline"
                   size={24}
-                  type="material-community"
+                  type="ionicon"
                   color="black"
                 />
               }
@@ -350,9 +351,9 @@ const EditPlanScreen = ({ navigation, route }) => {
               value={estimatedStartTime}
               leftIcon={
                 <Icon
-                  name="account"
+                  name="calendar-outline"
                   size={24}
-                  type="material-community"
+                  type="ionicon"
                   color="black"
                 />
               }
@@ -540,21 +541,6 @@ const EditPlanScreen = ({ navigation, route }) => {
                 })
               : null}
           </View>
-
-          {/* <Button
-            buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
-            title="submit"
-            style={{ marginVertical: 20 }}
-            onPress={updatePlan}
-          /> */}
-          {/* <Button
-            buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
-            title="cleare des and dp"
-            style={{ marginVertical: 20 }}
-            onPress={() => {
-              dispatch(clearDepartureAndDestinationAddress());
-            }}
-          /> */}
         </KeyboardAvoidingView>
       </View>
     </ScrollView>

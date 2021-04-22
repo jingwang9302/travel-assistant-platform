@@ -41,7 +41,13 @@ const GroupManageScreen = ({ navigation, route }) => {
   ]);
   const [test2, setTest2] = useState([]);
 
-  const { currUserRole, groupId, selectedUserDetail, readOnly } = route.params;
+  const {
+    currUserRole,
+    groupId,
+    selectedUserDetail,
+    readOnly,
+    userId,
+  } = route.params;
 
   useEffect(() => {
     loadManageScreen();

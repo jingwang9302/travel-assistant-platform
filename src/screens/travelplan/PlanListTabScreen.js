@@ -39,7 +39,7 @@ import {
   UPDATE_GROUPS,
   SET_CURRENTGROUP,
 } from "../../redux/actions/travelgroupAction";
-import { GROUP_DATA, PlAN_DATA } from "../travelgroup/Data";
+
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
 import {
@@ -65,6 +65,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
 
   const userProfile = useSelector((state) => state.user);
   const { ongoingPlan } = useSelector((state) => state.plans);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const isFocused = navigation.isFocused();
@@ -73,7 +74,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
     if (userProfile.isLogin) {
       fechTravelPlanOfInitiator();
     }
-  }, [userProfile, isFocused]);
+  }, [userProfile.isLogin, isFocused]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -122,13 +123,14 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
     setPlans([]);
     setLoading(true);
     setIsRefreshing(true);
+    setErrorMessage("");
     axios
       .get(PLAN_SERVICE + `read/plans_createdby/${userProfile.id}`)
       .then((res) => {
         const { data } = res.data;
 
-        console.log("plans fetched");
-        console.log(data);
+        // console.log("plans fetched");
+        // console.log(data);
         setPlans(data);
         setLoading(false);
         setIsRefreshing(false);
@@ -137,14 +139,19 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
         console.log(error.response.data.error);
         setIsRefreshing(false);
         setLoading(false);
-        Alert.alert("Alert", `${error.response.data.error}`);
+        if (error.response.status === 404) {
+          const message = "You don't have any travel plans";
+          setErrorMessage(message);
+        } else {
+          Alert.alert("Alert", `${error.response.data.error}`);
+        }
       });
   };
 
   const keyExtractor = (item, index) => index.toString();
   const renderItem = ({ item }) => {
-    console.log("each plan");
-    console.log(item);
+    // console.log("each plan");
+    // console.log(item);
     return (
       <PlanItem
         loading={loading}
@@ -166,6 +173,11 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <View>
+        {errorMessage ? (
+          <Text style={{ fontSize: 25 }}>{errorMessage}</Text>
+        ) : null}
+      </View>
       {plans && plans.length > 0 ? (
         <FlatList
           onRefresh={() => {

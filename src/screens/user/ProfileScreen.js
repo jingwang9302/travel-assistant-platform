@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect, useDispatch} from "react-redux";
 import {Avatar, Card, Icon, Input, Overlay} from "react-native-elements";
 import LoginAlertScreen from "./LoginAlertScreen";
@@ -25,17 +25,6 @@ const ProfileScreen = ({userProfile}) => {
     const [phone, setPhone] = useState(userProfile.phone);
     const [errorMessage, setErrorMessage] = useState('');
     const [avatarImage, setAvatarImage] = useState(null);
-
-    useEffect(() => {
-        (async () => {
-            if (Platform.OS !== 'web') {
-                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                if (status !== 'granted') {
-                    alert('Sorry, we need camera roll permissions to make this work!');
-                }
-            }
-        })();
-    }, []);
 
     const toggleOverlay = () => {
         setVisible(!visible);
@@ -125,6 +114,14 @@ const ProfileScreen = ({userProfile}) => {
     }
 
     const pickImage = async () => {
+        if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+                return;
+            }
+        }
+
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -138,6 +135,14 @@ const ProfileScreen = ({userProfile}) => {
     };
 
     const takePhoto = async () => {
+        if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+                return;
+            }
+        }
+
         let result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,

@@ -83,10 +83,26 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const { ongoingPlan } = useSelector((state) => state.plans);
 
   const dispatch = useDispatch();
+  const isFocused = navigation.isFocused();
 
   useEffect(() => {
-    fechSinglePlan();
-  }, [ongoingPlan]);
+    if (userProfile.isLogin) {
+      if (planId) {
+        fechSinglePlan();
+        Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+          .then((res) => {
+            if (res) {
+              setPositionSharing(true);
+            } else {
+              setPositionSharing(false);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
+  }, [ongoingPlan, isFocused, userProfile.isLogin]);
 
   React.useLayoutEffect(() => {
     if (userProfile.id === selectedPlan.initiator) {
@@ -180,12 +196,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
         ),
       });
     }
-    // <HiddenItem
-    //   title="Stop Position Sharing"
-    //   onPress={() => {
-    //     setPositionSharing(false);
-    //   }}
-    // />;
   }, [selectedPlan, isUserInPlan, positionSharing, ongoingPlan, notation]);
 
   if (!userProfile.isLogin) {
@@ -224,8 +234,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
       .then(function (response) {
         //need to check API
         const basicUserInfo = { ...response.data };
-        console.log("basic user info:");
-        console.log(basicUserInfo);
+        // console.log("basic user info:");
+        // console.log(basicUserInfo);
         // allInGroup.push(basicUserInfo);
         //console.log("allin Gorup:");
         //console.log(allInGroup);
@@ -246,6 +256,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
     if (travelMembers && travelMembers.length !== 0) {
       console.log("travel members are:");
       console.log(travelMembers);
+      //travelMembers.push(selectedPlan)
       travelMembers.forEach((id) => {
         console.log(`id is ${id}`);
         fechUserInfo(id);
@@ -256,7 +267,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const fechSinglePlan = () => {
     setIsRefreshing(true);
     setAllUserInPlan([]);
-    console.log(`Plan Id is ${planId}`);
+    //console.log(`Plan Id is ${planId}`);
     axios
       .get(PLAN_SERVICE + `read/${planId}`)
       .then((res) => {
@@ -271,6 +282,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
         setDestinations(data.destinationAddress);
         setDeparture(data.departureAddress);
         isUserInThisPlan(data);
+        //add intiator to members to display
+        data.travelMembers.push(data.initiator);
         loadTravelMembers(data.travelMembers);
 
         setSelectedPlan(data);
@@ -419,7 +432,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
             if (!res) {
               Location.startLocationUpdatesAsync("UpdateLocation", {
                 accuracy: Location.Accuracy.Low,
-                distanceInterval: 10,
+                distanceInterval: 30,
               });
             }
           })
@@ -510,7 +523,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
       url: PLAN_SERVICE + `delete/${userProfile.id}/${planId}`,
     })
       .then((res) => {
-        navigation.navigate("PlanListTab");
+        navigation.navigate("PlanListTab", { planDelete: true });
       })
       .catch((error) => {
         Alert.alert("Failed", error.response.data.error);
@@ -740,6 +753,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                       lng: selectedPlan.departureAddress.lng,
                     };
                     navigation.navigate("Map", {
+                      title: selectedPlan.departureAddress.title,
                       readOnly: true,
                       initialLocation: pickedLocation,
                     });
@@ -774,11 +788,14 @@ const PlanDetailScreen = ({ navigation, route }) => {
                   name="navigation"
                   type="feather"
                   onPress={() => {
-                    //     navigation.navigate("Navigation", {
-                    //       lat: selectedPlan.departureAddress.lat,
-                    //       lng: selectedPlan.departureAddress.lng,
-                    //  });
-                    Alert.alert("Alert", "Go to navigation screen");
+                    navigation.navigate("Navigation", {
+                      info: {
+                        address: selectedPlan.departureAddress.address,
+                        longitude: selectedPlan.departureAddress.lng,
+                        latitude: selectedPlan.departureAddress.lat,
+                      },
+                    });
+                    //Alert.alert("Alert", "Go to navigation screen");
                   }}
                 />
               </View>
@@ -807,6 +824,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
                             lng: item.lng,
                           };
                           navigation.navigate("Map", {
+                            title: item.title,
                             readOnly: true,
                             initialLocation: pickedLocation,
                           });
@@ -844,7 +862,14 @@ const PlanDetailScreen = ({ navigation, route }) => {
                         name="navigation"
                         type="feather"
                         onPress={() => {
-                          Alert.alert("Alert", "Go to navigation screen");
+                          navigation.navigate("Navigation", {
+                            info: {
+                              address: item.address,
+                              longitude: item.lng,
+                              latitude: item.lat,
+                            },
+                          });
+                          //Alert.alert("Alert", "Go to navigation screen");
                         }}
                       />
                     </View>

@@ -39,6 +39,14 @@ import {
   HiddenItem,
   OverflowMenu,
 } from "react-navigation-header-buttons";
+import {
+  setGroupsUserIn,
+  setCurrentGroup,
+  clearCurrGroup,
+  clearTravelgroup,
+  UPDATE_GROUP,
+  SET_CURRENTGROUP,
+} from "../../redux/actions/travelgroupAction";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import Loader from "../../components/Loader";
@@ -71,39 +79,10 @@ const GroupDetailScreen = ({ navigation, route }) => {
   const [currUserRole, setCurrUserRole] = useState("");
   const [buttonDisplay, setButtonDisplay] = useState([]);
   const [isGroupOwner, setIsGroupOwner] = useState(false);
+  const dispatch = useDispatch();
 
   let groupSelected;
   const allInGroup = [];
-
-  const leaveGroup = () => {
-    axios({
-      method: "DELETE",
-      url:
-        GROUP_SERVICE +
-        `delete/${groupSelected.groupOwner}/${groupId}/${userProfile.id}`,
-    })
-      .then((res) => {
-        navigation.navigate("GroupList");
-      })
-      .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
-      });
-  };
-
-  const deleteGroup = () => {
-    axios({
-      method: "DELETE",
-      url: GROUP_SERVICE + `update/close/${userProfile.id}/${groupId}`,
-    })
-      .then((res) => {
-        navigation.navigate("GroupList");
-      })
-      .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
-      });
-  };
   const buttonList = [
     {
       show: true,
@@ -173,7 +152,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (userProfile.isLogin) {
-      //setLoading(true);
+      setLoading(true);
       fetchSingleGroup();
     }
   }, []);
@@ -202,6 +181,59 @@ const GroupDetailScreen = ({ navigation, route }) => {
     return <LoginAlertScreen />;
   }
 
+  const fetchGroups = () => {
+    axios({
+      method: "get",
+      url: GROUP_SERVICE + "read/groups_in/" + userProfile.id,
+    })
+      .then(function (res) {
+        const { data } = res.data;
+        dispatch(setGroupsUserIn(data));
+        navigation.goBack();
+      })
+      .catch(function (error) {
+        console.log(error.response.data.error);
+        if (error.response.status === 404) {
+          dispatch(setGroupsUserIn([]));
+          navigation.goBack();
+        } else {
+          Alert.alert("Alert", error.response.data.error);
+        }
+      });
+  };
+
+  const leaveGroup = () => {
+    axios({
+      method: "DELETE",
+      url:
+        GROUP_SERVICE +
+        `delete/${groupSelected.groupOwner}/${groupId}/${userProfile.id}`,
+    })
+      .then((res) => {
+        fetchGroups();
+        //navigation.navigate("GroupList");
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
+        Alert.alert("Failed", error.response.data.error);
+      });
+  };
+
+  const deleteGroup = () => {
+    axios({
+      method: "DELETE",
+      url: GROUP_SERVICE + `update/close/${userProfile.id}/${groupId}`,
+    })
+      .then((res) => {
+        fetchGroups();
+        //navigation.navigate("GroupList");
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
+        Alert.alert("Failed", error.response.data.error);
+      });
+  };
+
   const fetchUserInfo = (userId, userRole) => {
     axios({
       method: "get",
@@ -215,7 +247,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
         const basicUserInfo = { ...response.data, role: userRole };
         // console.log("basic user info:");
         // console.log(basicUserInfo);
-        allInGroup.push(basicUserInfo);
+        //allInGroup.push(basicUserInfo);
         // console.log("allin Gorup:");
         // console.log(allInGroup);
         setAllPeopleInGroup((oldarr) => [...oldarr, basicUserInfo]);
@@ -239,10 +271,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
         `update/addmember/${selectedGroup.groupOwner}/${groupId}/${userProfile.id}`,
     })
       .then((res) => {
-        Alert.alert(
-          "Successful",
-          "You successfully join this group. Please refresh!"
-        );
+        fetchGroups();
       })
       .catch((error) => {
         Alert.alert("Alert", error.response.data.error);
@@ -456,8 +485,8 @@ const GroupDetailScreen = ({ navigation, route }) => {
           : null}
         {userNotInGroup ? (
           <Button
-            titleStyle={{ fontSize: 14 }}
-            size={20}
+            buttonStyle={{ borderRadius: 10 }}
+            style={{ marginVertical: 5 }}
             title="Join Group"
             onPress={joinGroup}
           />
@@ -467,25 +496,23 @@ const GroupDetailScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView>
-      <View style={{ flex: 1 }}>
-        <Loader loading={loading} />
-        {allPeopleInGroup && allPeopleInGroup.length !== 0 ? (
-          <FlatList
-            contentContainerStyle={{ alignContent: "space-between" }}
-            style={{ backgroundColor: "white" }}
-            onRefresh={fetchSingleGroup}
-            refreshing={isRefreshing}
-            numColumns={5}
-            data={allPeopleInGroup}
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-            ListHeaderComponent={listHeader}
-            ListFooterComponent={listFooter}
-          />
-        ) : null}
-      </View>
-    </SafeAreaView>
+    <View style={{ flex: 1 }}>
+      <Loader loading={loading} />
+      {allPeopleInGroup && allPeopleInGroup.length !== 0 ? (
+        <FlatList
+          contentContainerStyle={{ alignContent: "space-between" }}
+          style={{ backgroundColor: "white" }}
+          onRefresh={fetchSingleGroup}
+          refreshing={isRefreshing}
+          numColumns={5}
+          data={allPeopleInGroup}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={listHeader}
+          ListFooterComponent={listFooter}
+        />
+      ) : null}
+    </View>
   );
 };
 
@@ -494,12 +521,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: StatusBar.currentHeight || 2,
   },
-  rowContainer: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 2,
-    flexDirection: "column",
-    height: 10,
-  },
+
   item: {
     backgroundColor: "#f9c2ff",
     padding: 20,
