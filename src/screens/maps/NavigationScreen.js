@@ -114,7 +114,7 @@ const NavigationScreen = ({ route, navigation }) => {
         <MapViewDirections
           origin={origin}
           destination={destination}
-          apikey={config.PLACES_API_KEY}
+          apikey={config.DIRECTION_API_KEY}
           strokeWidth={4}
           strokeColor="hotpink"
           timePrecision="now"
