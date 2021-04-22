@@ -152,7 +152,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (userProfile.isLogin) {
-      //setLoading(true);
+      setLoading(true);
       fetchSingleGroup();
     }
   }, []);
@@ -193,7 +193,12 @@ const GroupDetailScreen = ({ navigation, route }) => {
       })
       .catch(function (error) {
         console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response.status === 404) {
+          dispatch(setGroupsUserIn([]));
+          navigation.goBack();
+        } else {
+          Alert.alert("Alert", error.response.data.error);
+        }
       });
   };
 
@@ -266,10 +271,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
         `update/addmember/${selectedGroup.groupOwner}/${groupId}/${userProfile.id}`,
     })
       .then((res) => {
-        Alert.alert(
-          "Successful",
-          "You successfully join this group. Please refresh!"
-        );
+        fetchGroups();
       })
       .catch((error) => {
         Alert.alert("Alert", error.response.data.error);
@@ -483,8 +485,8 @@ const GroupDetailScreen = ({ navigation, route }) => {
           : null}
         {userNotInGroup ? (
           <Button
-            titleStyle={{ fontSize: 14 }}
-            size={20}
+            buttonStyle={{ borderRadius: 10 }}
+            style={{ marginVertical: 5 }}
             title="Join Group"
             onPress={joinGroup}
           />

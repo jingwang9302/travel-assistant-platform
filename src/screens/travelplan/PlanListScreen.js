@@ -4,7 +4,14 @@ import { PLAN_SERVICE, GCS_URL } from "../../config/urls";
 
 import axios from "axios";
 
-import { StyleSheet, View, FlatList, StatusBar, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  StatusBar,
+  Alert,
+  Text,
+} from "react-native";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
@@ -17,19 +24,21 @@ const TravelPlanListScreen = ({ navigation, route }) => {
   const [dislikesValue, setDislikesValue] = useState(4);
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const userProfile = useSelector((state) => state.user);
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const { groupId } = route.params;
+  const isFocused = navigation.isFocused();
 
   useEffect(() => {
     if (userProfile.isLogin) {
-      if (groupId) {
+      if (groupId && isFocused) {
         fetchTravelPlan();
       }
     }
-  }, [userProfile]);
+  }, [userProfile, isFocused]);
 
   if (!userProfile.isLogin) {
     return <LoginAlertScreen />;
@@ -39,6 +48,7 @@ const TravelPlanListScreen = ({ navigation, route }) => {
     setIsRefreshing(true);
     //setPlans([]);
     setLoading(true);
+    setErrorMessage("");
     axios
       .get(PLAN_SERVICE + `read/plans_in/${groupId}`)
       .then((res) => {
@@ -51,7 +61,12 @@ const TravelPlanListScreen = ({ navigation, route }) => {
         console.log(error.response.data.error);
         setIsRefreshing(false);
         setLoading(false);
-        Alert.alert("Alert", `${error.response.data.error}`);
+        if (error.response.status === 404) {
+          const message = "No group travels";
+          setErrorMessage(message);
+        } else {
+          Alert.alert("Alert", `${error.response.data.error}`);
+        }
       });
   };
 
@@ -78,6 +93,11 @@ const TravelPlanListScreen = ({ navigation, route }) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <View>
+        {errorMessage ? (
+          <Text style={{ fontSize: 25 }}>{errorMessage}</Text>
+        ) : null}
+      </View>
       {plans && plans.length > 0 ? (
         <FlatList
           onRefresh={() => {

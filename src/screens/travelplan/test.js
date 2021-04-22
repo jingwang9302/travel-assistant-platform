@@ -243,7 +243,7 @@ const TestScreen = ({ navigation }) => {
       <Button
         title="go favorate"
         onPress={() => {
-          navigation.navigate("GroupCreate");
+          navigation.navigate("GroupManage", { userId: 3 });
         }}
       />
 

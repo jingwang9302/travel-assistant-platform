@@ -69,6 +69,7 @@ const GroupListScreen = ({ navigation, route }) => {
   // any hooks must be put on the top of any condition function or element
   useEffect(() => {
     if (userProfile.isLogin) {
+      setErrorMessage("");
       setLoading(true);
       fetchGroups();
       setLoading(false);
@@ -111,6 +112,10 @@ const GroupListScreen = ({ navigation, route }) => {
     });
   }, [ongoingPlan]);
 
+  // if (groups && groups.length !== 0) {
+  //   setErrorMessage("");
+  // }
+
   const IoniconsHeaderButton = (props) => (
     <HeaderButton IconComponent={Ionicons} iconSize={23} {...props} />
   );
@@ -121,7 +126,7 @@ const GroupListScreen = ({ navigation, route }) => {
   }
 
   function fetchGroups() {
-    // setErrorMessage("");
+    setErrorMessage("");
     setGroupsSearched([]);
     setIsRefreshing(true);
     //console.log("before axios");
@@ -133,13 +138,18 @@ const GroupListScreen = ({ navigation, route }) => {
         const { data } = res.data;
         //setGroups(data);
         dispatch(setGroupsUserIn(data));
-        console.log("fech is operated");
+        //console.log("fech is operated");
         setIsRefreshing(false);
       })
       .catch(function (error) {
-        console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
-        //setErrorMessage(error.response.data.error);
+        console.log(error.response);
+        if (error.response.status === 404) {
+          const message =
+            "You are not in any travel groups! Please create a new group or search existing groups";
+          setErrorMessage(message);
+        } else {
+          Alert.alert("Alert", error.response.data.error);
+        }
         setIsRefreshing(false);
       });
   }
@@ -207,7 +217,7 @@ const GroupListScreen = ({ navigation, route }) => {
 
             onPress: () => {
               if (search) {
-                console.log(`search is: ${search}`);
+                //console.log(`search is: ${search}`);
                 searchGroups(search);
                 //setSearch("");
               }
@@ -215,6 +225,7 @@ const GroupListScreen = ({ navigation, route }) => {
           }}
         />
       </View>
+
       <View>
         {groupsSearched && groupsSearched.length !== 0 ? (
           <View>
@@ -240,13 +251,19 @@ const GroupListScreen = ({ navigation, route }) => {
             </View>
           </View>
         ) : (
-          <FlatList
-            onRefresh={fetchGroups}
-            refreshing={isRefreshing}
-            data={groups}
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-          />
+          <View>
+            {groups && groups.length !== 0 ? (
+              <FlatList
+                onRefresh={fetchGroups}
+                refreshing={isRefreshing}
+                data={groups}
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
+              />
+            ) : (
+              <Text style={{ fontSize: 20 }}>{errorMessage}</Text>
+            )}
+          </View>
         )}
       </View>
 

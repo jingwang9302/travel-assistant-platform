@@ -129,6 +129,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
     const nowDate = new Date();
     if (date < nowDate) {
       setTimeInputError("Please pick the valid date and time ");
+      return;
     }
 
     if (!destinationAddress || destinationAddress.length === 0) {
@@ -153,7 +154,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
       .then((res) => {
         const { data } = res.data;
         setPlanCreated(data);
-        console.log(data);
+        //console.log(data);
         if (selectedImage.localUri) {
           upLoadImage(selectedImage.localUri, data._id);
         }
@@ -247,9 +248,9 @@ const CreateNewPlanScreen = ({ navigation }) => {
               value={planName}
               leftIcon={
                 <Icon
-                  name="account"
+                  name="reader-outline"
                   size={24}
-                  type="material-community"
+                  type="ionicon"
                   color="black"
                 />
               }
@@ -279,9 +280,9 @@ const CreateNewPlanScreen = ({ navigation }) => {
               value={planDescription}
               leftIcon={
                 <Icon
-                  name="account"
+                  name="reader-outline"
                   size={24}
-                  type="material-community"
+                  type="ionicon"
                   color="black"
                 />
               }
@@ -311,9 +312,9 @@ const CreateNewPlanScreen = ({ navigation }) => {
               value={date.toLocaleString()}
               leftIcon={
                 <Icon
-                  name="account"
+                  name="calendar-outline"
                   size={24}
-                  type="material-community"
+                  type="ionicon"
                   color="black"
                 />
               }
@@ -436,9 +437,10 @@ const CreateNewPlanScreen = ({ navigation }) => {
                     />
                   </TouchableOpacity>
                 </View>
-                <View style={{ marginRight: 30, width: 20, height: 20 }}>
+                <View style={{ marginRight: 35, width: 30, height: 30 }}>
                   <Icon
                     name="delete"
+                    type="antdesign"
                     onPress={() => {
                       dispatch(removeDeparturPlace());
                       console.log("delete clicked");
@@ -505,9 +507,10 @@ const CreateNewPlanScreen = ({ navigation }) => {
                         </TouchableOpacity>
                       </View>
 
-                      <View style={{ marginRight: 30, width: 20, height: 20 }}>
+                      <View style={{ marginRight: 35, width: 30, height: 30 }}>
                         <Icon
                           name="delete"
+                          type="antdesign"
                           onPress={() => {
                             dispatch(removeDestinationPlace(item.placeId));
                             console.log("delete clicked :");

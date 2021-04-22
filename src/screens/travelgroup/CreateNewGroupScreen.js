@@ -194,7 +194,14 @@ const CreateNewGroupScreen = ({ navigation }) => {
               ref={groupNameInputRef}
               errorMessage={groupNameInputError}
               blurOnSubmit={false}
-              leftIcon={<Icon name="people" size={24} color="black" />}
+              leftIcon={
+                <Icon
+                  name="reader-outline"
+                  type="ionicon"
+                  size={24}
+                  color="black"
+                />
+              }
               rightIcon={
                 <Icon
                   name="close"
@@ -219,7 +226,14 @@ const CreateNewGroupScreen = ({ navigation }) => {
               ref={groupDescriptionRef}
               errorMessage={groupDescriptionInputError}
               blurOnSubmit={false}
-              leftIcon={<Icon name="people" size={24} color="black" />}
+              leftIcon={
+                <Icon
+                  name="reader-outline"
+                  type="ionicon"
+                  size={24}
+                  color="black"
+                />
+              }
               rightIcon={
                 <Icon
                   name="close"

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
+  Dimensions,
 } from "react-native";
 
 import { Button } from "react-native-elements";
@@ -17,22 +18,24 @@ import {
   HiddenItem,
   OverflowMenu,
 } from "react-navigation-header-buttons";
+import MapInput from "../../components/MapInput";
 import axios from "axios";
 import { config } from "../../../config";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import * as Location from "expo-location";
 
 const MapScreen = ({ navigation, route }) => {
-  const { initialLocation, readOnly } = route.params;
+  const { initialLocation, readOnly, title } = route.params;
   const [selectedLocation, setSelectedLocation] = useState(initialLocation);
   //const [place, setPlace] = useState(null);
   const [placeDetail, setPlaceDetail] = useState(null);
+  const { height, width } = Dimensions.get("window");
 
   const mapRef = useRef(null);
   const mapDetailRef = useRef(null);
 
-  console.log("initiallocation is:");
-  console.log(initialLocation);
+  // console.log("initiallocation is:");
+  // console.log(initialLocation);
 
   const mapRegion = {
     latitude: initialLocation ? initialLocation.lat : 37.2329,
@@ -41,8 +44,8 @@ const MapScreen = ({ navigation, route }) => {
     longitudeDelta: 0.0421,
   };
 
-  console.log("mapRegi0n is:");
-  console.log(mapRegion);
+  // console.log("mapRegi0n is:");
+  // console.log(mapRegion);
 
   React.useLayoutEffect(() => {
     if (!readOnly) {
@@ -68,9 +71,10 @@ const MapScreen = ({ navigation, route }) => {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.lat},${selectedLocation.lng}&key=${config.PLACES_API_KEY}`
       )
       .then((res) => {
-        console.log("res: \n" + JSON.stringify(res));
+        //console.log("res: \n" + JSON.stringify(res));
         const result = res.data.results[0];
-        // console.log("result: \n" + result);
+        console.log("result: \n");
+        console.log(result);
 
         const address = result.formatted_address;
         const placeId = result.place_id;
@@ -165,10 +169,63 @@ const MapScreen = ({ navigation, route }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ flex: 0.1 }}>
+      <MapView
+        ref={mapRef}
+        style={{ height: "100%" }}
+        initialRegion={mapRegion}
+        zoomEnabled={true}
+        onPress={selectLocationHandler}
+      >
+        {markerCoordinates && (
+          <Marker coordinate={markerCoordinates}>
+            <Callout>
+              {placeDetail ? (
+                <View
+                  style={{
+                    flex: 1,
+                    length: 80,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 5,
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                    {placeDetail.name}
+                  </Text>
+                  <Text style={{ fontSize: 13 }}>
+                    {placeDetail.formatted_address}
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    length: 80,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 5,
+                  }}
+                >
+                  {title ? (
+                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                      {title}
+                    </Text>
+                  ) : (
+                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                      Picked Location
+                    </Text>
+                  )}
+                </View>
+              )}
+            </Callout>
+          </Marker>
+        )}
+      </MapView>
+      <View style={{ position: "absolute", width: width }}>
         <GooglePlacesAutocomplete
           placeholder="Search"
           fetchDetails={true}
+          autoFocus={true}
           onPress={(data, details) => {
             setPlaceDetail(details);
             onAutoCompleteHandler(details);
@@ -200,65 +257,10 @@ const MapScreen = ({ navigation, route }) => {
               fontSize: 15,
               flex: 1,
             },
-            listView: {
-              zIndex: 10,
-              width: "100%",
-              height: 200,
-              backgroundColor: "transparent",
-              position: "absolute",
-              top: 40,
-            },
           }}
         />
       </View>
-      <View style={{ flex: 1 }}>
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          initialRegion={mapRegion}
-          zoomEnabled={true}
-          onPress={selectLocationHandler}
-        >
-          {markerCoordinates && (
-            <Marker coordinate={markerCoordinates}>
-              <Callout>
-                {placeDetail ? (
-                  <View
-                    style={{
-                      flex: 1,
-                      length: 80,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: 5,
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                      {placeDetail.name}
-                    </Text>
-                    <Text style={{ fontSize: 13 }}>
-                      {placeDetail.formatted_address}
-                    </Text>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      flex: 1,
-                      length: 80,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: 5,
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                      Picked Location
-                    </Text>
-                  </View>
-                )}
-              </Callout>
-            </Marker>
-          )}
-        </MapView>
-      </View>
+
       <View style={styles.FloatingButton}>
         <Button title="My Location" onPress={showMyLocation} />
       </View>
