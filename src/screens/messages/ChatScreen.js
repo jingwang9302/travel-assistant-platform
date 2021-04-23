@@ -3,11 +3,16 @@ import React, {useState, useEffect, useCallback, } from 'react';
 import {useSelector} from 'react-redux';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import {GiftedChat} from 'react-native-gifted-chat';
-import AsyncStorage from '@react-native-community/async-storage';
 import firebaseConfig from '../../config/messagingConfig';
+import LoginAlertScreen from '../user/LoginAlertScreen';
 
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+
+/** As same in 'routes/userStack.js' */
+const LOGIN_SCREEN_LITERAL_NAME = 'Login';
+/** Literal prompt for guest user */
+const ANONYMOUS_USER_LOGIN_PROMPT = 'You need to login to use message function.';
 
 if (firebase.apps.length === 0){
     firebase.initializeApp(firebaseConfig);
@@ -70,10 +75,10 @@ const ChatScreen = (props) => {
      * Obtain user data. 
      */
     async function readUser(){
-        const user = await AsyncStorage.getItem('user');
-        if (user) {
-            setUser(JSON.parse(user))
-        }
+        setUser({
+            _id: currentUserProfile.id,
+            FirstName: currentUserProfile.firstName
+        });
     }
 
     /**
@@ -89,7 +94,9 @@ const ChatScreen = (props) => {
         await Promise.all(writes)
     }
 
-    return (
+    if (!currentUserProfile.isLogin) {
+        return ( <LoginAlertScreen /> );
+    } else return (
         <GiftedChat messages={messages} user={user} onSend={handleSend} renderUsernameOnMessage={true}/>
     );
 }

@@ -10,6 +10,7 @@ import axios from "axios";
 import DialogInput from 'react-native-dialog-input';
 import firebaseConfig from '../../config/messagingConfig';
 import {GET_ALL_GROUPS_USER_BELONGS_BY_USERID, USER_BASIC_PROFILE_BY_USERID_URL, GCS_URL} from '../../config/urls';
+import LoginAlertScreen from '../user/LoginAlertScreen';  
 
 /** As same in 'routes/userStack.js' */
 const LOGIN_SCREEN_LITERAL_NAME = 'Login';
@@ -23,14 +24,13 @@ if (firebase.apps.length === 0){
 const db = firebase.firestore();
 const messagesRef = db.collection('messages');
 
-// TODO: refresh after new user logs in.
 const MessageHomeScreen = () => {
     const userProfile = useSelector(state => state.user);
     /** List of groups that current user is in. */
     const [userGroupList, updateUserGroupList] = useState([]);
     const navigation = useNavigation();
     const isFocused = useIsFocused();
-    
+
     useEffect(() => {
       fetchUserChatGroupInfo();
     }, [isFocused]);
@@ -113,34 +113,11 @@ const MessageHomeScreen = () => {
       } 
     } 
     else return (
-        <View style={styles.container}>
-        <Text style={[styles.label, {marginTop: 40}]}>
-          {ANONYMOUS_USER_LOGIN_PROMPT}
-        </Text>
-        <Button
-          title={LOGIN_SCREEN_LITERAL_NAME}
-          onPress={()=> navigation.navigate(LOGIN_SCREEN_LITERAL_NAME)}
-          style={styles.loginButton}
-        />
-      </View>
+      <LoginAlertScreen />
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    label: {
-      fontSize: 20,
-      marginLeft: 15,
-    },
-    textInput: {
-      height: 40,
-      marginLeft: 15,
-    },
-    loginButton:{
-      marginTop:40,
-    },
     chatTitleText:{
       color:'black',
       paddingBottom:5,
