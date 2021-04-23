@@ -10,16 +10,9 @@ import {
 
 import axios from "axios";
 import {
-  StyleSheet,
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
   TouchableOpacity,
   View,
-  SafeAreaView,
   FlatList,
-  StatusBar,
   Alert,
   ActivityIndicator,
 } from "react-native";
@@ -31,8 +24,6 @@ import {
   USER_SERVICE,
   UPLOAD_IMAGE_URL,
 } from "../../config/urls";
-
-import { USER_DATA } from "../travelgroup/Data";
 
 const SearchUserScreen = ({ navigation, route }) => {
   const [search, setSearch] = useState("");
@@ -56,10 +47,6 @@ const SearchUserScreen = ({ navigation, route }) => {
     group.groupManagers = [];
   }
 
-  // const searchUser = () => {
-  //   console.log("search is operated");
-  // };
-
   const getFriend = () => {
     axios({
       method: "get",
@@ -79,6 +66,9 @@ const SearchUserScreen = ({ navigation, route }) => {
   };
 
   const fetchUserInfo = (userEmail) => {
+    if (!userEmail) {
+      return;
+    }
     axios({
       method: "get",
       url: USER_SERVICE + `/profile/${userEmail}`,
@@ -177,7 +167,7 @@ const SearchUserScreen = ({ navigation, route }) => {
           lightTheme={true}
           color="black"
           round={false}
-          placeholder="Input Email Here..."
+          placeholder="Input User Email Here..."
           onChangeText={(input) => setSearch(input)}
           value={search}
           searchIcon={{
@@ -187,8 +177,9 @@ const SearchUserScreen = ({ navigation, route }) => {
 
             onPress: () => {
               if (search) {
+                //console.log(`search is: ${search}`);
                 fetchUserInfo(search);
-                setSearch("");
+                //setSearch("");
               }
             },
           }}
