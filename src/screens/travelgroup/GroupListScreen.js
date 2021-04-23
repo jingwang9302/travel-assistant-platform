@@ -50,6 +50,14 @@ import {
   UPDATE_GROUP,
   SET_CURRENTGROUP,
 } from "../../redux/actions/travelgroupAction";
+
+import {
+  setDepartureAndDestination,
+  setOngoingPlan,
+  removeOngoingPlan,
+  clearDepartureAndDestinationAddress,
+  clearPlans,
+} from "../../redux/actions/travelPlanAction";
 import { GROUP_DATA } from "./Data";
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import { set } from "react-native-reanimated";
@@ -73,9 +81,11 @@ const GroupListScreen = ({ navigation, route }) => {
       setErrorMessage("");
       setLoading(true);
       fetchGroups();
+      fectchOngoingPlan();
       setLoading(false);
     } else {
       dispatch(clearTravelgroup());
+      dispatch(clearPlans());
     }
   }, [userProfile.isLogin]);
 
@@ -166,6 +176,20 @@ const GroupListScreen = ({ navigation, route }) => {
       .catch((error) => {
         console.log(error.response.data.error);
         Alert.alert("Alert", error.response.data.error);
+      });
+  };
+
+  const fectchOngoingPlan = () => {
+    axios({
+      method: "GET",
+      url: PLAN_SERVICE + `read_ongoing/${userProfile.id}`,
+    })
+      .then((res) => {
+        const { data } = res.data;
+        dispatch(setOngoingPlan(data._id));
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
       });
   };
 
