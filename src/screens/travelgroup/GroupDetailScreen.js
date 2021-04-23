@@ -461,17 +461,20 @@ const GroupDetailScreen = ({ navigation, route }) => {
     return (
       <View style={styles.buttonContainer}>
         <Divider style={{ marginBottom: 10, backgroundColor: "black" }} />
-        <Button
-          buttonStyle={{ borderRadius: 10, backgroundColor: "green" }}
-          title="Group Travels"
-          style={{ marginVertical: 5 }}
-          onPress={() =>
-            navigation.navigate("PlanList", {
-              groupId: groupId,
-            })
-          }
-        />
-        {buttonDisplay.length !== 0
+        {!userNotInGroup ? (
+          <Button
+            buttonStyle={{ borderRadius: 10, backgroundColor: "green" }}
+            title="Group Travels"
+            style={{ marginVertical: 5 }}
+            onPress={() =>
+              navigation.navigate("PlanList", {
+                groupId: groupId,
+              })
+            }
+          />
+        ) : null}
+
+        {buttonDisplay.length !== 0 && !userNotInGroup
           ? buttonDisplay.map((item, index) => {
               return (
                 <View key={index}>
