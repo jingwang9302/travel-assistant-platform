@@ -136,9 +136,9 @@ const CreateNewPlanScreen = ({ navigation }) => {
       Alert.alert("Warning", "Please Pick Destination Places");
       return;
     }
-    if (!departureAddress) {
-      departureAddress = {};
-    }
+    // if (!departureAddress) {
+    //   departureAddress = {};
+    // }
     setLoading(true);
     axios({
       method: "POST",
