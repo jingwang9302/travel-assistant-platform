@@ -39,6 +39,13 @@ import {
   UPDATE_GROUPS,
   SET_CURRENTGROUP,
 } from "../../redux/actions/travelgroupAction";
+import {
+  setDepartureAndDestination,
+  setOngoingPlan,
+  removeOngoingPlan,
+  clearDepartureAndDestinationAddress,
+  clearPlans,
+} from "../../redux/actions/travelPlanAction";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
@@ -69,10 +76,15 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const isFocused = navigation.isFocused();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (userProfile.isLogin) {
       fechTravelPlanOfInitiator();
+    } else {
+      //dispatch(clearDepartureAndDestinationAddress());
+      //dispatch(removeOngoingPlan());
+      dispatch(clearPlans());
     }
   }, [userProfile.isLogin, isFocused]);
 
@@ -88,12 +100,6 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
               title="Create a Plan"
               onPress={() => {
                 navigation.navigate("PlanCreate");
-              }}
-            />
-            <HiddenItem
-              title="Test"
-              onPress={() => {
-                navigation.navigate("Test");
               }}
             />
           </OverflowMenu>
