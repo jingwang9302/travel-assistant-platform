@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import {
@@ -190,6 +191,7 @@ const GroupManageScreen = ({ navigation, route }) => {
             source={{
               uri: UPLOAD_IMAGE_URL + selectedUserDetail.avatarUrl,
             }}
+            renderPlaceholderContent={<ActivityIndicator />}
             size="xlarge"
           />
 

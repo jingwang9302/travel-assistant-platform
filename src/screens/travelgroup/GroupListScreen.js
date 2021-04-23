@@ -20,6 +20,7 @@ import {
   FlatList,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   HeaderButtons,
@@ -186,6 +187,7 @@ const GroupListScreen = ({ navigation, route }) => {
             source={{
               uri: `${GCS_URL}${item.groupImage}`,
             }}
+            renderPlaceholderContent={<ActivityIndicator />}
           />
           <ListItem.Content>
             <ListItem.Title style={styles.itemTitle}>

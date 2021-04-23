@@ -13,6 +13,7 @@ import {
   RefreshControl,
   ImageBackground,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import {
@@ -391,6 +392,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
           uri: UPLOAD_IMAGE_URL + item.avatarUrl,
         }}
         size="large"
+        renderPlaceholderContent={<ActivityIndicator />}
         onPress={() =>
           navigation.navigate("GroupManage", {
             selectedUserDetail: item,

@@ -335,7 +335,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
           <View>
             <View
               style={{
-                marginHorizontal: 40,
+                marginHorizontal: 10,
                 flexDirection: "row",
                 justifyContent: "space-between",
               }}
@@ -361,44 +361,37 @@ const CreateNewPlanScreen = ({ navigation }) => {
               <Image
                 source={{ uri: selectedImage.localUri }}
                 style={{ width: 400, height: 200 }}
-                PlaceholderContent={
-                  <Icon
-                    name="add-circle-outline"
-                    type="ionicon"
-                    size={100}
-                    color="grey"
-                  />
-                }
+                PlaceholderContent={<ActivityIndicator />}
                 onPress={openImagePickerAsync}
               />
-            ) : (
-              <Image
-                style={{ width: 400, height: 200 }}
-                PlaceholderContent={
-                  <Icon
-                    name="add-circle-outline"
-                    type="ionicon"
-                    size={100}
-                    color="grey"
-                  />
-                }
-                onPress={openImagePickerAsync}
-              />
-            )}
+            ) : null}
           </View>
           <Divider style={{ marginVertical: 5, backgroundColor: "black" }} />
-          <View>
-            <Button
-              icon={<Icon name="add" size={25} color="white" />}
-              buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
-              title="Add Places"
-              style={{ marginVertical: 20 }}
-              onPress={() => {
-                navigation.navigate("PlacePick", {
-                  pickedLocationFromMap: null,
-                });
-              }}
-            />
+          <View style={{ marginVertical: 5 }}>
+            <View style={{ marginVertical: 5 }}>
+              <Button
+                buttonStyle={{
+                  marginHorizontal: 10,
+                  borderRadius: 10,
+                  backgroundColor: "green",
+                }}
+                title="Pick a photo"
+                onPress={openImagePickerAsync}
+              />
+            </View>
+            <View>
+              <Button
+                icon={<Icon name="add" size={25} color="white" />}
+                buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
+                title="Add Places"
+                style={{ marginVertical: 20 }}
+                onPress={() => {
+                  navigation.navigate("PlacePick", {
+                    pickedLocationFromMap: null,
+                  });
+                }}
+              />
+            </View>
           </View>
           <Divider style={{ marginVertical: 5, backgroundColor: "black" }} />
           <View>
@@ -412,7 +405,9 @@ const CreateNewPlanScreen = ({ navigation }) => {
               >
                 <View style={{ width: "90%" }}>
                   <TouchableOpacity>
-                    <Text style={{ fontSize: 20 }}>Departure Place:</Text>
+                    <Text style={{ fontSize: 20, marginHorizontal: 10 }}>
+                      Departure Place:
+                    </Text>
                     <ListItem>
                       <Avatar
                         size="small"
@@ -451,7 +446,7 @@ const CreateNewPlanScreen = ({ navigation }) => {
             ) : null}
           </View>
 
-          <View>
+          <View style={{ marginHorizontal: 10 }}>
             <Text style={{ fontSize: 20 }}>Destination Places:</Text>
             {destinationAddress && destinationAddress.length !== 0
               ? destinationAddress.map((item, index) => {

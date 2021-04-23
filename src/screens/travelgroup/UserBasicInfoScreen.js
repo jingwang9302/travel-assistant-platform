@@ -3,7 +3,7 @@ import { Button, ListItem, Avatar } from "react-native-elements";
 import React from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { StyleSheet, View, Alert } from "react-native";
+import { StyleSheet, View, Alert, ActivityIndicator } from "react-native";
 import {
   USER_SERVICE,
   GROUP_SERVICE,
@@ -39,6 +39,7 @@ const UserBasicInfoScreen = ({ navigation, route }) => {
           source={{
             uri: UPLOAD_IMAGE_URL + userInfo.avatarUrl,
           }}
+          renderPlaceholderContent={<ActivityIndicator />}
           size="xlarge"
         />
 

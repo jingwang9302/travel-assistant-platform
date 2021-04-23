@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   setGroupsUserIn,
@@ -248,43 +249,36 @@ const CreateNewGroupScreen = ({ navigation }) => {
             />
           </View>
 
-          <View style={{ alignItems: "center", marginTop: 30 }}>
+          <View style={{ alignItems: "center", marginTop: 10 }}>
             {selectedImage.localUri ? (
               <Image
                 source={{ uri: selectedImage.localUri }}
                 style={{ width: 400, height: 200 }}
-                PlaceholderContent={
-                  <Icon
-                    name="add-circle-outline"
-                    type="ionicon"
-                    size={100}
-                    color="grey"
-                  />
-                }
+                PlaceholderContent={<ActivityIndicator />}
                 onPress={openImagePickerAsync}
               />
-            ) : (
-              <Image
-                style={{ width: 400, height: 200 }}
-                PlaceholderContent={
-                  <Icon
-                    name="add-circle-outline"
-                    type="ionicon"
-                    size={100}
-                    color="grey"
-                  />
-                }
-                onPress={openImagePickerAsync}
-              />
-            )}
+            ) : null}
           </View>
           <View style={{ marginTop: 10 }}>
-            <Button
-              buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
-              title="submit"
-              //style={{ marginVertical: 20 }}
-              onPress={createNewGroup}
-            />
+            <View style={{ marginVertical: 10 }}>
+              <Button
+                buttonStyle={{
+                  marginHorizontal: 10,
+                  borderRadius: 10,
+                  backgroundColor: "green",
+                }}
+                title="Pick a photo"
+                onPress={openImagePickerAsync}
+              />
+            </View>
+            <View>
+              <Button
+                buttonStyle={{ marginHorizontal: 10, borderRadius: 10 }}
+                title="submit"
+                //style={{ marginVertical: 20 }}
+                onPress={createNewGroup}
+              />
+            </View>
           </View>
         </KeyboardAvoidingView>
       </ScrollView>

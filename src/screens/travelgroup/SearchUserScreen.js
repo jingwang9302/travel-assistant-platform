@@ -21,6 +21,7 @@ import {
   FlatList,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { createRef, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -95,14 +96,6 @@ const SearchUserScreen = ({ navigation, route }) => {
           foraddrole,
           groupId,
         });
-        //setUserSearched(searchedUser);
-
-        //setAllPeopleInGroup((oldarr) => [...oldarr, basicUserInfo]);
-        // setAll([..all, basicUserInfo]);
-
-        // setAllPeopleInGroup((old) => {
-        //   [...old, basicUserInfo];
-        // });
       })
       .catch(function (error) {
         //setErrorMessage(error.response.data);
@@ -163,6 +156,7 @@ const SearchUserScreen = ({ navigation, route }) => {
               source={{
                 uri: UPLOAD_IMAGE_URL + item.avatarUrl,
               }}
+              renderPlaceholderContent={<ActivityIndicator />}
             />
             <ListItem.Content>
               <ListItem.Title>

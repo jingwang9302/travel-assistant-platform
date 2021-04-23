@@ -2,14 +2,14 @@ import React from "react";
 import {
   View,
   Text,
-  Image,
+  //Image,
   StyleSheet,
   TouchableOpacity,
   TouchableNativeFeedback,
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { Icon, Badge } from "react-native-elements";
+import { Icon, Badge, Image } from "react-native-elements";
 import { PLAN_BASE_URL, GCS_URL } from "../../config/urls";
 
 const PlanItem = (props) => {
@@ -33,6 +33,8 @@ const PlanItem = (props) => {
                   source={{
                     uri: GCS_URL + props.imageUrl,
                   }}
+                  PlaceholderContent={<ActivityIndicator />}
+
                   //source={require("../../screens/travelplan/images/planimage.jpeg")}
                 />
               </View>

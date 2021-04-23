@@ -14,6 +14,7 @@ import {
   Modal,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   setDepartureAndDestination,
@@ -203,17 +204,21 @@ const PlanDetailScreen = ({ navigation, route }) => {
   }
   const isUserInThisPlan = (plan) => {
     if (userProfile.id === plan.initiator) {
-      setNotation("You are the initiator of this plan");
+      //console.log("You are the initiator of this plan");
+      //setNotation("You are the initiator of this plan");
       return;
     }
     if (plan.travelMembers && plan.travelMembers.length !== 0) {
       if (plan.travelMembers.includes(userProfile.id)) {
         setIsUserInPlan(true);
-        setNotation("You have joined this plan");
+        //setNotation("You have joined this plan");
+        //console.log("You have joined this plan");
         return;
       }
     }
-    setNotation("You are not in this plan");
+    setIsUserInPlan(false);
+    //setNotation("You are not in this plan");
+    //console.log("You are not in this plan");
   };
 
   // const fechUserInfo = (userId) => {
@@ -252,22 +257,24 @@ const PlanDetailScreen = ({ navigation, route }) => {
       });
   };
 
-  const loadTravelMembers = (travelMembers) => {
+  const loadTravelMembers = (travelMembers, initiator) => {
     if (travelMembers && travelMembers.length !== 0) {
       console.log("travel members are:");
       console.log(travelMembers);
       //travelMembers.push(selectedPlan)
       travelMembers.forEach((id) => {
-        console.log(`id is ${id}`);
+        //console.log(`id is ${id}`);
         fechUserInfo(id);
       });
     }
+    fechUserInfo(initiator);
   };
 
   const fechSinglePlan = () => {
     setIsRefreshing(true);
     setAllUserInPlan([]);
-    //console.log(`Plan Id is ${planId}`);
+
+    console.log("single plan feched");
     axios
       .get(PLAN_SERVICE + `read/${planId}`)
       .then((res) => {
@@ -278,13 +285,13 @@ const PlanDetailScreen = ({ navigation, route }) => {
             dispatch(removeOngoingPlan());
           }
         }
+
         //selectedPlan.destinationAddress;
         setDestinations(data.destinationAddress);
         setDeparture(data.departureAddress);
         isUserInThisPlan(data);
-        //add intiator to members to display
-        data.travelMembers.push(data.initiator);
-        loadTravelMembers(data.travelMembers);
+
+        loadTravelMembers(data.travelMembers, data.initiator);
 
         setSelectedPlan(data);
         setIsRefreshing(false);
@@ -307,7 +314,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
     })
       .then((res) => {
         const { data } = res.data;
-        setSelectedPlan(data);
+        fechSinglePlan();
         Alert.alert("Successful", "Join the plan successfully");
       })
       .catch((error) => {
@@ -335,7 +342,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
     })
       .then((res) => {
         const { data } = res.data;
-        setSelectedPlan(data);
+        fechSinglePlan();
         Alert.alert("Successful", "Quit the plan successfully");
       })
       .catch((error) => {
@@ -922,6 +929,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
           source={{
             uri: UPLOAD_IMAGE_URL + item.avatarUrl,
           }}
+          renderPlaceholderContent={<ActivityIndicator />}
           size="large"
           onPress={() =>
             navigation.navigate("GroupManage", {
