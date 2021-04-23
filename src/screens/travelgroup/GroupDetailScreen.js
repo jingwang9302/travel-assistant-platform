@@ -87,7 +87,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
   const buttonList = [
     {
       show: true,
-      name: "Add Memmbers",
+      name: "Add Members",
       onPress: () => {
         navigation.navigate("UserSearch", {
           groupId,
