@@ -18,6 +18,7 @@ export const NOTIFICATION_WEBSOCKET_SERVICE = BASE_URL + "/notification-ws/notif
 export const BLOG_SERVICE = BASE_URL + "/user/api/blog";
 export const UPLOAD_IMAGE_URL = BASE_URL + "/user";
 export const GET_FINISHED_TRAVEL_PLANS_BY_USER_ID = PLAN_SERVICE + "read_finished/";
+export const GET_A_SINGLE_PLAN_BY_ID = PLAN_SERVICE + "read/";
 
 /** Group related service */
 export const GROUP_SERVICE = "https://travel-group-service.wn.r.appspot.com/v1/travelgroup/";

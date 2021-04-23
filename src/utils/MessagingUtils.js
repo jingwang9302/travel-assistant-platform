@@ -1,43 +1,61 @@
 // @refresh reset
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+// import { Alert } from 'react-native';
 import firebaseConfig from '../config/messagingConfig';
+import axios from "axios";
 
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import { GET_A_SINGLE_PLAN_BY_ID } from '../config/urls';
+
 
 const SOSTextIdLength = 6;
+const SOSText = "This is an SOS message.";
 
-export const sendSOSToOngoingPlanGroupChat= (currentUserProfile, ongoingPlan) => {
+export const sendSOSToOngoingPlanGroupChat = async (currentUserProfile, ongoingPlan) => {
+    travelGroup = '';
     if (firebase.apps.length === 0){
         firebase.initializeApp(firebaseConfig);
     }
 
     const db = firebase.firestore();
     const messagesRef = db.collection('messages');
-    // const currentUserProfile = useSelector(state => state.user);
-    // const ongoingPlanId = useSelector(state => state.ongoingPlan);
 
     const userId = currentUserProfile.id;
     const userFirstName = currentUserProfile.firstName;
-    //TODO: change SOS text.
-    const SOSText = "This is an SOS.";
 
-    messagesRef.add(
-        {
-            // TODO: for test only.
-            _id: getRandomString(SOSTextIdLength),
-            chatGroup:2,
-            text:SOSText,
-            user:{
-                _id: userId,
-                name: userFirstName,
-            },
-            createdAt: new Date(),
+    axios({
+        method: 'get',
+        url: GET_A_SINGLE_PLAN_BY_ID + ongoingPlan,
+        headers: {
+            'Authorization': 'Bearer '+ currentUserProfile.token
         }
-    ).then(()=>{
-        console.log("SOS sent.");
-    });
+        })
+        .then(function (response) {
+            console.log("Fetched travelGroup is: " + response.data.data.travelGroup);
+            travelGroup = response.data.data.travelGroup;
+
+            messagesRef.add(
+                {
+                    _id: getRandomString(SOSTextIdLength),
+                    chatGroup:travelGroup,
+                    text:SOSText,
+                    user:{
+                        _id: userId,
+                        name: userFirstName,
+                    },
+                    createdAt: new Date(),
+                }
+            ).then(()=>{
+                console.log("SOS sent.");
+            });
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert(error);
+                }
+            );
 }
 
 function getRandomString(length) {
