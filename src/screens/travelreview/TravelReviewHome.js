@@ -8,8 +8,6 @@ import axios from "axios";
 
 const TravelReviewHome = ({navigation}) => {
     const userProfile = useSelector(state => state.user);
-    const userId = userProfile.id;
-
     const [travelRecords, updateTravelRecords] = useState([]);
     // const [travelMembers, updateTravelMembers] = useState([]);
     
@@ -36,7 +34,8 @@ const TravelReviewHome = ({navigation}) => {
             .catch((error) => {
                 // console.log();
                 Alert.alert(error.response.data.error);
-      });
+            }
+        );
     }
 
 
