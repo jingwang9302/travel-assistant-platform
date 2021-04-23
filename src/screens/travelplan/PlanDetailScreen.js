@@ -20,6 +20,7 @@ import {
   setDepartureAndDestination,
   setOngoingPlan,
   removeOngoingPlan,
+  clearDepartureAndDestinationAddress,
 } from "../../redux/actions/travelPlanAction";
 
 import {
@@ -714,12 +715,10 @@ const PlanDetailScreen = ({ navigation, route }) => {
           </View>
         </View>
         <Divider style={{ marginVertical: 10, backgroundColor: "black" }} />
-        {selectedPlan.travelMembers &&
-        selectedPlan.travelMembers.length !== 0 ? (
-          <View style={{ marginVertical: 10, marginHorizontal: 5 }}>
-            <Text style={{ fontSize: 20 }}>Participants:</Text>
-          </View>
-        ) : null}
+
+        <View style={{ marginVertical: 10, marginHorizontal: 5 }}>
+          <Text style={{ fontSize: 20 }}>Participants:</Text>
+        </View>
       </SafeAreaView>
     );
   };
