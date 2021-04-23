@@ -85,7 +85,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const { ongoingPlan } = useSelector((state) => state.plans);
 
   const dispatch = useDispatch();
-  const isFocused = navigation.isFocused();
+  //const isFocused = navigation.isFocused();
 
   useEffect(() => {
     if (userProfile.isLogin) {
@@ -104,7 +104,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
           });
       }
     }
-  }, [ongoingPlan, isFocused, userProfile.isLogin]);
+  }, [userProfile.isLogin]);
 
   React.useLayoutEffect(() => {
     if (userProfile.id === selectedPlan.initiator) {
@@ -518,6 +518,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
         setSelectedPlan(data);
         startPositionSharingAlert();
         dispatch(setOngoingPlan(planId));
+        fechSinglePlan();
       })
       .catch((error) => {
         console.log(error.response.data.error);
@@ -540,6 +541,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   const participantStartPlan = () => {
     dispatch(setOngoingPlan(planId));
+    fechSinglePlan();
     startPositionSharingAlert();
   };
 
