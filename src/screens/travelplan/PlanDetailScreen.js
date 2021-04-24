@@ -103,8 +103,10 @@ const PlanDetailScreen = ({ navigation, route }) => {
             console.log(error);
           });
       }
+    } else {
+      navigation.navigate("PlanListUserIn");
     }
-  }, [userProfile.isLogin]);
+  }, [planId, userProfile.isLogin]);
 
   React.useLayoutEffect(() => {
     if (userProfile.id === selectedPlan.initiator) {
