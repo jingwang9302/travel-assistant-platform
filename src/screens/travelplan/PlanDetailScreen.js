@@ -70,7 +70,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const [destinations, setDestinations] = useState([]);
   const [depature, setDeparture] = useState(null);
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [isUserInPlan, setIsUserInPlan] = useState(false);
@@ -400,11 +400,13 @@ const PlanDetailScreen = ({ navigation, route }) => {
       return;
     }
     const pemission = verifyPermissions();
-    if (pemission)
+    if (pemission) {
       uploadPostion(
         locations[0].coords.longitude,
         locations[0].coords.latitude
       );
+    }
+
     console.log("Received new locations", locations[0].coords.longitude);
   });
 
@@ -427,41 +429,62 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   // uploading user's postion to DB
   const startSharingPosition = async () => {
-    axios({
-      method: "POST",
-      url: PLAN_SERVICE + `ongoing/${userProfile.id}/${planId}`,
-    })
-      .then((res) => {
-        console.log("create ongoing Travelplan success");
-        setPositionSharing(true);
-        //to check if backgroud task is already running
-        Location.hasStartedLocationUpdatesAsync("UpdateLocation")
-          .then((res) => {
-            if (!res) {
-              Location.startLocationUpdatesAsync("UpdateLocation", {
-                accuracy: Location.Accuracy.Low,
-                distanceInterval: 30,
-              });
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+    setButtonLoading(true);
+    const permission = verifyPermissions();
+    let myLocation = null;
+    if (permission) {
+      myLocation = await Location.getCurrentPositionAsync({ accuracy: 6 });
+    }
+
+    if (myLocation) {
+      axios({
+        method: "POST",
+        url: PLAN_SERVICE + `ongoing/${userProfile.id}/${planId}`,
+        data: {
+          firstName: userProfile.firstName,
+          lastName: userProfile.lastName,
+          lat: myLocation.coords.latitude,
+          lng: myLocation.coords.longitude,
+        },
       })
-      .catch((error) => {
-        Alert.alert("Failed", error.response.data.error);
-        console.log(error.response.data.error);
-      });
+        .then((res) => {
+          console.log("create ongoing Travelplan success");
+          setButtonLoading(false);
+          setPositionSharing(true);
+          //to check if backgroud task is already running
+          Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+            .then((res) => {
+              if (!res) {
+                Location.startLocationUpdatesAsync("UpdateLocation", {
+                  accuracy: Location.Accuracy.Low,
+                  distanceInterval: 30,
+                });
+              }
+              alert("Position is being shared");
+            })
+            .catch((error) => {
+              setButtonLoading(false);
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          if (error.response.status === 404) {
+            Alert.alert("Alert", error.response.data.error);
+          }
+          setButtonLoading(false);
+          console.log(error.response.data.error);
+        });
+    }
   };
 
   const stopSharingPosition = () => {
-    setPositionSharing(false);
     Location.hasStartedLocationUpdatesAsync("UpdateLocation")
       .then((res) => {
         if (res) {
           Location.stopLocationUpdatesAsync("UpdateLocation");
-          Alert.alert("Position Sharing is Stopped");
+          alert("Position Sharing is Stopped");
         }
+        setPositionSharing(false);
         deleteOngoingTravelplan();
       })
       .catch((error) => {
@@ -476,20 +499,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
       return false;
     }
     return true;
-  };
-
-  const createOngoingTravelplan = () => {
-    axios({
-      method: "POST",
-      url: PLAN_SERVICE + `ongoing/${userProfile.id}/${planId}`,
-    })
-      .then((res) => {
-        console.log("create ongoing Travelplan success");
-      })
-      .catch((error) => {
-        Alert.alert("Alert", error.response.data.error);
-        console.log(error.response.data.error);
-      });
   };
 
   const deleteOngoingTravelplan = () => {
@@ -628,6 +637,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
             </Text>
             {!positionSharing && ongoingPlan === planId ? (
               <Button
+                loading={buttonLoading}
                 title="Start Sharing Position"
                 onPress={startSharingPosition}
               />
