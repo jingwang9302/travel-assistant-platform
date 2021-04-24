@@ -10,7 +10,7 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
-const MapInput = ({ setRegion, setMarker, currentLocation }) => {
+const MapInput = ({ setRegion, setMarker, currentLocation, setShowCard }) => {
   const [text, setText] = useState("");
   const [getSearchResultApi, searchResult, errorMessage] = useResults(
     currentLocation
@@ -70,6 +70,7 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
               url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`,
             },
           ]);
+          setShowCard(true);
         } else {
           // console.log(details);
           setRegion({
@@ -97,6 +98,7 @@ const MapInput = ({ setRegion, setMarker, currentLocation }) => {
         },
         onSubmitEditing: () => {
           getSearchResultApi(text);
+          setShowCard(true);
         },
       }}
       query={{
