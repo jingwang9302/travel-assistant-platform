@@ -21,8 +21,6 @@ const { height, width } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
-const CARD_HEIGHT = 220;
-const CARD_WIDTH = width * 0.8;
 
 const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
@@ -48,7 +46,6 @@ const SearchScreen = ({ navigation }) => {
   };
 
   const mergeCoods = (desLocation) => {
-    console.log("merge coords");
     if (desLocation) {
       const { desLatitude, desLongitude } = desLocation;
       const hasStartAndEnd =
@@ -60,7 +57,6 @@ const SearchScreen = ({ navigation }) => {
       }
     }
   };
-  // console.log(navigationInfo);
 
   return (
     <View>
@@ -114,58 +110,144 @@ const SearchScreen = ({ navigation }) => {
             </Marker>
           ))}
       </MapView>
-      {curMarker && typeof curMarker.url === "string" && (
+      {showCard && curMarker && typeof curMarker.url === "string" && (
         <View
           style={{
-            backgroundColor: "white",
+            backgroundColor: "#e0e0e0",
             position: "absolute",
-            top: 0.51 * height,
+            bottom: 0,
+            width: width - 10,
             alignSelf: "center",
           }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Result", { result: curMarker });
-            }}
-          >
-            <Image
-              source={{
-                uri: curMarker.url,
-              }}
-              style={{
-                width: width,
-                alignSelf: "center",
-                height: height * 0.15,
-              }}
-            />
-          </TouchableOpacity>
-
+          {/* Image touchable opacity */}
           <View>
-            <Text
-              style={{
-                backgroundColor: "white",
-                fontSize: 18,
-                fontWeight: "bold",
+            <Text style={{ fontSize: 10, fontFamily: "Helvetica" }}>
+              Click the image to see more
+            </Text>
+            <TouchableOpacity
+              style={{ backgroundColor: "grey" }}
+              onPress={() => {
+                navigation.navigate("Result", { result: curMarker });
               }}
             >
-              {`${curMarker.title}`}
-            </Text>
-            <Text style={{ backgroundColor: "white", fontSize: 15 }}>
-              {curMarker.address}
-            </Text>
-            {navigationInfo && (
-              <Text style={{ fontSize: 15 }}>
-                {`Estimate time: ${navigationInfo.time}        Distance: ${navigationInfo.distance}`}
+              <Image
+                source={{
+                  uri: curMarker.url,
+                }}
+                style={{
+                  width: width - 15,
+                  alignSelf: "center",
+                  height: height * 0.15,
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ marginHorizontal: 3 }}>
+            {/* Info Text: title, address, time & distance */}
+            <View>
+              {/* Title */}
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                {`${curMarker.title}`}
               </Text>
-            )}
-            <Button
-              onPress={() => {
-                navigation.navigate("Navigation", { info: curMarker });
+
+              {/* Address text */}
+              <Text style={{ fontSize: 15 }}>{curMarker.address}</Text>
+
+              {/* Estimate time and distance */}
+              {navigationInfo && (
+                <Text style={{ fontSize: 15 }}>
+                  {`Estimate time: ${navigationInfo.time}        Distance: ${navigationInfo.distance}`}
+                </Text>
+              )}
+            </View>
+
+            {/* Three buttons */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
-              icon={<Icon name="arrow-right" size={20} color="white" />}
-              iconRight
-              title="Start Navigation"
-            />
+            >
+              <View
+                style={{
+                  height: 30,
+                  backgroundColor: "#00b2ff",
+                  borderRadius: 5,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "center",
+                    width: Math.ceil((width - 12) / 3),
+                    alignItems: "center",
+                    flex: 1,
+                    justifyContent: "center",
+                  }}
+                >
+                  <View>
+                    <Text style={{ fontSize: 15 }}> Show Route</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  height: 30,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "center",
+                    width: Math.ceil((width - 12) / 3),
+                    paddingHorizontal: 2,
+                    alignItems: "center",
+                    backgroundColor: "#00b2ff",
+                    flex: 1,
+                    justifyContent: "center",
+                    borderRadius: 5,
+                  }}
+                  onPress={() => {
+                    navigation.navigate("Navigation", { info: curMarker });
+                  }}
+                >
+                  <View>
+                    <Text style={{ fontSize: 15 }}>Start Navigation</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  height: 30,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "center",
+                    width: Math.ceil((width - 12) / 3),
+                    paddingHorizontal: 2,
+                    alignItems: "center",
+                    backgroundColor: "#00b2ff",
+                    flex: 1,
+                    justifyContent: "center",
+                    borderRadius: 5,
+                  }}
+                  onPress={() => {
+                    setShowCard(false);
+                  }}
+                >
+                  <View>
+                    <Text style={{ fontSize: 15 }}> Close Card</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       )}
@@ -208,6 +290,7 @@ const styles = StyleSheet.create({
     height: 80,
     opacity: 0.8,
   },
+  buttonContainer: { flex: 1, paddingHorizontal: 2 },
 });
 
 export default SearchScreen;
