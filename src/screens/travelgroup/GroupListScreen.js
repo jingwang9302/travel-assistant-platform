@@ -103,12 +103,6 @@ const GroupListScreen = ({ navigation, route }) => {
                 navigation.navigate("GroupCreate");
               }}
             />
-            <HiddenItem
-              title="Test"
-              onPress={() => {
-                navigation.navigate("Test");
-              }}
-            />
           </OverflowMenu>
           {ongoingPlan ? (
             <Item

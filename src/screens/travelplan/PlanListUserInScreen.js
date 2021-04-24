@@ -1,54 +1,6 @@
 import React, { createRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
-
-import axios from "axios";
-import {
-  getGroupsUserIn,
-  GET_SINGLE_GROUP_BY_ID,
-} from "../../redux/actions/travelgroupAction";
-import {
-  StyleSheet,
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  SafeAreaView,
-  FlatList,
-  StatusBar,
-  Image,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
-
-import { USER_SERVICE } from "../../config/urls";
-import Loader from "../../components/Loader";
-import {
-  Icon,
-  Input,
-  Button,
-  ListItem,
-  Avatar,
-  SearchBar,
-  Card,
-  Badge,
-} from "react-native-elements";
-import {
-  UPDATE_GROUPS,
-  SET_CURRENTGROUP,
-} from "../../redux/actions/travelgroupAction";
-import {
-  setDepartureAndDestination,
-  setOngoingPlan,
-  removeOngoingPlan,
-  clearDepartureAndDestinationAddress,
-  clearPlans,
-} from "../../redux/actions/travelPlanAction";
-
-import LoginAlertScreen from "../user/LoginAlertScreen";
-import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
 import {
   HeaderButtons,
   HeaderButton,
@@ -57,18 +9,29 @@ import {
   OverflowMenu,
 } from "react-navigation-header-buttons";
 
+import axios from "axios";
+
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  StatusBar,
+  Alert,
+} from "react-native";
+
+import { Icon, Badge } from "react-native-elements";
+
+import { clearPlans } from "../../redux/actions/travelPlanAction";
+
+import LoginAlertScreen from "../user/LoginAlertScreen";
+import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
 import { Ionicons } from "@expo/vector-icons";
 
-const TravelPlanListTabScreen = ({ navigation, route }) => {
+const PlanListUserInScreen = ({ navigation, route }) => {
   const [plans, setPlans] = useState([]);
-
-  //for test
-  const [likesValue, setlikesValue] = useState(4);
-  const [dislikesValue, setDislikesValue] = useState(4);
-
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  //const [ongoingPlan, setOngoingPlan] = useState();
 
   const userProfile = useSelector((state) => state.user);
   const { ongoingPlan } = useSelector((state) => state.plans);
@@ -80,10 +43,8 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (userProfile.isLogin) {
-      fechTravelPlanOfInitiator();
+      fechTravelPlanUserIn();
     } else {
-      //dispatch(clearDepartureAndDestinationAddress());
-      //dispatch(removeOngoingPlan());
       dispatch(clearPlans());
     }
   }, [userProfile.isLogin, isFocused]);
@@ -96,10 +57,23 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
             style={{ marginHorizontal: 5 }}
             OverflowIcon={() => <Icon name="menu" size={30} />}
           >
-            <HiddenItem
+            {/* <HiddenItem
               title="Create a Plan"
               onPress={() => {
                 navigation.navigate("PlanCreate");
+              }}
+            /> */}
+            <HiddenItem
+              title="Plans You Created"
+              onPress={() => {
+                navigation.navigate("PlanListUserCreated");
+              }}
+            />
+            <HiddenItem
+              title="Plans You finished"
+              onPress={() => {
+                navigation.navigate("User", { screen: "TravelReviewHome" });
+                //navigation.navigate("TravelReviewHome");
               }}
             />
           </OverflowMenu>
@@ -117,26 +91,24 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
     });
   }, [ongoingPlan]);
 
-  if (!userProfile.isLogin) {
-    return <LoginAlertScreen />;
-  }
-
   const IoniconsHeaderButton = (props) => (
     <HeaderButton IconComponent={Ionicons} iconSize={23} {...props} />
   );
 
-  const fechTravelPlanOfInitiator = () => {
+  if (!userProfile.isLogin) {
+    return <LoginAlertScreen />;
+  }
+
+  // fetch travel plans that user doesn't finish
+  const fechTravelPlanUserIn = () => {
     setPlans([]);
     setLoading(true);
     setIsRefreshing(true);
     setErrorMessage("");
     axios
-      .get(PLAN_SERVICE + `read/plans_createdby/${userProfile.id}`)
+      .get(PLAN_SERVICE + `read_unfinished/${userProfile.id}`)
       .then((res) => {
         const { data } = res.data;
-
-        // console.log("plans fetched");
-        // console.log(data);
         setPlans(data);
         setLoading(false);
         setIsRefreshing(false);
@@ -146,7 +118,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
         setIsRefreshing(false);
         setLoading(false);
         if (error.response.status === 404) {
-          const message = "You don't have any travel plans";
+          const message = "You don't have any unfinished travel plans";
           setErrorMessage(message);
         } else {
           Alert.alert("Alert", `${error.response.data.error}`);
@@ -156,8 +128,6 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
 
   const keyExtractor = (item, index) => index.toString();
   const renderItem = ({ item }) => {
-    // console.log("each plan");
-    // console.log(item);
     return (
       <PlanItem
         loading={loading}
@@ -187,7 +157,7 @@ const TravelPlanListTabScreen = ({ navigation, route }) => {
       {plans && plans.length > 0 ? (
         <FlatList
           onRefresh={() => {
-            fechTravelPlanOfInitiator();
+            fechTravelPlanUserIn();
           }}
           refreshing={isRefreshing}
           data={plans}
@@ -234,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TravelPlanListTabScreen;
+export default PlanListUserInScreen;

@@ -10,19 +10,26 @@ import MapScreen from "../screens/travelplan/MapScreen";
 import EditPlanScreen from "../screens/travelplan/EditPlanScreen";
 import GroupListForPlanPublishScreen from "../screens/travelgroup/GroupListForPlanPublishScreen";
 import TestScreen from "../screens/travelplan/test";
-import TravelPlanListTabScreen from "../screens/travelplan/PlanListTabScreen";
+import PlanListUserCreatedScreen from "../screens/travelplan/PlanListUserCreatedScreen";
+import PlanListUserInScreen from "../screens/travelplan/PlanListUserInScreen";
 import GroupManageScreen from "../screens/travelgroup/GroupManageScreen";
 import NavigationScreen from "../screens/maps/NavigationScreen";
 
 const TravelplanStack = () => {
   const Stack = createStackNavigator();
   return (
-    <Stack.Navigator initialRouteName="PlanListTab">
+    <Stack.Navigator initialRouteName="PlanListUserIn">
       <Stack.Screen
-        name="PlanListTab"
-        component={TravelPlanListTabScreen}
-        options={{ title: "Your Plans" }}
+        name="PlanListUserCreated"
+        component={PlanListUserCreatedScreen}
+        options={{ title: "Plans Created" }}
       />
+      <Stack.Screen
+        name="PlanListUserIn"
+        component={PlanListUserInScreen}
+        options={{ title: "Plans unFinished" }}
+      />
+
       <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
       <Stack.Screen
         name="PlanPublish"

@@ -74,9 +74,38 @@ const PlanItem = (props) => {
                   )}
                 </View>
 
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                  {props.status}
-                </Text>
+                {props.status && props.status === "Ongoing" ? (
+                  <Badge
+                    status="warning"
+                    textStyle={{
+                      color: "white",
+                      fontSize: 14,
+                    }}
+                    value={props.status}
+                  />
+                ) : null}
+
+                {props.status && props.status === "Ended" ? (
+                  <Badge
+                    status="success"
+                    textStyle={{
+                      color: "white",
+                      fontSize: 14,
+                    }}
+                    value={props.status}
+                  />
+                ) : null}
+                {props.status === "Published" || props.status === "Created" ? (
+                  <Badge
+                    status="primary"
+                    textStyle={{
+                      color: "white",
+                      fontSize: 14,
+                    }}
+                    value={props.status}
+                  />
+                ) : null}
+
                 <View>
                   <Icon name="thumbs-down-outline" type="ionicon" />
                   {props.dislikes === 0 ? null : (
