@@ -95,6 +95,7 @@ const SearchScreen = ({ navigation }) => {
                 };
                 mergeCoods(desLocation);
                 setCurMarker(item);
+                setShowCard(true);
               }}
             >
               <Callout
