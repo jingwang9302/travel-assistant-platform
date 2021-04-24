@@ -28,6 +28,7 @@ const SearchScreen = ({ navigation }) => {
   const [curMarker, setCurMarker] = useState(null);
   const { navigationInfo, getDirections } = useDirection();
   const { ongoingPlan } = useSelector((state) => state.plans);
+  const [showCard, setShowCard] = useState(true);
   // const ongoingPlan = "123";
   const { currentLocation, loading, error } = useCurrentLocation();
   if (!currentLocation) {
@@ -257,13 +258,14 @@ const SearchScreen = ({ navigation }) => {
           setRegion={setRegion}
           setMarker={setMarker}
           currentLocation={currentLocation}
+          setShowCard={setShowCard}
         />
       </View>
       {ongoingPlan && (
         <SOSButton style={{ position: "absolute", top: 0.05 * height }} />
       )}
 
-      {curMarker && (
+      {curMarker && ongoingPlan && (
         <UsersLocationButton
           style={{ position: "absolute", top: 0.05 * height }}
           marker={curMarker}
