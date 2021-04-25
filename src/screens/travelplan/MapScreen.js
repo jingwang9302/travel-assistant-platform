@@ -1,24 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-  Alert,
-  Dimensions,
-} from "react-native";
+import { View, Text, StyleSheet, Alert, Dimensions } from "react-native";
 
 import { Button } from "react-native-elements";
 import MapView, { Marker, Callout } from "react-native-maps";
-import {
-  HeaderButtons,
-  HeaderButton,
-  Item,
-  HiddenItem,
-  OverflowMenu,
-} from "react-navigation-header-buttons";
-import MapInput from "../../components/MapInput";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+
 import axios from "axios";
 import { config } from "../../../config";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
@@ -32,10 +18,6 @@ const MapScreen = ({ navigation, route }) => {
   const { height, width } = Dimensions.get("window");
 
   const mapRef = useRef(null);
-  const mapDetailRef = useRef(null);
-
-  // console.log("initiallocation is:");
-  // console.log(initialLocation);
 
   const mapRegion = {
     latitude: initialLocation ? initialLocation.lat : 37.2329,
@@ -43,9 +25,6 @@ const MapScreen = ({ navigation, route }) => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
-
-  // console.log("mapRegi0n is:");
-  // console.log(mapRegion);
 
   React.useLayoutEffect(() => {
     if (!readOnly) {
@@ -81,8 +60,6 @@ const MapScreen = ({ navigation, route }) => {
         const { lat } = result.geometry.location;
         const { lng } = result.geometry.location;
         const place = { placeId, address, lat, lng };
-        // console.log("place is: ");
-        // console.log(`${place.address}`);
 
         navigation.navigate("PlacePick", {
           placeInfo: place,
@@ -130,15 +107,7 @@ const MapScreen = ({ navigation, route }) => {
       return;
     }
 
-    // console.log("picked location");
-    // console.log(event.nativeEvent.coordinate.latitude);
-    // console.log(event.nativeEvent.coordinate.longitude);
-
     if (placeDetail) {
-      // console.log("atuo location");
-      // console.log(placeDetail.geometry.location.lat);
-      // console.log(placeDetail.geometry.location.lng);
-
       if (
         event.nativeEvent.coordinate.latitude ===
           placeDetail.geometry.location.lat &&
@@ -149,8 +118,6 @@ const MapScreen = ({ navigation, route }) => {
       }
     }
     setPlaceDetail(null);
-    // console.log("setplace detail is clicked");
-    // console.log(placeDetail);
 
     setSelectedLocation({
       lat: event.nativeEvent.coordinate.latitude,
