@@ -10,7 +10,13 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = ASPECT_RATIO * LATITUDE_DELTA;
 
-const MapInput = ({ setRegion, setMarker, currentLocation, setShowCard }) => {
+const MapInput = ({
+  setRegion,
+  setMarker,
+  currentLocation,
+  setShowCard,
+  setNavigationInfo,
+}) => {
   const [text, setText] = useState("");
   const [getSearchResultApi, searchResult, errorMessage] = useResults(
     currentLocation
@@ -70,24 +76,6 @@ const MapInput = ({ setRegion, setMarker, currentLocation, setShowCard }) => {
               url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.PLACES_API_KEY}`,
             },
           ]);
-          setShowCard(true);
-        } else {
-          // console.log(details);
-          setRegion({
-            latitude: details.geometry.location.lat,
-            longitude: details.geometry.location.lng,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          });
-          setMarker([
-            {
-              place_id: details.place_id,
-              latitude: details.geometry.location.lat,
-              longitude: details.geometry.location.lng,
-              title: details.description,
-              address: `Address: (${details.geometry.location.lat}, ${details.geometry.location.lng})`,
-            },
-          ]);
         }
       }}
       textInputProps={{
@@ -98,7 +86,16 @@ const MapInput = ({ setRegion, setMarker, currentLocation, setShowCard }) => {
         },
         onSubmitEditing: () => {
           getSearchResultApi(text);
-          setShowCard(true);
+          setRegion({
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          });
+          setNavigationInfo(null);
+        },
+        onChange: () => {
+          setShowCard(false);
         },
       }}
       query={{
