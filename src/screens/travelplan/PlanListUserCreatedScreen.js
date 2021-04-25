@@ -19,13 +19,7 @@ import { clearPlans } from "../../redux/actions/travelPlanAction";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
-import {
-  HeaderButtons,
-  HeaderButton,
-  Item,
-  HiddenItem,
-  OverflowMenu,
-} from "react-navigation-header-buttons";
+import { HeaderButtons, HeaderButton } from "react-navigation-header-buttons";
 
 import { Ionicons } from "@expo/vector-icons";
 
@@ -53,10 +47,19 @@ const PlanListUserCreatedScreen = ({ navigation, route }) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+        <HeaderButtons
+          HeaderButtonComponent={IoniconsHeaderButton}
+          children={Badge}
+        >
           {ongoingPlan ? (
-            <Item
-              iconName="airplane-outline"
+            <Badge
+              status="warning"
+              containerStyle={{ marginTop: 5, marginRight: 10 }}
+              textStyle={{
+                color: "white",
+                fontSize: 14,
+              }}
+              value="Ongoing"
               onPress={() => {
                 navigation.navigate("PlanDetail", { planId: ongoingPlan });
               }}
