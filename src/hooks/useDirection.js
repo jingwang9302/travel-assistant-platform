@@ -26,11 +26,10 @@ export default () => {
       });
       setNavigationInfo({ coords, distance, time });
       // console.log(navigationInfo);
-      //   console.log(coords);
     } catch (error) {
       console.log("Error: ", error);
     }
   };
 
-  return { navigationInfo, getDirections };
+  return { navigationInfo, setNavigationInfo, getDirections };
 };

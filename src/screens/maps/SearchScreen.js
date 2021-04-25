@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
-import { Card, ListItem, Button, Icon } from "react-native-elements";
 import MapInput from "../../components/MapInput";
 import ResultList from "./ResultsList";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
@@ -26,7 +25,7 @@ const SearchScreen = ({ navigation }) => {
   let [region, setRegion] = useState(null);
   const [marker, setMarker] = useState([]);
   const [curMarker, setCurMarker] = useState(null);
-  const { navigationInfo, getDirections } = useDirection();
+  const { navigationInfo, setNavigationInfo, getDirections } = useDirection();
   const { ongoingPlan } = useSelector((state) => state.plans);
   const [showCard, setShowCard] = useState(true);
   // const ongoingPlan = "123";
@@ -91,6 +90,13 @@ const SearchScreen = ({ navigation }) => {
               onPress={() => {
                 setCurMarker(item);
                 setShowCard(true);
+                const reg = {
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                  latitudeDelta: LATITUDE_DELTA,
+                  longitudeDelta: LONGITUDE_DELTA,
+                };
+                setRegion(reg);
                 setNavigationInfo(null);
               }}
             >
@@ -268,6 +274,7 @@ const SearchScreen = ({ navigation }) => {
           setMarker={setMarker}
           currentLocation={currentLocation}
           setShowCard={setShowCard}
+          setNavigationInfo={setNavigationInfo}
         />
       </View>
       {ongoingPlan && (
