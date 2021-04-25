@@ -18,16 +18,10 @@ import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
 
 const TravelPlanListScreen = ({ navigation, route }) => {
   const [plans, setPlans] = useState([]);
-
-  //for test
-  const [likesValue, setlikesValue] = useState(4);
-  const [dislikesValue, setDislikesValue] = useState(4);
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
   const userProfile = useSelector((state) => state.user);
-
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const { groupId } = route.params;
   const isFocused = navigation.isFocused();
