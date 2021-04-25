@@ -1,15 +1,6 @@
-import React, {
-  useState,
-  useCallback,
-  createRef,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, useCallback, useRef } from "react";
 import axios from "axios";
-
-import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   ScrollView,
   View,
@@ -18,19 +9,14 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { Button, Input, Icon } from "react-native-elements";
+import { Input, Icon } from "react-native-elements";
 import { config } from "../../../config";
 import {
   HeaderButtons,
-  HeaderButton,
-  Item,
   HiddenItem,
   OverflowMenu,
 } from "react-navigation-header-buttons";
 
-//import Colors from "../constants/Colors";
-//import * as placesActions from "../store/places-actions";
-//import ImagePicker from "../components/ImagePicker";
 import LocationPicker from "../../components/travelgroup_and_travelplan/LocationPicker";
 
 import {
@@ -41,41 +27,16 @@ import {
 const PlacePickScreen = ({ navigation, route }) => {
   const [placeTitle, setPlaceTitle] = useState("");
   const [placeTitleInputError, setPlaceTitleInputError] = useState("");
-  //   const [selectedImage, setSelectedImage] = useState();
-  const [selectedLocation, setSelectedLocation] = useState({
-    lat: 37.785834,
-    lng: -122.406417,
-  });
-  const [selectedPlace, setSelectedPlace] = useState({
-    placeId: "",
-    title: "Place",
-    lat: 37.785834,
-    lng: -122.406417,
-    address: "",
-  });
-  const userProfile = useSelector((state) => state.user);
-
   //get this from mapscreen
   let { pickedLocationFromMap, placeInfo } = route.params;
   const dispatch = useDispatch();
   const placeTitleInputRef = useRef();
 
-  let placeTitle_S = "";
-  let errorMessage_S = "";
-
-  //   useEffect(() => {
-  //     if (pickedLocationFromMap) {
-  //       console.log("location from map");
-  //       console.log(pickedLocationFromMap.lng);
-  // setSelectedLocation(pickedLocationFromMap);
-  //     }
-  //   }, [pickedLocationFromMap]);
   if (!pickedLocationFromMap) {
     pickedLocationFromMap = { lat: 37.785834, lng: -122.406417 };
   }
 
   React.useLayoutEffect(() => {
-    console.log(`layout ${placeTitle}`);
     navigation.setOptions({
       headerRight: () => (
         <HeaderButtons>
@@ -101,16 +62,16 @@ const PlacePickScreen = ({ navigation, route }) => {
     });
   }, [placeInfo, placeTitle, pickedLocationFromMap]);
 
-  const locationPickedHandler = useCallback((location) => {
-    setSelectedLocation(location);
-  }, []);
-
   const savePlace = (type) => {
     // console.log(`save clicked placeTitel is ${placeTitle}`);
     if (!placeTitle) {
       setPlaceTitleInputError("Please Input Place Title");
       return;
     }
+    // if (!route.params?.placeInfo) {
+    //   Alert.alert("Alert", "Please Pick a Place");
+    //   return;
+    // }
 
     if (!placeInfo) {
       Alert.alert("Alert", "Please Pick a Place");
@@ -127,41 +88,10 @@ const PlacePickScreen = ({ navigation, route }) => {
     setPlaceTitle("");
     navigation.goBack();
   };
-  const clearInputCallback = useCallback(() => {
-    setPlaceTitle("");
-    setPlaceTitleInputError("");
-    console.log(`after close: placetitle is ${placeTitle}`);
-    console.log(`after close input error is ${placeTitleInputError}`);
-  }, [placeTitle]);
 
   const clearTitleInput = () => {
     setPlaceTitle("");
     setPlaceTitleInputError("");
-    console.log(`after close: placetitle is ${placeTitle}`);
-    console.log(`after close input error is ${placeTitleInputError}`);
-  };
-
-  const fetchLoaction = () => {
-    axios
-      .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=48.8152937,2.4597668&key=${config.PLACES_API_KEY}`
-      )
-      .then((res) => {
-        console.log(res.data);
-        const result = res.data.results[0];
-        const address = result.formatted_address;
-        const placeId = result.place_id;
-        const { lat } = result.geometry.location;
-        const { lng } = result.geometry.location;
-        console.log(
-          `address: ${address}; place_id: ${placeId}; lat: ${lat}; lng: ${lng}`
-        );
-        setSelectedPlace({ placeId, title: placeTitle, lat, lng, address });
-      })
-      .catch((error) => {
-        console.log(error.response.data.error_message);
-        Alert.alert("Failed!", "feching google place has problem");
-      });
   };
 
   return (
