@@ -10,9 +10,6 @@ import axios from "axios";
 
 import {
   StyleSheet,
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -30,8 +27,6 @@ import {
   OverflowMenu,
 } from "react-navigation-header-buttons";
 import { Ionicons } from "@expo/vector-icons";
-
-import { USER_SERVICE } from "../../config/urls";
 import Loader from "../../components/Loader";
 import {
   Icon,
@@ -40,27 +35,19 @@ import {
   ListItem,
   Avatar,
   SearchBar,
-  Header,
+  Badge,
 } from "react-native-elements";
 import {
   setGroupsUserIn,
-  setCurrentGroup,
-  clearCurrGroup,
   clearTravelgroup,
-  UPDATE_GROUP,
-  SET_CURRENTGROUP,
 } from "../../redux/actions/travelgroupAction";
 
 import {
-  setDepartureAndDestination,
   setOngoingPlan,
-  removeOngoingPlan,
-  clearDepartureAndDestinationAddress,
   clearPlans,
 } from "../../redux/actions/travelPlanAction";
-import { GROUP_DATA } from "./Data";
+
 import LoginAlertScreen from "../user/LoginAlertScreen";
-import { set } from "react-native-reanimated";
 
 const GroupListScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
@@ -73,15 +60,17 @@ const GroupListScreen = ({ navigation, route }) => {
   const [groupsSearched, setGroupsSearched] = useState([]);
   const dispatch = useDispatch();
 
-  const [buttonDisplay, setButtonDisplay] = useState([]);
-
   // any hooks must be put on the top of any condition function or element
   useEffect(() => {
     if (userProfile.isLogin) {
+      if (!ongoingPlan) {
+        fectchOngoingPlan();
+      }
+
       setErrorMessage("");
       setLoading(true);
       fetchGroups();
-      fectchOngoingPlan();
+
       setLoading(false);
     } else {
       dispatch(clearTravelgroup());
@@ -92,7 +81,10 @@ const GroupListScreen = ({ navigation, route }) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+        <HeaderButtons
+          HeaderButtonComponent={IoniconsHeaderButton}
+          children={(Badge, Button)}
+        >
           <OverflowMenu
             style={{ marginHorizontal: 10 }}
             OverflowIcon={() => <Icon name="menu" size={30} />}
@@ -105,8 +97,14 @@ const GroupListScreen = ({ navigation, route }) => {
             />
           </OverflowMenu>
           {ongoingPlan ? (
-            <Item
-              iconName="airplane-outline"
+            <Badge
+              status="warning"
+              containerStyle={{ marginTop: 7 }}
+              textStyle={{
+                color: "white",
+                fontSize: 14,
+              }}
+              value="Ongoing"
               onPress={() => {
                 navigation.navigate("PlanDetail", { planId: ongoingPlan });
               }}
@@ -116,10 +114,6 @@ const GroupListScreen = ({ navigation, route }) => {
       ),
     });
   }, [ongoingPlan]);
-
-  // if (groups && groups.length !== 0) {
-  //   setErrorMessage("");
-  // }
 
   const IoniconsHeaderButton = (props) => (
     <HeaderButton IconComponent={Ionicons} iconSize={23} {...props} />
