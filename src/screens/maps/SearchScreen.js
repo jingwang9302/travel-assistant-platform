@@ -91,6 +91,7 @@ const SearchScreen = ({ navigation }) => {
               onPress={() => {
                 setCurMarker(item);
                 setShowCard(true);
+                setNavigationInfo(null);
               }}
             >
               <Callout
