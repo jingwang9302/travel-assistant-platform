@@ -89,11 +89,6 @@ const SearchScreen = ({ navigation }) => {
               title={item.title}
               key={item.place_id}
               onPress={() => {
-                const desLocation = {
-                  desLatitude: item.latitude,
-                  desLongitude: item.longitude,
-                };
-                mergeCoods(desLocation);
                 setCurMarker(item);
                 setShowCard(true);
               }}
@@ -178,6 +173,7 @@ const SearchScreen = ({ navigation }) => {
                 justifyContent: "space-between",
               }}
             >
+              {/* Button 1: Show Route Button */}
               <View
                 style={{
                   height: 30,
@@ -193,12 +189,21 @@ const SearchScreen = ({ navigation }) => {
                     flex: 1,
                     justifyContent: "center",
                   }}
+                  onPress={() => {
+                    const desLocation = {
+                      desLatitude: curMarker.latitude,
+                      desLongitude: curMarker.longitude,
+                    };
+                    mergeCoods(desLocation);
+                  }}
                 >
                   <View>
                     <Text style={{ fontSize: 15 }}> Show Route</Text>
                   </View>
                 </TouchableOpacity>
               </View>
+
+              {/* Button 2: Start navigation Button */}
               <View
                 style={{
                   height: 30,
@@ -224,6 +229,8 @@ const SearchScreen = ({ navigation }) => {
                   </View>
                 </TouchableOpacity>
               </View>
+
+              {/* Button 3: Close Card Button */}
               <View
                 style={{
                   height: 30,
@@ -245,7 +252,7 @@ const SearchScreen = ({ navigation }) => {
                   }}
                 >
                   <View>
-                    <Text style={{ fontSize: 15 }}> Close Card</Text>
+                    <Text style={{ fontSize: 15 }}>Close Card</Text>
                   </View>
                 </TouchableOpacity>
               </View>
