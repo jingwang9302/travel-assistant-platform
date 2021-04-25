@@ -6,38 +6,28 @@ import axios from "axios";
 import {
   ActivityIndicator,
   StyleSheet,
-  Keyboard,
   KeyboardAvoidingView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
   Alert,
-  Platform,
 } from "react-native";
 
-import { USER_SERVICE, GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
+import { PLAN_SERVICE } from "../../config/urls";
 
 import Loader from "../../components/Loader";
 import {
   Icon,
   Input,
   Image,
-  header,
   Button,
   Divider,
   ListItem,
   Avatar,
 } from "react-native-elements";
-import {
-  HeaderButtons,
-  HeaderButton,
-  Item,
-  HiddenItem,
-  OverflowMenu,
-} from "react-navigation-header-buttons";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
-import LoginAlertScreen from "../user/LoginAlertScreen";
 import {
   clearDepartureAndDestinationAddress,
   removeDeparturPlace,
@@ -46,14 +36,11 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateNewPlanScreen = ({ navigation }) => {
-  const [errorMessage, setErrorMessage] = useState("");
   const [planName, setPlanName] = useState("");
   const [planDescription, setPlanDescription] = useState("");
   const [estimatedStartTime, setEstimatedStartTime] = useState("");
-  const [destinations, setDestinations] = useState([]);
-  const [departure, setDeparture] = useState("");
+
   const [selectedImage, setSelectedImage] = useState({ localUri: "" });
-  const [planCreated, setPlanCreated] = useState(null);
   const [loading, setLoading] = useState(false);
   const [
     planDescriptionInputErrorMessage,
@@ -110,7 +97,6 @@ const CreateNewPlanScreen = ({ navigation }) => {
     setSelectedImage({ localUri: pickerResult.uri });
   };
   const createNewPlan = () => {
-    setErrorMessage("");
     setPlanNameInputError("");
     setPlanDescriptionInputError("");
     if (!planName) {
@@ -153,22 +139,18 @@ const CreateNewPlanScreen = ({ navigation }) => {
     })
       .then((res) => {
         const { data } = res.data;
-        setPlanCreated(data);
-        //console.log(data);
+        // Once new travel plan created successfully, cleare departure and desitination state in redux
+        dispatch(clearDepartureAndDestinationAddress());
         if (selectedImage.localUri) {
           upLoadImage(selectedImage.localUri, data._id);
+        } else {
+          setLoading(false);
+          navigation.navigate("PlanListUserCreated", { planCreated: true });
         }
-        setLoading(false);
-        //clear departure and destination addresses in redux
-        dispatch(clearDepartureAndDestinationAddress());
-        navigation.navigate("PlanListTab", { planCreated: true });
       })
       .catch((error) => {
-        //setErrorMessage(error.response.data.error);
-
         setLoading(false);
-        //clear departure and destination addresses
-        dispatch(clearDepartureAndDestinationAddress());
+
         Alert.alert("Creation Failed!", error.response.data.error);
         console.log(error.response.data.error);
       });
@@ -198,16 +180,15 @@ const CreateNewPlanScreen = ({ navigation }) => {
       },
     })
       .then((res) => {
-        const { data } = res.data;
-        console.log(`image name is ${data}`);
-        setSelectedImage({
-          localUri: `http://localhost:5001/uploads/${data}`,
-        });
+        setLoading(false);
+        navigation.navigate("PlanListUserCreated", { planCreated: true });
       })
       .catch((error) => {
-        // setErrorMessage(error.response.data.error);
-        Alert.alert("Creation Failed!", error.response.data.error);
+        setLoading(false);
+
+        Alert.alert("Image uploading failed", error.response.data.error);
         console.log(error.response.data.error);
+        navigation.navigate("PlanListUserCreated", { planCreated: true });
       });
   };
 
@@ -261,7 +242,6 @@ const CreateNewPlanScreen = ({ navigation }) => {
                   onPress={() => {
                     setPlanNameInputError("");
                     setPlanName("");
-                    setErrorMessage("");
                   }}
                 />
               }
@@ -294,7 +274,6 @@ const CreateNewPlanScreen = ({ navigation }) => {
                   onPress={() => {
                     setPlanDescriptionInputError("");
                     setPlanDescription("");
-                    setErrorMessage("");
                   }}
                 />
               }
@@ -326,7 +305,6 @@ const CreateNewPlanScreen = ({ navigation }) => {
                   onPress={() => {
                     setTimeInputError("");
                     //setDate()
-                    setErrorMessage("");
                   }}
                 />
               }
