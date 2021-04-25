@@ -15,13 +15,7 @@ import {
   Alert,
 } from "react-native";
 
-import {
-  USER_SERVICE,
-  GROUP_SERVICE,
-  PLAN_SERVICE,
-  PLAN_BASE_URL,
-  GCS_URL,
-} from "../../config/urls";
+import { PLAN_SERVICE, GCS_URL } from "../../config/urls";
 
 import Loader from "../../components/Loader";
 import {
@@ -34,15 +28,8 @@ import {
   ListItem,
   Avatar,
 } from "react-native-elements";
-import {
-  HeaderButtons,
-  HeaderButton,
-  Item,
-  HiddenItem,
-  OverflowMenu,
-} from "react-navigation-header-buttons";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
-import LoginAlertScreen from "../user/LoginAlertScreen";
 import {
   removeDestinationPlace,
   removeDeparturPlace,
@@ -51,18 +38,10 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const EditPlanScreen = ({ navigation, route }) => {
-  const { plan } = route.params;
-  const [errorMessage, setErrorMessage] = useState("");
   const [planName, setPlanName] = useState("");
   const [planDescription, setPlanDescription] = useState("");
   const [estimatedStartTime, setEstimatedStartTime] = useState("");
-
-  // const [destinationAddress, setDestinationAddress] = useState([]);
-  //const [departureAddress, setDepartureAddress] = useState("");
-  const [selectedImage, setSelectedImage] = useState({
-    localUri: `${GCS_URL}${plan.image}`,
-  });
-  const [planUpdated, setPlanUpdated] = useState(null);
+  const [selectedImage, setSelectedImage] = useState({});
   const [loading, setLoading] = useState(false);
   const [
     planDescriptionInputErrorMessage,
@@ -78,18 +57,28 @@ const EditPlanScreen = ({ navigation, route }) => {
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
+  const {
+    oldPlanId,
+    oldPlanName,
+    oldPlanDescription,
+    oldImage,
+    oldStartDate,
+  } = route.params;
 
   const userProfile = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-  const oldUrl = `${GCS_URL}${plan.image}`;
 
   useEffect(() => {
-    setPlanName(plan.planName);
-    //console.log(`planName is: ${planName}`);
-    setPlanDescription(plan.planDescription);
-    setEstimatedStartTime(plan.startDate);
+    setPlanName(oldPlanName);
+    setPlanDescription(oldPlanDescription);
+    setEstimatedStartTime(oldStartDate);
+    setSelectedImage({
+      localUri: `${GCS_URL}${oldImage}`,
+    });
   }, []);
+  let oldImageUrl = `${GCS_URL}${oldImage}`;
+  //console.log(`oldplanId: ${oldPlanId}`);
 
   const onChange = (event, selectedDate) => {
     //const date = new Date();
@@ -122,14 +111,6 @@ const EditPlanScreen = ({ navigation, route }) => {
               updatePlan();
             }}
           />
-          <Item
-            style={{ marginRight: 15, justifyContent: "center" }}
-            title="test"
-            onPress={() => {
-              console.log(`test planname is: ${planName}`);
-              console.log(`test descripiton is: ${planDescription}`);
-            }}
-          />
         </HeaderButtons>
       ),
     });
@@ -159,11 +140,9 @@ const EditPlanScreen = ({ navigation, route }) => {
   };
 
   const updatePlan = () => {
-    setErrorMessage("");
     setPlanNameInputError("");
     setPlanDescriptionInputError("");
     setStartTimeInputError("");
-    //setIsRefreshing(true);
 
     if (!planName) {
       setPlanNameInputError("Please enter the planName");
@@ -190,15 +169,12 @@ const EditPlanScreen = ({ navigation, route }) => {
       Alert.alert("Warning", "Please Pick Destination Places");
       return;
     }
-    // if (!departureAddress) {
-    //   departureAddress = {};
-    // }
 
     setLoading(true);
 
     axios({
       method: "PUT",
-      url: PLAN_SERVICE + `update/${userProfile.id}/${plan._id}`,
+      url: PLAN_SERVICE + `update/${userProfile.id}/${oldPlanId}`,
       data: {
         planName,
         planDescription,
@@ -209,35 +185,26 @@ const EditPlanScreen = ({ navigation, route }) => {
     })
       .then((res) => {
         const { data } = res.data;
-        setPlanUpdated(data);
-        console.log("Updated plan:");
-        console.log(data);
-        console.log(selectedImage.localUri);
+        console.log("new plan:");
+        //clear departure and destination addresses
+        dispatch(clearDepartureAndDestinationAddress());
         if (
           selectedImage.localUri &&
-          selectedImage.localUri !== oldUrl &&
+          selectedImage.localUri !== oldImageUrl &&
           selectedImage.localUri !== ""
         ) {
           console.log("selelected image url:");
           console.log(selectedImage.localUri);
-          upLoadImage(selectedImage.localUri, data._id);
+          upLoadImage(selectedImage.localUri, oldPlanId);
+        } else {
+          setLoading(false);
+          navigation.navigate("PlanDetail", {
+            planId: oldPlanId,
+          });
         }
-
-        setLoading(false);
-        //clear departure and destination addresses
-
-        dispatch(clearDepartureAndDestinationAddress());
-        navigation.navigate("PlanDetail", {
-          planId: plan._id,
-        });
       })
       .catch((error) => {
-        //setErrorMessage(error.response.data.error);
-
         setLoading(false);
-        //clear departure and destination addresses
-        dispatch(clearDepartureAndDestinationAddress());
-
         Alert.alert("Updating Failed!", error.response.data.error);
         console.log(error.response.data.error);
       });
@@ -267,15 +234,14 @@ const EditPlanScreen = ({ navigation, route }) => {
       },
     })
       .then((res) => {
-        const { data } = res.data;
-        console.log(`image name is ${data}`);
-        // setSelectedImage({
-        //   localUri: `http://localhost:5001/uploads/${data}`,
-        // });
+        setLoading(false);
+        navigation.navigate("PlanDetail", {
+          planId: oldPlanId,
+        });
       })
       .catch((error) => {
-        // setErrorMessage(error.response.data.error);
-        Alert.alert("Updating Failed!", error.response.data.error);
+        setLoading(false);
+        Alert.alert("Updating Image Failed!", error.response.data.error);
         console.log(error.response.data.error);
       });
   };
@@ -308,10 +274,8 @@ const EditPlanScreen = ({ navigation, route }) => {
                   name="close"
                   size={20}
                   onPress={() => {
-                    //planNameRef.current.clear();
                     setPlanNameInputError("");
                     setPlanName("");
-                    setErrorMessage("");
                   }}
                 />
               }
@@ -345,7 +309,6 @@ const EditPlanScreen = ({ navigation, route }) => {
                     //planDescriptionRef.current.clear();
                     setPlanDescriptionInputError("");
                     setPlanDescription("");
-                    setErrorMessage("");
                   }}
                 />
               }
@@ -376,10 +339,8 @@ const EditPlanScreen = ({ navigation, route }) => {
                   name="close"
                   size={20}
                   onPress={() => {
-                    //planDescriptionRef.current.clear();
                     setStartTimeInputError("");
                     setEstimatedStartTime("");
-                    setErrorMessage("");
                   }}
                 />
               }
