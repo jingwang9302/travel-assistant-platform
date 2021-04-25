@@ -4,7 +4,6 @@ import { GROUP_SERVICE, PLAN_SERVICE } from "../../config/urls";
 import {
   HeaderButtons,
   HeaderButton,
-  Item,
   HiddenItem,
   OverflowMenu,
 } from "react-navigation-header-buttons";
@@ -18,11 +17,14 @@ import {
   FlatList,
   StatusBar,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 
 import { Icon, Badge } from "react-native-elements";
-
-import { clearPlans } from "../../redux/actions/travelPlanAction";
+import {
+  setOngoingPlan,
+  clearPlans,
+} from "../../redux/actions/travelPlanAction";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import PlanItem from "../../components/travelgroup_and_travelplan/PlanItem";
@@ -34,15 +36,18 @@ const PlanListUserInScreen = ({ navigation, route }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const userProfile = useSelector((state) => state.user);
-  const { ongoingPlan } = useSelector((state) => state.plans);
-  const [errorMessage, setErrorMessage] = useState("");
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const { ongoingPlan } = useSelector((state) => state.plans);
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const isFocused = navigation.isFocused();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (userProfile.isLogin) {
+      if (!ongoingPlan) {
+        fectchOngoingPlan();
+      }
       fechTravelPlanUserIn();
     } else {
       dispatch(clearPlans());
@@ -52,17 +57,14 @@ const PlanListUserInScreen = ({ navigation, route }) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+        <HeaderButtons
+          HeaderButtonComponent={IoniconsHeaderButton}
+          children={Badge}
+        >
           <OverflowMenu
             style={{ marginHorizontal: 5 }}
             OverflowIcon={() => <Icon name="menu" size={30} />}
           >
-            {/* <HiddenItem
-              title="Create a Plan"
-              onPress={() => {
-                navigation.navigate("PlanCreate");
-              }}
-            /> */}
             <HiddenItem
               title="Plans You Created"
               onPress={() => {
@@ -79,8 +81,14 @@ const PlanListUserInScreen = ({ navigation, route }) => {
           </OverflowMenu>
 
           {ongoingPlan ? (
-            <Item
-              iconName="airplane-outline"
+            <Badge
+              status="warning"
+              containerStyle={{ marginTop: 7 }}
+              textStyle={{
+                color: "white",
+                fontSize: 14,
+              }}
+              value="Ongoing"
               onPress={() => {
                 navigation.navigate("PlanDetail", { planId: ongoingPlan });
               }}
@@ -126,6 +134,20 @@ const PlanListUserInScreen = ({ navigation, route }) => {
       });
   };
 
+  const fectchOngoingPlan = () => {
+    axios({
+      method: "GET",
+      url: PLAN_SERVICE + `read_ongoing/${userProfile.id}`,
+    })
+      .then((res) => {
+        const { data } = res.data;
+        dispatch(setOngoingPlan(data._id));
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
+      });
+  };
+
   const keyExtractor = (item, index) => index.toString();
   const renderItem = ({ item }) => {
     return (
@@ -165,6 +187,13 @@ const PlanListUserInScreen = ({ navigation, route }) => {
           renderItem={renderItem}
         />
       ) : null}
+      <TouchableOpacity
+        style={styles.touchableOpacityStyleFloating}
+        onPress={() => navigation.navigate("PlanCreate")}
+        activeOpacity={0.7}
+      >
+        <Icon name="add-box" type="material" size={50} color="skyblue" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -201,6 +230,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
 
     marginVertical: 10,
+  },
+  touchableOpacityStyleFloating: {
+    position: "absolute",
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 30,
+    bottom: 20,
   },
 });
 
