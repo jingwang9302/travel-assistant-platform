@@ -41,6 +41,7 @@ import {
   SearchBar,
   Divider,
 } from "react-native-elements";
+import { useIsFocused } from "@react-navigation/native";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 //import { ScrollView } from "react-native-gesture-handler";
@@ -69,14 +70,12 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const [allUserInPlan, setAllUserInPlan] = useState([]);
   const [destinations, setDestinations] = useState([]);
   const [depature, setDeparture] = useState(null);
-  const [comments, setComments] = useState([]);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [isUserInPlan, setIsUserInPlan] = useState(false);
   const [positionSharing, setPositionSharing] = useState(false);
   const [notation, setNotation] = useState("");
-  const [intervalObj, setIntervalObj] = useState(null);
 
   const planStatus = ["Created", "Published", "Ongoing", "Ended"];
   const userProfile = useSelector((state) => state.user);
@@ -85,11 +84,11 @@ const PlanDetailScreen = ({ navigation, route }) => {
   const { ongoingPlan } = useSelector((state) => state.plans);
 
   const dispatch = useDispatch();
-  //const isFocused = navigation.isFocused();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (userProfile.isLogin) {
-      if (planId) {
+      if (planId && isFocused) {
         fechSinglePlan();
         Location.hasStartedLocationUpdatesAsync("UpdateLocation")
           .then((res) => {
@@ -106,7 +105,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
     } else {
       navigation.navigate("PlanListUserIn");
     }
-  }, [planId, userProfile.isLogin]);
+  }, [planId, userProfile.isLogin, isFocused]);
 
   React.useLayoutEffect(() => {
     if (userProfile.id === selectedPlan.initiator) {
@@ -118,9 +117,13 @@ const PlanDetailScreen = ({ navigation, route }) => {
                 style={{ marginRight: 15, justifyContent: "center" }}
                 title="Edit"
                 onPress={() => {
-                  dispatch(setDepartureAndDestination(selectedPlan));
+                  dispatch(setDepartureAndDestination({ ...selectedPlan }));
                   navigation.navigate("PlanEdit", {
-                    plan: selectedPlan,
+                    oldPlanId: selectedPlan._id,
+                    oldPlanName: selectedPlan.planName,
+                    oldPlanDescription: selectedPlan.planDescription,
+                    oldStartDate: selectedPlan.startDate,
+                    oldImage: selectedPlan.image,
                   });
                 }}
               />
@@ -214,22 +217,12 @@ const PlanDetailScreen = ({ navigation, route }) => {
     if (plan.travelMembers && plan.travelMembers.length !== 0) {
       if (plan.travelMembers.includes(userProfile.id)) {
         setIsUserInPlan(true);
-        //setNotation("You have joined this plan");
-        //console.log("You have joined this plan");
+
         return;
       }
     }
     setIsUserInPlan(false);
-    //setNotation("You are not in this plan");
-    //console.log("You are not in this plan");
   };
-
-  // const fechUserInfo = (userId) => {
-  //   const user = USER_DATA.filter((item) => item.id === userId)[0];
-  //   console.log("feched user is");
-  //   console.log(user);
-  //   setAllUserInPlan((old) => [...old, user]);
-  // };
 
   const fechUserInfo = (userId) => {
     axios({
@@ -242,17 +235,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
       .then(function (response) {
         //need to check API
         const basicUserInfo = { ...response.data };
-        // console.log("basic user info:");
-        // console.log(basicUserInfo);
-        // allInGroup.push(basicUserInfo);
-        //console.log("allin Gorup:");
-        //console.log(allInGroup);
-        setAllUserInPlan((oldarr) => [...oldarr, basicUserInfo]);
-        // setAll([..all, basicUserInfo]);
 
-        // setAllPeopleInGroup((old) => {
-        //   [...old, basicUserInfo];
-        // });
+        setAllUserInPlan((oldarr) => [...oldarr, basicUserInfo]);
       })
       .catch(function (error) {
         setErrorMessage(error.response.data);
@@ -404,8 +388,8 @@ const PlanDetailScreen = ({ navigation, route }) => {
     const pemission = verifyPermissions();
     if (pemission) {
       uploadPostion(
-        locations[0].coords.longitude,
-        locations[0].coords.latitude
+        locations[0].coords.latitude,
+        locations[0].coords.longitude
       );
     }
 
@@ -818,15 +802,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
                         },
                       },
                     });
-
-                    // navigation.navigate("Navigation", {
-                    //   info: {
-                    //     address: selectedPlan.departureAddress.address,
-                    //     longitude: selectedPlan.departureAddress.lng,
-                    //     latitude: selectedPlan.departureAddress.lat,
-                    //   },
-                    // });
-                    //Alert.alert("Alert", "Go to navigation screen");
                   }}
                 />
               </View>
@@ -903,15 +878,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
                               },
                             },
                           });
-
-                          // navigation.navigate("Navigation", {
-                          //   info: {
-                          //     address: item.address,
-                          //     longitude: item.lng,
-                          //     latitude: item.lat,
-                          //   },
-                          // });
-                          //Alert.alert("Alert", "Go to navigation screen");
                         }}
                       />
                     </View>
@@ -973,17 +939,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
           ListFooterComponent={listFooter}
         />
       ) : null}
-      {/* <View style={styles.touchableOpacityStyleFloating}>
-        {!positionSharing && ongoingPlan === planId ? (
-          <Button
-            title="Start Sharing Position"
-            onPress={startSharingPosition}
-          />
-        ) : null}
-        {positionSharing && ongoingPlan === planId ? (
-          <Button title="Stop Sharing Position" onPress={stopSharingPosition} />
-        ) : null}
-      </View> */}
     </View>
   );
 };
