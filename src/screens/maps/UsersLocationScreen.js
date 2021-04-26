@@ -10,7 +10,8 @@ import {
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import { useSelector } from "react-redux";
 import { Button, Icon } from "react-native-elements";
-import { PLAN_SERVICE } from "../../config/urls";
+import axios from "axios";
+import { PLAN_SERVICE, USER_SERVICE } from "../../config/urls";
 import SOSButton from "../../components/map/SOSButton";
 
 const { height, width } = Dimensions.get("window");
@@ -30,8 +31,8 @@ const UsersLocationScreen = ({ route, navigation }) => {
   //     planId: "6069327483e40856e49c5925",
   //     userId: 1,
   //     __v: 0,
-  //     lat: 37.2329,
-  //     lng: -122.406417,
+  //     lat: 37.3688,
+  //     lng: -122.0363,
   //   },
   //   {
   //     _id: "6077e99aeb8947000a300cd0",
@@ -46,11 +47,12 @@ const UsersLocationScreen = ({ route, navigation }) => {
   //     planId: "6069327483e40856e49c5925",
   //     userId: 3,
   //     __v: 0,
-  //     lat: 37.7749,
-  //     lng: -122.4194,
+  //     lat: 37.323,
+  //     lng: -122.0322,
   //   },
   // ];
   const [usersList, setUsersList] = useState(null);
+  const [author, setAuthor] = useState(null);
 
   const initRegion = {
     latitude: latitude,
@@ -62,6 +64,28 @@ const UsersLocationScreen = ({ route, navigation }) => {
   const { ongoingPlan } = useSelector((state) => state.plans);
   // const ongoingPlan = "123";
 
+  const userProfile = useSelector((state) => state.user);
+  const getAuthor = (authorId) => {
+    axios({
+      method: "get",
+      url: USER_SERVICE + "/profile/basic/" + authorId,
+      headers: {
+        Authorization: "Bearer " + userProfile.token,
+      },
+    })
+      .then(function (response) {
+        setAuthor(response.data);
+        console.log(author);
+      })
+      .catch(function (error) {
+        if (error.response.data.message === null) {
+          console.log(error.message);
+        } else {
+          console.log(error.response.data.message);
+        }
+      });
+  };
+
   // Fetch users' location from PlanService
   const fetchUsersLocation = async () => {
     try {
@@ -72,9 +96,11 @@ const UsersLocationScreen = ({ route, navigation }) => {
       const usersCoords = usersInfo.map((user) => {
         const res = {
           userId: user.userId,
+          userName: getAuthor(user.userId),
           latitude: user.lat,
           longitude: user.lng,
         };
+        console.log(res);
         return res;
       });
       setUsersList(usersCoords);
@@ -118,7 +144,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
         showsMyLocationButton={true}
         initialRegion={initRegion}
         followsUserLocation={true}
-        // minZoomLevel={10}
+        minZoomLevel={2}
         region={initRegion}
       >
         <Marker
@@ -142,6 +168,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
             <Marker
               coordinate={user}
               key={user.userId}
+              title={author.firstName + author.lastName}
               image={{
                 uri:
                   "https://icons.iconarchive.com/icons/icons-land/vista-map-markers/128/Map-Marker-Ball-Azure-icon.png",
