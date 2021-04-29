@@ -103,6 +103,15 @@ const PlanDetailScreen = ({ navigation, route }) => {
           });
       }
     } else {
+      Location.hasStartedLocationUpdatesAsync("UpdateLocation")
+        .then((res) => {
+          if (res) {
+            Location.stopLocationUpdatesAsync("UpdateLocation");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       navigation.navigate("PlanListUserIn");
     }
   }, [planId, userProfile.isLogin, isFocused]);
