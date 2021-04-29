@@ -27,8 +27,12 @@ const UserBasicInfoScreen = ({ navigation, route }) => {
         navigation.goBack();
       })
       .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert(error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
   return (
