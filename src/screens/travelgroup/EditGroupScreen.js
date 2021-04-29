@@ -1,6 +1,6 @@
 import React, { createRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getGroupsUserIn } from "../../redux/actions/travelgroupAction";
+
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -14,25 +14,13 @@ import {
   Alert,
 } from "react-native";
 
-import {
-  USER_SERVICE,
-  GROUP_SERVICE,
-  GROUP_BASE_URL,
-  GCS_URL,
-} from "../../config/urls";
+import { GROUP_SERVICE, GCS_URL } from "../../config/urls";
 import Loader from "../../components/Loader";
 import { Icon, Input, Image, Button } from "react-native-elements";
-import { set } from "react-native-reanimated";
+
 import LoginAlertScreen from "../user/LoginAlertScreen";
-import { Item } from "react-navigation-header-buttons";
-import {
-  setGroupsUserIn,
-  setCurrentGroup,
-  clearCurrGroup,
-  clearTravelgroup,
-  UPDATE_GROUP,
-  SET_CURRENTGROUP,
-} from "../../redux/actions/travelgroupAction";
+
+import { setGroupsUserIn } from "../../redux/actions/travelgroupAction";
 
 const EditGroupScreen = ({ navigation, route }) => {
   const { groupName, groupDescription, groupImage, _id } = route.params;
@@ -106,8 +94,12 @@ const EditGroupScreen = ({ navigation, route }) => {
       .catch(function (error) {
         setLoading(false);
         // setErrorMessage(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
-        console.log(error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -122,8 +114,12 @@ const EditGroupScreen = ({ navigation, route }) => {
         navigation.goBack();
       })
       .catch(function (error) {
-        console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   }
 
@@ -157,8 +153,12 @@ const EditGroupScreen = ({ navigation, route }) => {
       .catch((error) => {
         //setErrorMessage(error.response.data.error);
         // Alert.alert(`${errorMessage}`);
-        console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
