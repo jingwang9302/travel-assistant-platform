@@ -142,12 +142,12 @@ const GroupListScreen = ({ navigation, route }) => {
       })
       .catch(function (error) {
         console.log(error.response);
-        if (error.response.status === 404) {
+        if (error.response && error.response.status === 404) {
           const message =
             "You are not in any travel groups! Please create a new group or search existing groups";
           setErrorMessage(message);
         } else {
-          Alert.alert("Alert", error.response.data.error);
+          console.log(error);
         }
         setIsRefreshing(false);
       });
@@ -162,8 +162,12 @@ const GroupListScreen = ({ navigation, route }) => {
         setGroupsSearched(data);
       })
       .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response && error.response.status === 404) {
+          //console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -177,7 +181,11 @@ const GroupListScreen = ({ navigation, route }) => {
         dispatch(setOngoingPlan(data._id));
       })
       .catch((error) => {
-        console.log(error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+        } else {
+          console.log(error);
+        }
       });
   };
 
