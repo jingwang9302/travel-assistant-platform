@@ -89,27 +89,14 @@ const UsersLocationScreen = ({ route, navigation }) => {
 
   let timer = null;
 
-  const endTimer = () => {
-    timer && clearInterval(timer);
-  };
-
   // fetch users location and render on map every 10 seconds
   useEffect(() => {
-    navigation.addListener("focus", () => {
-      if (ongoingPlan) {
-        timer = setInterval(() => {
-          fetchUsersLocation();
-        }, 10000);
-      }
-    });
-    timer && clearInterval(timer);
-  }, []);
-
-  //clear timer when unfocus
-  useEffect(() => {
-    navigation.addListener("blur", () => {
-      endTimer();
-    });
+    if (ongoingPlan && !timer) {
+      timer = setInterval(() => {
+        fetchUsersLocation();
+      }, 10000);
+    }
+    return timer && clearInterval(timer);
   }, []);
 
   return (
