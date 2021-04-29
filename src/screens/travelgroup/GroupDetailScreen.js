@@ -33,21 +33,8 @@ import {
   SearchBar,
   Divider,
 } from "react-native-elements";
-import {
-  HeaderButtons,
-  HeaderButton,
-  Item,
-  HiddenItem,
-  OverflowMenu,
-} from "react-navigation-header-buttons";
-import {
-  setGroupsUserIn,
-  setCurrentGroup,
-  clearCurrGroup,
-  clearTravelgroup,
-  UPDATE_GROUP,
-  SET_CURRENTGROUP,
-} from "../../redux/actions/travelgroupAction";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import { setGroupsUserIn } from "../../redux/actions/travelgroupAction";
 
 import LoginAlertScreen from "../user/LoginAlertScreen";
 import Loader from "../../components/Loader";
@@ -193,12 +180,12 @@ const GroupDetailScreen = ({ navigation, route }) => {
         navigation.goBack();
       })
       .catch(function (error) {
-        console.log(error.response.data.error);
-        if (error.response.status === 404) {
+        if (error.response && error.response.status === 404) {
+          console.log(error.response);
           dispatch(setGroupsUserIn([]));
           navigation.goBack();
         } else {
-          Alert.alert("Alert", error.response.data.error);
+          console.log(error);
         }
       });
   };
@@ -215,8 +202,12 @@ const GroupDetailScreen = ({ navigation, route }) => {
         //navigation.navigate("GroupList");
       })
       .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -230,8 +221,12 @@ const GroupDetailScreen = ({ navigation, route }) => {
         //navigation.navigate("GroupList");
       })
       .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert("Failed", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -259,8 +254,12 @@ const GroupDetailScreen = ({ navigation, route }) => {
         // });
       })
       .catch(function (error) {
-        setErrorMessage(error.response.data);
-        console.log(error.response.data);
+        if (error.response) {
+          console.log(error.response);
+          setErrorMessage(error.response.data);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -275,7 +274,12 @@ const GroupDetailScreen = ({ navigation, route }) => {
         fetchGroups();
       })
       .catch((error) => {
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert("Alert", error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -296,10 +300,14 @@ const GroupDetailScreen = ({ navigation, route }) => {
         setIsRefreshing(false);
       })
       .catch(function (error) {
-        setErrorMessage(error.response.data.error);
-        // console.log(errorMessage);
         setLoading(false);
         setIsRefreshing(false);
+        if (error.response) {
+          setErrorMessage(error.response.data.error);
+        } else {
+          console.log(error);
+        }
+        // console.log(errorMessage);
       });
   };
 
