@@ -14,14 +14,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import {
-  setGroupsUserIn,
-  setCurrentGroup,
-  clearCurrGroup,
-  clearTravelgroup,
-  UPDATE_GROUP,
-  SET_CURRENTGROUP,
-} from "../../redux/actions/travelgroupAction";
+import { setGroupsUserIn } from "../../redux/actions/travelgroupAction";
 
 import { USER_SERVICE, GROUP_SERVICE, GROUP_BASE_URL } from "../../config/urls";
 import Loader from "../../components/Loader";
@@ -99,8 +92,12 @@ const CreateNewGroupScreen = ({ navigation }) => {
       .catch(function (error) {
         setLoading(false);
         //setErrorMessage(error.response.data.error);
-        console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -115,8 +112,12 @@ const CreateNewGroupScreen = ({ navigation }) => {
         navigation.goBack();
       })
       .catch(function (error) {
-        console.log(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   }
 
@@ -149,8 +150,12 @@ const CreateNewGroupScreen = ({ navigation }) => {
       })
       .catch((error) => {
         //setErrorMessage(error.response.data.error);
-        Alert.alert("Alert", error.response.data.error);
-        console.log(error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
