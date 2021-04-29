@@ -11,47 +11,14 @@ import axios from "axios";
 
 import {
   StyleSheet,
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
   TouchableOpacity,
   View,
-  SafeAreaView,
   FlatList,
   StatusBar,
 } from "react-native";
-import {
-  HeaderButtons,
-  HeaderButton,
-  Item,
-  HiddenItem,
-  OverflowMenu,
-} from "react-navigation-header-buttons";
-import { Ionicons } from "@expo/vector-icons";
 
-import { USER_SERVICE } from "../../config/urls";
-import Loader from "../../components/Loader";
-import {
-  Icon,
-  Input,
-  Button,
-  ListItem,
-  Avatar,
-  SearchBar,
-  Header,
-} from "react-native-elements";
-import {
-  setGroupsUserIn,
-  setCurrentGroup,
-  clearCurrGroup,
-  clearTravelgroup,
-  UPDATE_GROUP,
-  SET_CURRENTGROUP,
-} from "../../redux/actions/travelgroupAction";
+import { ListItem, Avatar } from "react-native-elements";
 
-import LoginAlertScreen from "../user/LoginAlertScreen";
-import { set } from "react-native-reanimated";
 import { Alert } from "react-native";
 
 const GroupListForPlanPublishScreen = ({ navigation, route }) => {
@@ -74,8 +41,12 @@ const GroupListForPlanPublishScreen = ({ navigation, route }) => {
         navigation.goBack();
       })
       .catch((error) => {
-        Alert.alert("Alert", error.response.data.error);
-        console.log(error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
