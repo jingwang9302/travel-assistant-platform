@@ -61,26 +61,28 @@ const SearchUserScreen = ({ navigation, route }) => {
         setFriends(response.data);
       })
       .catch(function (error) {
-        console.log(error.response);
+        if (error.response && error.response.status === 404) {
+          Alert.alert(error.response.data.message);
+        } else {
+          console.log(error.response);
+        }
       });
   };
 
-  const fetchUserInfo = (userEmail) => {
-    if (!userEmail) {
+  const fetchUserInfo = () => {
+    if (!search) {
       return;
     }
     axios({
       method: "get",
-      url: USER_SERVICE + `/profile/${userEmail}`,
+      url: USER_SERVICE + `/profile/${search}`,
       headers: {
         Authorization: "Bearer " + userProfile.token,
       },
     })
       .then(function (response) {
-        //need to check API
         const searchedUser = response.data;
-        // console.log("searched user info:");
-        // console.log(searchedUser);
+
         navigation.navigate("UserBasicInfo", {
           userInfo: searchedUser,
           foraddrole,
@@ -88,9 +90,11 @@ const SearchUserScreen = ({ navigation, route }) => {
         });
       })
       .catch(function (error) {
-        //setErrorMessage(error.response.data);
-        Alert.alert(error.response);
-        console.log(error);
+        if (error.response && error.response.status === 404) {
+          Alert.alert(error.response.data.message);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -102,12 +106,15 @@ const SearchUserScreen = ({ navigation, route }) => {
         `update/${foraddrole}/${userProfile.id}/${groupId}/${idToAdd}`,
     })
       .then((res) => {
-        //Alert.alert("Successful");
         navigation.goBack();
       })
       .catch((error) => {
-        console.log(error.response.data.error);
-        Alert.alert(error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -177,14 +184,13 @@ const SearchUserScreen = ({ navigation, route }) => {
 
             onPress: () => {
               if (search) {
-                //console.log(`search is: ${search}`);
-                fetchUserInfo(search);
-                //setSearch("");
+                fetchUserInfo();
               }
             },
           }}
         />
       </View>
+
       <View>
         <FlatList
           data={friends}
