@@ -27,15 +27,24 @@ const TravelplanStack = () => {
       <Stack.Screen
         name="PlanListUserIn"
         component={PlanListUserInScreen}
-        options={{ title: "Plans unFinished" }}
+        options={{ title: "Plans Unfinished" }}
       />
 
-      <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
+      <Stack.Screen
+        name="PlanDetail"
+        component={PlanDetailScreen}
+        options={{ title: "Plan Detail" }}
+      />
       <Stack.Screen
         name="PlanPublish"
         component={GroupListForPlanPublishScreen}
+        options={{ title: "Publish Plan" }}
       />
-      <Stack.Screen name="PlanEdit" component={EditPlanScreen} />
+      <Stack.Screen
+        name="PlanEdit"
+        component={EditPlanScreen}
+        options={{ title: "Edit Plan" }}
+      />
       <Stack.Screen
         name="PlanCreate"
         component={CreateNewPlanScreen}
@@ -51,8 +60,12 @@ const TravelplanStack = () => {
         component={MapScreen}
         options={{ title: "Map" }}
       />
-      <Stack.Screen name="Test" component={TestScreen} />
-      <Stack.Screen name="GroupManage" component={GroupManageScreen} />
+
+      <Stack.Screen
+        name="GroupManage"
+        component={GroupManageScreen}
+        options={{ title: "Manage Group" }}
+      />
     </Stack.Navigator>
   );
 };
