@@ -312,9 +312,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   //not available for initiator
   const quitPlan = () => {
-    if (ongoingPlan && ongoingPlan === planId) {
-      dispatch(removeOngoingPlan());
-    }
     if (positionSharing) {
       //if user is in ongoing plan, stop sharing position first
       stopSharingPosition();
@@ -329,6 +326,9 @@ const PlanDetailScreen = ({ navigation, route }) => {
     })
       .then((res) => {
         const { data } = res.data;
+        if (ongoingPlan && ongoingPlan === planId) {
+          dispatch(removeOngoingPlan());
+        }
         fechSinglePlan();
         Alert.alert("Successful", "Quit the plan successfully");
       })
@@ -340,9 +340,6 @@ const PlanDetailScreen = ({ navigation, route }) => {
 
   //only available for initiator
   const endPlan = () => {
-    if (ongoingPlan && ongoingPlan === planId) {
-      dispatch(removeOngoingPlan());
-    }
     if (positionSharing) {
       stopSharingPosition();
     }
@@ -353,6 +350,9 @@ const PlanDetailScreen = ({ navigation, route }) => {
       data: { status: 3, endDate: date.toLocaleString() },
     })
       .then((res) => {
+        if (ongoingPlan && ongoingPlan === planId) {
+          dispatch(removeOngoingPlan());
+        }
         console.log("End Plan Successfully");
         fechSinglePlan();
       })
