@@ -144,7 +144,7 @@ const PlanListUserInScreen = ({ navigation, route }) => {
         dispatch(setOngoingPlan(data._id));
       })
       .catch((error) => {
-        console.log(error.response.data.error);
+        console.log(error.response);
       });
   };
 
@@ -176,17 +176,16 @@ const PlanListUserInScreen = ({ navigation, route }) => {
           <Text style={{ fontSize: 25 }}>{errorMessage}</Text>
         ) : null}
       </View>
-      {plans && plans.length > 0 ? (
-        <FlatList
-          onRefresh={() => {
-            fechTravelPlanUserIn();
-          }}
-          refreshing={isRefreshing}
-          data={plans}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-        />
-      ) : null}
+      <FlatList
+        onRefresh={() => {
+          fechTravelPlanUserIn();
+        }}
+        refreshing={isRefreshing}
+        data={plans}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+      />
+
       <TouchableOpacity
         style={styles.touchableOpacityStyleFloating}
         onPress={() => navigation.navigate("PlanCreate")}
