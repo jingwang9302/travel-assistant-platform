@@ -33,7 +33,11 @@ const TravelgroupStack = () => {
         component={GroupDetailScreen}
         options={{ title: "Group Info" }}
       />
-      <Stack.Screen name="UserSearch" component={SearchUserScreen} />
+      <Stack.Screen
+        name="UserSearch"
+        component={SearchUserScreen}
+        options={{ title: "Search User" }}
+      />
 
       <Stack.Screen
         name="GroupEdit"
@@ -45,13 +49,21 @@ const TravelgroupStack = () => {
         component={CreateNewGroupScreen}
         options={{ title: "New Group" }}
       />
-      <Stack.Screen name="GroupManage" component={GroupManageScreen} />
+      <Stack.Screen
+        name="GroupManage"
+        component={GroupManageScreen}
+        options={{ title: "Manage Group" }}
+      />
       <Stack.Screen
         name="PlanList"
         component={PlanListScreen}
         options={{ title: "Group Travels" }}
       />
-      <Stack.Screen name="UserBasicInfo" component={UserBasicInfoScreen} />
+      <Stack.Screen
+        name="UserBasicInfo"
+        component={UserBasicInfoScreen}
+        options={{ title: "User Basic Info" }}
+      />
     </Stack.Navigator>
   );
 };
