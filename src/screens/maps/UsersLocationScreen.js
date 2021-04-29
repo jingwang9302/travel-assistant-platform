@@ -146,7 +146,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
             <Marker
               coordinate={user}
               key={user.userId}
-              title={userFirstName + userLastName}
+              title={user.userFirstName + user.userLastName}
               image={{
                 uri:
                   "https://icons.iconarchive.com/icons/icons-land/vista-map-markers/128/Map-Marker-Ball-Azure-icon.png",
