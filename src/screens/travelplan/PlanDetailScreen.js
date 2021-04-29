@@ -527,7 +527,7 @@ const PlanDetailScreen = ({ navigation, route }) => {
       url: PLAN_SERVICE + `delete/${userProfile.id}/${planId}`,
     })
       .then((res) => {
-        navigation.navigate("PlanListTab", { planDelete: true });
+        navigation.navigate("PlanListUserCreated", { planDelete: true });
       })
       .catch((error) => {
         Alert.alert("Failed", error.response.data.error);
