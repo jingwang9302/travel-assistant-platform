@@ -52,7 +52,6 @@ const UsersLocationScreen = ({ route, navigation }) => {
   //   },
   // ];
   const [usersList, setUsersList] = useState(null);
-  const [author, setAuthor] = useState(null);
 
   const initRegion = {
     latitude: latitude,
@@ -64,28 +63,6 @@ const UsersLocationScreen = ({ route, navigation }) => {
   const { ongoingPlan } = useSelector((state) => state.plans);
   // const ongoingPlan = "123";
 
-  const userProfile = useSelector((state) => state.user);
-  const getAuthor = (authorId) => {
-    axios({
-      method: "get",
-      url: USER_SERVICE + "/profile/basic/" + authorId,
-      headers: {
-        Authorization: "Bearer " + userProfile.token,
-      },
-    })
-      .then(function (response) {
-        setAuthor(response.data);
-        console.log(author);
-      })
-      .catch(function (error) {
-        if (error.response.data.message === null) {
-          console.log(error.message);
-        } else {
-          console.log(error.response.data.message);
-        }
-      });
-  };
-
   // Fetch users' location from PlanService
   const fetchUsersLocation = async () => {
     try {
@@ -96,7 +73,8 @@ const UsersLocationScreen = ({ route, navigation }) => {
       const usersCoords = usersInfo.map((user) => {
         const res = {
           userId: user.userId,
-          userName: getAuthor(user.userId),
+          userFirstName: user.firstName,
+          userLastName: user.lastName,
           latitude: user.lat,
           longitude: user.lng,
         };
@@ -168,7 +146,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
             <Marker
               coordinate={user}
               key={user.userId}
-              title={author.firstName + author.lastName}
+              title={userFirstName + userLastName}
               image={{
                 uri:
                   "https://icons.iconarchive.com/icons/icons-land/vista-map-markers/128/Map-Marker-Ball-Azure-icon.png",
