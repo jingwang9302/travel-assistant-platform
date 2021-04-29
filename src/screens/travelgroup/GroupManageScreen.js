@@ -83,7 +83,12 @@ const GroupManageScreen = ({ navigation, route }) => {
         navigation.goBack();
       })
       .catch((error) => {
-        Alert.alert("Failed", error.response.data.error);
+        if (error.response) {
+          console.log(error.response);
+          Alert.alert(error.response.data.error);
+        } else {
+          console.log(error);
+        }
       });
   };
 
