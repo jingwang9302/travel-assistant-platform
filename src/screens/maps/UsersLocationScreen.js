@@ -5,13 +5,10 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import { useSelector } from "react-redux";
-import { Button, Icon } from "react-native-elements";
-import axios from "axios";
-import { PLAN_SERVICE, USER_SERVICE } from "../../config/urls";
+import { PLAN_SERVICE } from "../../config/urls";
 import SOSButton from "../../components/map/SOSButton";
 
 const { height, width } = Dimensions.get("window");
@@ -30,6 +27,8 @@ const UsersLocationScreen = ({ route, navigation }) => {
   //     _id: "6077e99aeb8947000a300cd9",
   //     planId: "6069327483e40856e49c5925",
   //     userId: 1,
+  //     firstName: "tracey",
+  //     lastName: "Wang",
   //     __v: 0,
   //     lat: 37.3688,
   //     lng: -122.0363,
@@ -38,6 +37,8 @@ const UsersLocationScreen = ({ route, navigation }) => {
   //     _id: "6077e99aeb8947000a300cd0",
   //     planId: "6069327483e40856e49c5925",
   //     userId: 2,
+  //     firstName: "Jason",
+  //     lastName: "Wang",
   //     __v: 0,
   //     lat: 37.3359902,
   //     lng: -122.0153873,
@@ -46,6 +47,8 @@ const UsersLocationScreen = ({ route, navigation }) => {
   //     _id: "6077e99aeb8947000a300cd1",
   //     planId: "6069327483e40856e49c5925",
   //     userId: 3,
+  //     firstName: "karl",
+  //     lastName: "zhang",
   //     __v: 0,
   //     lat: 37.323,
   //     lng: -122.0322,
@@ -89,15 +92,27 @@ const UsersLocationScreen = ({ route, navigation }) => {
 
   let timer = null;
 
+  const endTimer = () => {
+    timer && clearInterval(timer);
+  };
+
   // fetch users location and render on map every 10 seconds
   useEffect(() => {
-    if (ongoingPlan && !timer) {
-      timer = setInterval(() => {
-        fetchUsersLocation();
-      }, 10000);
-    }
-    return timer && clearInterval(timer);
+    navigation.addListener("focus", () => {
+      if (ongoingPlan) {
+        timer = setInterval(() => {
+          fetchUsersLocation();
+        }, 10000);
+      }
+    });
+    timer && clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    navigation.addListener("blur", () => {
+      endTimer();
+    });
+  });
 
   return (
     <View style={{ flex: 1, flexDirection: "column" }}>
@@ -133,7 +148,7 @@ const UsersLocationScreen = ({ route, navigation }) => {
             <Marker
               coordinate={user}
               key={user.userId}
-              title={user.userFirstName + user.userLastName}
+              title={user.userFirstName + " " + user.userLastName}
               image={{
                 uri:
                   "https://icons.iconarchive.com/icons/icons-land/vista-map-markers/128/Map-Marker-Ball-Azure-icon.png",
